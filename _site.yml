@@ -17,14 +17,14 @@ output:
 bibliography: crossref.bib
 csl: chicago-author-date.csl
 navbar:
-  title: research-compendium-website
+  title: PLB DSS Analysis
   left:
   - text: About
     icon: fa fa-home
     href: index.html
-  - text: Data
+  - text: Model Evaluation
     icon: fa fa-table
-    href: data.html
+    href: Analysis1.html
   - text: Codes
     icon: fa fa-file-code-o
     href: code.html
