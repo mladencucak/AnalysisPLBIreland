@@ -6,5 +6,4 @@ Website example: https://emdelponte.github.io/research-compendium-website/
 
 # Authors of this repository
 
-Mladen Cucak
-Adam Sparks
+Emerson Del Ponte (delponte@ufv.br)
