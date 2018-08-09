@@ -226,8 +226,7 @@ IrishRulesModel <-function(data, param = NULL){
 ###Model Run
 The model is run for each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
 ```{r}
-#data frame split by year and dynamicly added columns as result of model run with different parameters
-#save the output of function as name of curent run in new column
+
 
 for(i in 1:nrow(par) ){
   loop_var <- apply(par[i,],1, function(x) {
@@ -236,7 +235,7 @@ for(i in 1:nrow(par) ){
   })
   OP[,ncol(OP)+1] <-  as.numeric(loop_var)
   rm(loop_var)
-  names(OP)[ncol(OP)] <- paste0(par[i,1])
+  names(OP)[ncol(OP)] <- paste0(par[i,1]) #asign the name
 }
 
 nn <- paste0(names(OP[,26:73]), "_ebh","")
@@ -245,6 +244,21 @@ setnames(OP, old = c(names(OP[,26:73])), new = nn)
 rm(i,nn)
 # Sample of outputs
 head(OP[, c(1,7,9,15,24:30)],5)
+```
+
+
+##
+
+```{r}
+#Get subsets of data  for period before the epidemics were initiated
+dates_cut <-  read_csv("./data/plantingdates.csv", col_types = cols(disease_observed_sus = col_date(format = "%d/%m/%Y"),
+                                                          last_assessment = col_date(format = "%d/%m/%Y"),
+                                                          disease_observed_res = col_date(format = "%d/%m/%Y"),
+                                                          disease_observed_setanta = col_date(format = "%d/%m/%Y")))
+dates_cut$planting_date <- as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
+dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
+dates_cut
+
 ```
 
 ## Description of variables
