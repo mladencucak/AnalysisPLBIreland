@@ -15,7 +15,6 @@ list.of.packages <-
     "ggplot2",
     "knitr",
     "zoo",
-    "RCurl",
     "imputeTS",
     "scales",
     "padr",
@@ -37,7 +36,7 @@ packages_load <-lapply(list.of.packages, require, character.only = TRUE)
 if (any(as.numeric(packages_load)==0)){
   warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
 }else {
-  print("All packags are succesfully loaded")
+  print("All packages were succesfully loaded.")
 }
 
 rm(list.of.packages, new.packages)
@@ -92,7 +91,7 @@ OP %>% group_by( year_var)  %>%
             NA_rhum = sum(is.na(rhum)))
 ```
 
-Rain is somewhat harder to impute but there are ways around this problem, especially when there is only few values missing. Since rain data is required only in certain rare situations, which are defined within the model, we can use the same conditions to impute these missing values. 
+Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations, which are defined within the model, we can use the same conditions to impute these missing values. 
 We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. 
 
 ```{r}
