@@ -2,13 +2,12 @@
 
 The goal of this research is to evaluate potato late blight forecasting model and its application in Republic of Ireland. 
 
-The funding for this project comes from DAFM (Deparment of Agriculture). 
+The funding for this project comes from DAFM (Deparment of Agriculture, Food and Marine). 
 
 ## Project team
 
 Maynooth University:
 - [Rowan Fealy](https://www.maynoothuniversity.ie/people/rowan-fealy)
-
 
 Teagasc:
 - [Stephen Kildea](https://www.teagasc.ie/contact/staff-directory/k/steven-kildea/)
@@ -16,7 +15,7 @@ Teagasc:
 Met Eirean:
 - [Keith Lambkin](https://www.researchgate.net/profile/Keith_Lambkin)
 
-External collaborator:
+University of Queensland:
 - [Adam Sparks](http://staffprofile.usq.edu.au/profile/Adam-Sparks)
 
 ## Methodology

@@ -1,9 +1,6 @@
 IrishRulesModel <-
 function(data, param = NULL){
-  
-  require(data.table)
-  require(tidyverse)
-  require(zoo)
+
   
   # Parameter list
   if (is.null(param)){

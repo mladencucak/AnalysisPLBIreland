@@ -27,9 +27,8 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
-<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
-<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -119,7 +118,6 @@ body {
   padding-top: 65px;
   margin-top: -65px;
 }
-
 .section h2 {
   padding-top: 65px;
   margin-top: -65px;
@@ -139,6 +137,43 @@ body {
 .section h6 {
   padding-top: 65px;
   margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -160,18 +195,77 @@ $(document).ready(function () {
 });
 </script>
 
-
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -321,7 +415,7 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://mladencucak.github.io/AnalysisPLBIreland">
+  <a href="https://github.com/mladencucak/AnalysisPLBIreland">
     <span class="fa fa-github-square"></span>
      
     source
@@ -354,7 +448,6 @@ div.tocify {
     &quot;ggplot2&quot;,
     &quot;knitr&quot;,
     &quot;zoo&quot;,
-    &quot;RCurl&quot;,
     &quot;imputeTS&quot;,
     &quot;scales&quot;,
     &quot;padr&quot;,
@@ -376,9 +469,9 @@ packages_load &lt;-lapply(list.of.packages, require, character.only = TRUE)
 if (any(as.numeric(packages_load)==0)){
   warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
 }else {
-  print(&quot;All packags are succesfully loaded&quot;)
+  print(&quot;All packages were succesfully loaded.&quot;)
 }</code></pre>
-<pre><code>## [1] &quot;All packags are succesfully loaded&quot;</code></pre>
+<pre><code>## [1] &quot;All packages were succesfully loaded.&quot;</code></pre>
 <pre class="r"><code>rm(list.of.packages, new.packages)</code></pre>
 </div>
 <div id="data" class="section level2">
@@ -425,7 +518,7 @@ OP %&gt;% group_by( year_var)  %&gt;%
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there is only few values missing. Since rain data is required only in certain rare situations, which are defined within the model, we can use the same conditions to impute these missing values. We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0.</p>
+<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations, which are defined within the model, we can use the same conditions to impute these missing values. We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0.</p>
 <pre class="r"><code>OP[is.na(OP$rain),]$rain&lt;- with(OP[is.na(OP$rain),],ifelse(rhum&lt;88|temp&lt;8, 0, rain))
 OP %&gt;% group_by( year_var)  %&gt;%
   summarize(NA_rain = sum(is.na(rain)),
@@ -560,17 +653,14 @@ par</code></pre>
 <div id="model-run" class="section level3">
 <h3>Model Run</h3>
 <p>The model is run for each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied.</p>
-<pre class="r"><code>#data frame split by year and dynamicly added columns as result of model run with different parameters
-#save the output of function as name of curent run in new column
-
-for(i in 1:nrow(par) ){
+<pre class="r"><code>for(i in 1:nrow(par) ){
   loop_var &lt;- apply(par[i,],1, function(x) {
     k &lt;- lapply(split(OP, factor(OP$year)), function(chunk)  IrishRulesModel(chunk, x)) #get the list of outpus
     unlist(k) -&gt; k  #make it a vector
   })
   OP[,ncol(OP)+1] &lt;-  as.numeric(loop_var)
   rm(loop_var)
-  names(OP)[ncol(OP)] &lt;- paste0(par[i,1])
+  names(OP)[ncol(OP)] &lt;- paste0(par[i,1]) #asign the name
 }
 
 nn &lt;- paste0(names(OP[,26:73]), &quot;_ebh&quot;,&quot;&quot;)
@@ -584,6 +674,22 @@ head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
 {"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["doy"],"name":[2],"type":["int"],"align":["right"]},{"label":["rain"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[5],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["risk_11111_ebh"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["risk_12111_ebh"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["risk_12211_ebh"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["risk_11211_ebh"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["risk_21111_ebh"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-04-01 00:00:00","2":"91","3":"0","4":"8.0","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401162"},{"1":"2007-04-01 01:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401163"},{"1":"2007-04-01 02:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401164"},{"1":"2007-04-01 03:00:00","2":"91","3":"0","4":"7.6","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401165"},{"1":"2007-04-01 04:00:00","2":"91","3":"0","4":"7.2","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401166"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+</div>
+</div>
+<div id="section" class="section level2">
+<h2></h2>
+<pre class="r"><code>#Get subsets of data  for period before the epidemics were initiated
+dates_cut &lt;-  read_csv(&quot;./data/plantingdates.csv&quot;, col_types = cols(disease_observed_sus = col_date(format = &quot;%d/%m/%Y&quot;),
+                                                          last_assessment = col_date(format = &quot;%d/%m/%Y&quot;),
+                                                          disease_observed_res = col_date(format = &quot;%d/%m/%Y&quot;),
+                                                          disease_observed_setanta = col_date(format = &quot;%d/%m/%Y&quot;)))
+dates_cut$planting_date &lt;- as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
+dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
+dates_cut</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year"],"name":[1],"type":["int"],"align":["right"]},{"label":["planting_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["emergence"],"name":[3],"type":["date"],"align":["right"]},{"label":["disease_observed_sus"],"name":[4],"type":["date"],"align":["right"]},{"label":["disease_observed_res"],"name":[5],"type":["date"],"align":["right"]},{"label":["disease_observed_setanta"],"name":[6],"type":["date"],"align":["right"]},{"label":["last_assessment"],"name":[7],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"2007-04-03","3":"2007-04-24","4":"2007-06-30","5":"2007-07-19","6":"2007-07-19","7":"2007-08-23"},{"1":"2008","2":"2008-04-07","3":"2008-04-28","4":"2008-07-02","5":"2008-07-15","6":"2008-07-09","7":"2008-08-13"},{"1":"2009","2":"2009-04-21","3":"2009-05-12","4":"2009-07-06","5":"2009-07-27","6":"2009-07-13","7":"2009-08-08"},{"1":"2010","2":"2010-05-04","3":"2010-05-25","4":"2010-07-19","5":"2010-08-02","6":"2010-07-19","7":"2010-08-30"},{"1":"2011","2":"2011-05-06","3":"2011-05-27","4":"2011-07-28","5":"2011-08-11","6":"2011-08-11","7":"2011-08-25"},{"1":"2012","2":"2012-05-28","3":"2012-06-18","4":"2012-07-13","5":"2012-07-19","6":"2012-07-13","7":"2012-08-28"},{"1":"2013","2":"2013-06-03","3":"2013-06-24","4":"2013-08-23","5":"2013-09-05","6":"2013-09-05","7":"2013-09-20"},{"1":"2014","2":"2014-05-23","3":"2014-06-13","4":"2014-08-01","5":"2014-08-14","6":"2014-08-22","7":"2014-09-11"},{"1":"2015","2":"2015-05-22","3":"2015-06-12","4":"2015-07-31","5":"2015-09-09","6":"2015-08-13","7":"2015-09-18"},{"1":"2016","2":"2016-05-31","3":"2016-06-21","4":"2016-07-22","5":"2016-09-09","6":"2016-08-05","7":"2016-09-16"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
 </div>
 </div>
 <div id="description-of-variables" class="section level2">
@@ -771,7 +877,7 @@ head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
 ##     }
 ##     invisible(names)
 ## }
-## &lt;bytecode: 0x0fcef2f0&gt;
+## &lt;bytecode: 0x000000001d30b8f8&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 </div>
 <div id="download" class="section level2">
