@@ -130,12 +130,11 @@ dates_cut <-
   as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
   dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
   dates_cut %>% gt()
-  
 ```
 
-# The analysis 
+# The Analysis 
 
-The set of main parameters of Irish rules model is evaluated. The csv sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulnd named `risk_11111` represents set of the original model parameters. 
+The set of main parameters of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulnd named `90_10_12_rain` represents set of the original model parameters. 
 
 ```{r message=FALSE, warning=FALSE}
 #read in parameters
@@ -411,7 +410,7 @@ SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){
     group_by(year_var) %>%
     summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %>% 
     mutate_at(., #some years have two warnings during the warning period
-              .vars = colnames(.[grep("ebh", colnames(.))]),funs(ifelse(. >1 , 1, 0)))
+              .vars = colnames(.[grep("ebh", colnames(.))]),funs(ifelse(. >= 1 , 1, 0)))
     
   # tpfn_df[,1:4]
   
@@ -477,8 +476,9 @@ ROC_data <- as.data.frame(data.table::rbindlist(ROC)) #Outputs stored for each w
 ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
 ROC_data[[1]] %>% gt()
 ```
-###Visualisation
 
+###ROC 
+Empirical ROC curve was created for each variation of the model.  
 ```{r}
 df <- ROC_data[["90_10_12_rain"]]
 df <- df[rev(df$cut_point),]
@@ -508,12 +508,27 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
 ```
 
 ###
-```{r}
 
+```{r}
+#function to calculate AUC for list of inputs
+
+GetAUC <- function(fun_df){
+  fun_df <- fun_df[rev(order(fun_df$cut_point)),]
+  auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
+  result <- data.frame(model = unique(fun_df$model),
+                       auc = auc)
+  return(result)
+}
+AUC_data <- lapply(ROC_data, function(x) GetAUC(x))
+AUC_data <- bind_rows(AUC_data)
 ```
 
 ```{r}
-
+parameters <- colnames(par[,names(par) != "model"])
+AUC_data <-  separate(AUC_data, model, into =  parameters, sep = "_")
+AUC_data[AUC_data$lw_rh== "rain","lw_rh"] <- 0
+AUC_data[,parameters] <- lapply(AUC_data[,parameters], function(x) as.numeric(x))
+AUC_data<- data.frame(AUC_data)
 ```
 
 ```{r}
