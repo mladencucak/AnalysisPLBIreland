@@ -104,6 +104,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -395,6 +398,13 @@ div.tocify {
   <a href="Analysis1.html">
     <span class="fa fa fa fa-table"></span>
      
+    Model Comparison
+  </a>
+</li>
+<li>
+  <a href="Analysis1.html">
+    <span class="fa fa fa fa-table"></span>
+     
     Model Evaluation
   </a>
 </li>
@@ -435,9 +445,8 @@ div.tocify {
 </div>
 
 
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
 <p>Packages needed for the nalysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -451,28 +460,40 @@ div.tocify {
     &quot;imputeTS&quot;,
     &quot;scales&quot;,
     &quot;padr&quot;,
+    &quot;devtools&quot;,
     &quot;readxl&quot;,
     &quot;stringr&quot;,
     &quot;lubridate&quot;,
     &quot;readr&quot;,
-    &quot;egg&quot;
+    &quot;pracma&quot;,
+    &quot;glue&quot;,
+    &quot;remotes&quot;,
+    &quot;parallel&quot;,
+    &quot;pbapply&quot;,
+    &quot;ggrepel&quot;,
+    &quot;ggthemes&quot;
   )
+
+
 
 new.packages &lt;- list.of.packages[!(list.of.packages %in% installed.packages()[,&quot;Package&quot;])]
 
 #Download packages that are not already present
 if(length(new.packages)) install.packages(new.packages)
 
+if(&quot;gt&quot;%in%installed.packages()== FALSE) remotes::install_github(&quot;rstudio/gt&quot;)
+
+list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
 packages_load &lt;-lapply(list.of.packages, require, character.only = TRUE)
+
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load)==0)){
   warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
 }else {
   print(&quot;All packages were succesfully loaded.&quot;)
-}</code></pre>
+};rm(list.of.packages, new.packages, packages_load)</code></pre>
 <pre><code>## [1] &quot;All packages were succesfully loaded.&quot;</code></pre>
-<pre class="r"><code>rm(list.of.packages, new.packages)</code></pre>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
@@ -480,12 +501,380 @@ if (any(as.numeric(packages_load)==0)){
 <h3>Weather Data</h3>
 <p>Historical weather data from a Met Éireann Oak Park synoptic weather station was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years.</p>
 <pre class="r"><code>#Weather data, parameters and cut off dates
-load(file=&quot;data/OP_2007-2016.RData&quot;)
-OP[1:5,1:20]</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["short_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["year"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["month"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["day"],"name":[5],"type":["int"],"align":["right"]},{"label":["i_rain"],"name":[6],"type":["int"],"align":["right"]},{"label":["rain"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["i_temp"],"name":[8],"type":["int"],"align":["right"]},{"label":["temp"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["i_wetb"],"name":[10],"type":["int"],"align":["right"]},{"label":["wetb"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["dewpt"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["i_rhum"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["rhum"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["msl"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["i_wdsp"],"name":[17],"type":["int"],"align":["right"]},{"label":["wdsp"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["i_wddir"],"name":[19],"type":["int"],"align":["right"]},{"label":["wddir"],"name":[20],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-01-01 00:00:00","2":"2007-01-01","3":"2007","4":"1","5":"1","6":"0","7":"0.2","8":"0","9":"4.8","10":"0","11":"4.1","12":"3.0","13":"7.6","14":"0","15":"87","16":"1006.9","17":"2","18":"11","19":"2","20":"250","_rn_":"2399002"},{"1":"2007-01-01 01:00:00","2":"2007-01-01","3":"2007","4":"1","5":"1","6":"0","7":"0.0","8":"0","9":"5.4","10":"0","11":"4.4","12":"3.0","13":"7.6","14":"0","15":"84","16":"1007.6","17":"2","18":"7","19":"2","20":"240","_rn_":"2399003"},{"1":"2007-01-01 02:00:00","2":"2007-01-01","3":"2007","4":"1","5":"1","6":"0","7":"0.0","8":"0","9":"5.8","10":"0","11":"4.7","12":"3.2","13":"7.7","14":"0","15":"83","16":"1008.4","17":"2","18":"6","19":"2","20":"250","_rn_":"2399004"},{"1":"2007-01-01 03:00:00","2":"2007-01-01","3":"2007","4":"1","5":"1","6":"0","7":"0.1","8":"0","9":"5.2","10":"0","11":"4.3","12":"2.8","13":"7.5","14":"0","15":"84","16":"1009.7","17":"2","18":"15","19":"2","20":"260","_rn_":"2399005"},{"1":"2007-01-01 04:00:00","2":"2007-01-01","3":"2007","4":"1","5":"1","6":"0","7":"0.0","8":"0","9":"5.6","10":"0","11":"4.2","12":"2.3","13":"7.2","14":"0","15":"79","16":"1010.9","17":"2","18":"15","19":"2","20":"260","_rn_":"2399006"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
+load(file=&quot;data/op_2007_16/OP_2007-2016.RData&quot;)
+
+OP[1:5,1:20] %&gt;% gt()</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#hjhzhiyyxr .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#hjhzhiyyxr .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#hjhzhiyyxr .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hjhzhiyyxr .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hjhzhiyyxr .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#hjhzhiyyxr .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hjhzhiyyxr .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#hjhzhiyyxr .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#hjhzhiyyxr .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#hjhzhiyyxr .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#hjhzhiyyxr .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#hjhzhiyyxr .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#hjhzhiyyxr .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#hjhzhiyyxr .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#hjhzhiyyxr .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#hjhzhiyyxr .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#hjhzhiyyxr .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#hjhzhiyyxr .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#hjhzhiyyxr .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#hjhzhiyyxr .gt_center {
+  text-align: center;
+}
+
+#hjhzhiyyxr .gt_left {
+  text-align: left;
+}
+
+#hjhzhiyyxr .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hjhzhiyyxr .gt_font_normal {
+  font-weight: normal;
+}
+
+#hjhzhiyyxr .gt_font_bold {
+  font-weight: bold;
+}
+
+#hjhzhiyyxr .gt_font_italic {
+  font-style: italic;
+}
+
+#hjhzhiyyxr .gt_super {
+  font-size: 65%;
+}
+
+#hjhzhiyyxr .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="hjhzhiyyxr" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>short_date</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>year</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>month</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>day</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rain</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rain</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_temp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wetb</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wetb</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>dewpt</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>vappr</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rhum</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rhum</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>msl</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wdsp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wdsp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wddir</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wddir</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 00:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.2</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.8</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.1</td>
+<td class='gt_row gt_right'>3.0</td>
+<td class='gt_row gt_right'>7.6</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>87</td>
+<td class='gt_row gt_right'>1006.9</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>11</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>250</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>2007-01-01 01:00:00</td>
+<td class='gt_row gt_left gt_striped'>2007-01-01</td>
+<td class='gt_row gt_right gt_striped'>2007</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>0.0</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>5.4</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>4.4</td>
+<td class='gt_row gt_right gt_striped'>3.0</td>
+<td class='gt_row gt_right gt_striped'>7.6</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>84</td>
+<td class='gt_row gt_right gt_striped'>1007.6</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>7</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>240</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 02:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.0</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>5.8</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.7</td>
+<td class='gt_row gt_right'>3.2</td>
+<td class='gt_row gt_right'>7.7</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>83</td>
+<td class='gt_row gt_right'>1008.4</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>6</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>250</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>2007-01-01 03:00:00</td>
+<td class='gt_row gt_left gt_striped'>2007-01-01</td>
+<td class='gt_row gt_right gt_striped'>2007</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>0.1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>5.2</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>4.3</td>
+<td class='gt_row gt_right gt_striped'>2.8</td>
+<td class='gt_row gt_right gt_striped'>7.5</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>84</td>
+<td class='gt_row gt_right gt_striped'>1009.7</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>15</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>260</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 04:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.0</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>5.6</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.2</td>
+<td class='gt_row gt_right'>2.3</td>
+<td class='gt_row gt_right'>7.2</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>79</td>
+<td class='gt_row gt_right'>1010.9</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>15</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>260</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
 </div>
 <pre class="r"><code>colnames(OP)[which(names(OP) == &quot;year&quot;)] &lt;- &quot;year_var&quot;
 OP &lt;- add_column(OP, week_var =data.table::week(OP$date), .before = &quot;i_rain&quot; )
@@ -531,44 +920,724 @@ OP %&gt;% group_by( year_var)  %&gt;%
 </div>
 </div>
 </div>
-<div id="the-analysis" class="section level2">
-<h2>The analysis</h2>
+<div id="dates" class="section level2">
+<h2>Dates</h2>
+<p>Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period for visible disease symptoms to be observed in the field.</p>
+<pre class="r"><code>#Get subsets of data  for period before the epidemics were initiated
+dates_cut &lt;-
+  read_csv(
+  &quot;./data/op_2007_16/plantingdates.csv&quot;,
+  col_types = cols(
+  disease_observed_sus = col_date(format = &quot;%d/%m/%Y&quot;),
+  last_assessment = col_date(format = &quot;%d/%m/%Y&quot;)
+  )
+  )
+  dates_cut$planting_date &lt;-
+  as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
+  dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
+  dates_cut %&gt;% gt()</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#iwepsvfctb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#iwepsvfctb .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#iwepsvfctb .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#iwepsvfctb .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#iwepsvfctb .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#iwepsvfctb .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#iwepsvfctb .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#iwepsvfctb .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#iwepsvfctb .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#iwepsvfctb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#iwepsvfctb .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#iwepsvfctb .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#iwepsvfctb .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#iwepsvfctb .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#iwepsvfctb .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#iwepsvfctb .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#iwepsvfctb .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#iwepsvfctb .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#iwepsvfctb .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#iwepsvfctb .gt_center {
+  text-align: center;
+}
+
+#iwepsvfctb .gt_left {
+  text-align: left;
+}
+
+#iwepsvfctb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#iwepsvfctb .gt_font_normal {
+  font-weight: normal;
+}
+
+#iwepsvfctb .gt_font_bold {
+  font-weight: bold;
+}
+
+#iwepsvfctb .gt_font_italic {
+  font-style: italic;
+}
+
+#iwepsvfctb .gt_super {
+  font-size: 65%;
+}
+
+#iwepsvfctb .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="iwepsvfctb" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>year</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>planting_date</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>emergence</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>disease_observed_sus</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>last_assessment</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_left'>2007-04-03</td>
+<td class='gt_row gt_left'>2007-04-24</td>
+<td class='gt_row gt_left'>2007-06-30</td>
+<td class='gt_row gt_left'>2007-08-23</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>2008</td>
+<td class='gt_row gt_left gt_striped'>2008-04-07</td>
+<td class='gt_row gt_left gt_striped'>2008-04-28</td>
+<td class='gt_row gt_left gt_striped'>2008-07-02</td>
+<td class='gt_row gt_left gt_striped'>2008-08-13</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>2009</td>
+<td class='gt_row gt_left'>2009-04-21</td>
+<td class='gt_row gt_left'>2009-05-12</td>
+<td class='gt_row gt_left'>2009-07-06</td>
+<td class='gt_row gt_left'>2009-08-08</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>2010</td>
+<td class='gt_row gt_left gt_striped'>2010-05-04</td>
+<td class='gt_row gt_left gt_striped'>2010-05-25</td>
+<td class='gt_row gt_left gt_striped'>2010-07-19</td>
+<td class='gt_row gt_left gt_striped'>2010-08-30</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>2011</td>
+<td class='gt_row gt_left'>2011-05-06</td>
+<td class='gt_row gt_left'>2011-05-27</td>
+<td class='gt_row gt_left'>2011-07-28</td>
+<td class='gt_row gt_left'>2011-08-25</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>2012</td>
+<td class='gt_row gt_left gt_striped'>2012-05-28</td>
+<td class='gt_row gt_left gt_striped'>2012-06-18</td>
+<td class='gt_row gt_left gt_striped'>2012-07-13</td>
+<td class='gt_row gt_left gt_striped'>2012-08-28</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>2013</td>
+<td class='gt_row gt_left'>2013-06-03</td>
+<td class='gt_row gt_left'>2013-06-24</td>
+<td class='gt_row gt_left'>2013-08-23</td>
+<td class='gt_row gt_left'>2013-09-20</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>2014</td>
+<td class='gt_row gt_left gt_striped'>2014-05-23</td>
+<td class='gt_row gt_left gt_striped'>2014-06-13</td>
+<td class='gt_row gt_left gt_striped'>2014-08-01</td>
+<td class='gt_row gt_left gt_striped'>2014-09-11</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>2015</td>
+<td class='gt_row gt_left'>2015-05-22</td>
+<td class='gt_row gt_left'>2015-06-12</td>
+<td class='gt_row gt_left'>2015-07-31</td>
+<td class='gt_row gt_left'>2015-09-18</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>2016</td>
+<td class='gt_row gt_left gt_striped'>2016-05-31</td>
+<td class='gt_row gt_left gt_striped'>2016-06-21</td>
+<td class='gt_row gt_left gt_striped'>2016-07-22</td>
+<td class='gt_row gt_left gt_striped'>2016-09-16</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div>
+</div>
+</div>
+<div id="the-analysis" class="section level1">
+<h1>The analysis</h1>
 <p>The set of main parameters of Irish rules model is evaluated. The csv sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulnd named <code>risk_11111</code> represents set of the original model parameters.</p>
 <pre class="r"><code>#read in parameters
-par &lt;- read_csv(paste0(&quot;./data/parameters.csv&quot;), skip = 10)
-par$param_set &lt;-stringi::stri_replace_all_fixed(par$param_set, &quot;\t&quot;, &quot;&quot;)
-par</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["param_set"],"name":[1],"type":["chr"],"align":["left"]},{"label":["rh_thresh"],"name":[2],"type":["int"],"align":["right"]},{"label":["temp_thres"],"name":[3],"type":["int"],"align":["right"]},{"label":["hours"],"name":[4],"type":["int"],"align":["right"]},{"label":["wet_before"],"name":[5],"type":["int"],"align":["right"]},{"label":["wet_after"],"name":[6],"type":["int"],"align":["right"]},{"label":["lw_rh"],"name":[7],"type":["int"],"align":["right"]},{"label":["X8"],"name":[8],"type":["chr"],"align":["left"]},{"label":["X9"],"name":[9],"type":["chr"],"align":["left"]},{"label":["X10"],"name":[10],"type":["chr"],"align":["left"]},{"label":["X11"],"name":[11],"type":["chr"],"align":["left"]}],"data":[{"1":"risk_11111","2":"90","3":"10","4":"12","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12111","2":"90","3":"8","4":"12","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12211","2":"90","3":"8","4":"10","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11211","2":"90","3":"10","4":"10","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21111","2":"88","3":"10","4":"12","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22111","2":"88","3":"8","4":"12","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22211","2":"88","3":"8","4":"10","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21211","2":"88","3":"10","4":"10","5":"3","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11121","2":"90","3":"10","4":"12","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12121","2":"90","3":"8","4":"12","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12221","2":"90","3":"8","4":"10","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11221","2":"90","3":"10","4":"10","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21121","2":"88","3":"10","4":"12","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22121","2":"88","3":"8","4":"12","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22221","2":"88","3":"8","4":"10","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21221","2":"88","3":"10","4":"10","5":"5","6":"3","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11131","2":"90","3":"10","4":"12","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12131","2":"90","3":"8","4":"12","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12231","2":"90","3":"8","4":"10","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11231","2":"90","3":"10","4":"10","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21131","2":"88","3":"10","4":"12","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22131","2":"88","3":"8","4":"12","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22231","2":"88","3":"8","4":"10","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21231","2":"88","3":"10","4":"10","5":"0","6":"4","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11112","2":"90","3":"10","4":"12","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12112","2":"90","3":"8","4":"12","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12212","2":"90","3":"8","4":"10","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11212","2":"90","3":"10","4":"10","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21112","2":"88","3":"10","4":"12","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22112","2":"88","3":"8","4":"12","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22212","2":"88","3":"8","4":"10","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21212","2":"88","3":"10","4":"10","5":"3","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11122","2":"90","3":"10","4":"12","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12122","2":"90","3":"8","4":"12","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12222","2":"90","3":"8","4":"10","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11222","2":"90","3":"10","4":"10","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21122","2":"88","3":"10","4":"12","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22122","2":"88","3":"8","4":"12","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22222","2":"88","3":"8","4":"10","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21222","2":"88","3":"10","4":"10","5":"5","6":"3","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11132","2":"90","3":"10","4":"12","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12132","2":"90","3":"8","4":"12","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_12232","2":"90","3":"8","4":"10","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_11232","2":"90","3":"10","4":"10","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21132","2":"88","3":"10","4":"12","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22132","2":"88","3":"8","4":"12","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_22232","2":"88","3":"8","4":"10","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"},{"1":"risk_21232","2":"88","3":"10","4":"10","5":"0","6":"4","7":"90","8":"NA","9":"NA","10":"NA","11":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
+par &lt;- read_xlsx(paste(&quot;./data/op_2007_16/par.xlsx&quot;), sheet = &quot;par&quot;)
+par %&gt;% gt()</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#lihhveihla .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#lihhveihla .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#lihhveihla .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lihhveihla .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lihhveihla .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#lihhveihla .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lihhveihla .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#lihhveihla .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#lihhveihla .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#lihhveihla .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#lihhveihla .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#lihhveihla .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#lihhveihla .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#lihhveihla .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#lihhveihla .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#lihhveihla .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#lihhveihla .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#lihhveihla .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#lihhveihla .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#lihhveihla .gt_center {
+  text-align: center;
+}
+
+#lihhveihla .gt_left {
+  text-align: left;
+}
+
+#lihhveihla .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lihhveihla .gt_font_normal {
+  font-weight: normal;
+}
+
+#lihhveihla .gt_font_bold {
+  font-weight: bold;
+}
+
+#lihhveihla .gt_font_italic {
+  font-style: italic;
+}
+
+#lihhveihla .gt_super {
+  font-size: 65%;
+}
+
+#lihhveihla .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="lihhveihla" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thres</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>hours</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_right'>93</td>
+<td class='gt_row gt_right'>13</td>
+<td class='gt_row gt_right'>15</td>
+<td class='gt_row gt_left'>rain</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>92</td>
+<td class='gt_row gt_right gt_striped'>12</td>
+<td class='gt_row gt_right gt_striped'>14</td>
+<td class='gt_row gt_left gt_striped'>90</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>91</td>
+<td class='gt_row gt_right'>11</td>
+<td class='gt_row gt_right'>13</td>
+<td class='gt_row gt_left'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>90</td>
+<td class='gt_row gt_right gt_striped'>10</td>
+<td class='gt_row gt_right gt_striped'>12</td>
+<td class='gt_row gt_left gt_striped'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>89</td>
+<td class='gt_row gt_right'>9</td>
+<td class='gt_row gt_right'>11</td>
+<td class='gt_row gt_left'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>88</td>
+<td class='gt_row gt_right gt_striped'>8</td>
+<td class='gt_row gt_right gt_striped'>10</td>
+<td class='gt_row gt_left gt_striped'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>87</td>
+<td class='gt_row gt_right'>7</td>
+<td class='gt_row gt_right'>9</td>
+<td class='gt_row gt_left'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right gt_striped'>86</td>
+<td class='gt_row gt_right gt_striped'>6</td>
+<td class='gt_row gt_right gt_striped'>8</td>
+<td class='gt_row gt_left gt_striped'>NA</td>
+</tr>
+<tr>
+<td class='gt_row gt_right'>85</td>
+<td class='gt_row gt_right'>5</td>
+<td class='gt_row gt_right'>7</td>
+<td class='gt_row gt_left'>NA</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
 </div>
+<pre class="r"><code>params &lt;- expand.grid(par[,1:3])
+
+#set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
+params$lw_rh &lt;- &quot;rain&quot;
+
+#Repeat all of the analysis considering rh &gt;= 90% as an estimator of leaf wetness
+params2 &lt;- params
+params2$lw_rh &lt;- as.character(90)
+
+par &lt;- bind_rows(params, params2)
+rm(params, params2)
+
+# set a column with a name for each model
+par&lt;- add_column(par, model = NA, .before = 1 )
+for (i in seq_along(1 : nrow(par))) {
+  par[i,1] &lt;- paste0( par[i,2: length(names(par))], collapse = &quot;_&quot; )
+}
+str(par)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1458 obs. of  5 variables:
+##  $ model     : chr  &quot;93_13_15_rain&quot; &quot;92_13_15_rain&quot; &quot;91_13_15_rain&quot; &quot;90_13_15_rain&quot; ...
+##  $ rh_thresh : num  93 92 91 90 89 88 87 86 85 93 ...
+##  $ temp_thres: num  13 13 13 13 13 13 13 13 13 12 ...
+##  $ hours     : num  15 15 15 15 15 15 15 15 15 15 ...
+##  $ lw_rh     : chr  &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; ...</code></pre>
 <div id="the-model" class="section level3">
 <h3>The model</h3>
 <p>Implementation of the model</p>
-<pre class="r"><code>IrishRulesModel &lt;-function(data, param = NULL){
+<pre class="r"><code>IrishRulesModel &lt;- function(weather, param = NULL,infill_gap = NULL){
+    
+  
+  # param &lt;- par[1,]
+  # weather &lt;- OP[OP$year_var==2016,]
+  
+  require(data.table)
+  require(tidyverse)
+  require(zoo)
+  
+  # wetness requirement prior to infection accumulation start
+  # time window of 6 hours, 3 before/after sporulation ends
+  wet_before &lt;- 3 
+  wet_after &lt;- 3
+  
   # Parameter list
   if (is.null(param)){
     rh_thresh &lt;- 90
     temp_thres &lt;- 10
     hours &lt;- 12   #sum of hours before EBH accumulation
-    wet_before &lt;- 3
-    wet_after &lt;- 3
   }else{
     #pass a vector of parameters 
     rh_thresh &lt;- as.numeric(param[2])
     temp_thres &lt;- as.numeric(param[3])
     hours &lt;- as.numeric(param[4])   
-    wet_before &lt;- as.numeric(param[5])
-    wet_after &lt;- as.numeric(param[6])
-    lw_rhum &lt;- param[7]           #if is NA then only rain data will be used
+    lw_rhum &lt;- param[5]           #if is NA then only rain data will be used
   }
   
-  data  %&gt;% collect  %&gt;% .[[&quot;rain&quot;]] -&gt; rain
-  data  %&gt;% collect  %&gt;% .[[&quot;rhum&quot;]] -&gt; rh
-  data  %&gt;% collect  %&gt;% .[[&quot;temp&quot;]] -&gt; temp
-  if(sum(is.na(with(data, rain, temp,rhum)))&gt;5){
-    stop(print(&quot;sum of NAs is more than 5&quot;))
+  
+  weather[[&quot;rain&quot;]] -&gt; rain
+  if(&quot;rhum&quot; %in% names(weather)){weather[[&quot;rhum&quot;]] -&gt; rh}
+  if(&quot;rh&quot; %in% names(weather)){weather[[&quot;rh&quot;]] -&gt; rh}
+  weather [[&quot;temp&quot;]] -&gt; temp
+  
+  
+  
+  # This function to infil missing values to let the model run
+  #If maximum infill gap is not provided it is defaulted to 7
+  if (is.null(infill_gap)) {
+    infill_gap &lt;- 7
+  } 
+  
+  if(sum(is.na(with(weather, rain, temp,rhum)))&gt;0){
+    temp &lt;- round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap),1)
+    rh &lt;- round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap),0)
+    rh  &lt;- sapply(rh, function(x) ifelse(x&gt;100, x&lt;-100, x))
+  }
+  
+  if(sum(is.na(with(weather, rain, temp,rhum)))&gt;0){
+    stop(print(&quot;The sum of NAs is more than 7! Check your weather data.&quot;))
   }
   
   #&quot;Out of boounds&quot;
@@ -576,29 +1645,18 @@ par</code></pre>
   temp &lt;- c(temp, rep(0,20))
   rh &lt;- c(rh, rep(0,20))
   
-  rain &lt;- na.approx(rain, maxgap = 5)
-  temp &lt;- na.approx(temp, maxgap = 5)
-  rh &lt;- na.approx(rh, maxgap = 5)
-  # rain &lt;- as.vector(data[,9])
-  # temp &lt;- data[,6]
-  # rh &lt;- data[,7]
-  # class(temp)
   # check if there is 12 hours of conditions: rh &gt;= 90 and t&gt;= 10
-  criteria&lt;- as.numeric(temp&gt;=temp_thres &amp; rh&gt;=rh_thresh) #Specify criteria&gt; data$crit
+    criteria&lt;- as.numeric(temp&gt;=temp_thres &amp; rh&gt;=rh_thresh)
+
+  #cumulative sum of hours that meet the criteria with restart at zero
+  criteria_sum &lt;-  stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
   
-  #cumulative sum with restart at zero
-  #criteria_sum &lt;-  ave(criteria, cumsum(criteria == 0), FUN = cumsum)
-  #data$rs33 &lt;- with(rle(data$rs1!=0), sequence(lengths)*rep(values, lengths))
-  criteria_sum &lt;- ave(coalesce(criteria, 0), data.table::rleid(zoo::na.locf(criteria != 0,maxgap = 3)), FUN = cumsum)
-  
-  
-  #cumulative sum with restart at zero
-  # criteria_sum &lt;-  ave(criteria, cumsum(criteria == 0), FUN = cumsum)
-  #data$rs33 &lt;- with(rle(data$rs1!=0), sequence(lengths)*rep(values, lengths))
   risk &lt;- rep(0, length(temp))
   
-  criteria_met12  &lt;-as.numeric( criteria_sum &gt;= hours )
+  criteria_met12  &lt;-as.numeric( criteria_sum &gt;= hours ) #accumulaition of EBH starts on 10th hour
   idx             &lt;-which(criteria_sum == hours)
+  
+  
   
   
   #If there are no accumulations return vector with zeros
@@ -653,44 +1711,541 @@ par</code></pre>
 <div id="model-run" class="section level3">
 <h3>Model Run</h3>
 <p>The model is run for each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied.</p>
-<pre class="r"><code>for(i in 1:nrow(par) ){
-  loop_var &lt;- apply(par[i,],1, function(x) {
-    k &lt;- lapply(split(OP, factor(OP$year)), function(chunk)  IrishRulesModel(chunk, x)) #get the list of outpus
-    unlist(k) -&gt; k  #make it a vector
-  })
-  OP[,ncol(OP)+1] &lt;-  as.numeric(loop_var)
-  rm(loop_var)
-  names(OP)[ncol(OP)] &lt;- paste0(par[i,1]) #asign the name
-}
-
-nn &lt;- paste0(names(OP[,26:73]), &quot;_ebh&quot;,&quot;&quot;)
-names(OP[,26:73]) &lt;-  nn
-setnames(OP, old = c(names(OP[,26:73])), new = nn)
-rm(i,nn)
+<pre class="r"><code>#Not run
+# for(i in 1:nrow(par)) {
+#   loop_var &lt;- apply(par[i,], 1, function(x) {           #Run the model with different parameters 
+#          k &lt;-
+#         lapply(split(OP, factor(OP$year)), function(chunk)
+#         IrishRulesModel(chunk, x)) #get the list of outpus
+#         unlist(k) -&gt; k  #make it a vector
+#         })
+#     OP[, ncol(OP) + 1] &lt;-  as.numeric(loop_var) 
+#     rm(loop_var)
+#     names(OP)[ncol(OP)] &lt;- paste0(par[i, 1])
+#     print(paste(i, &quot;of&quot;, nrow(par)))
+# }
+# 
+# 
+# nn &lt;- paste0(names(OP[,26: length(names(OP))]), &quot;_ebh&quot;,&quot;&quot;)
+# setnames(OP, old = c(names(OP[,26: length(names(OP))])), new = nn)
+# rm(i,nn)</code></pre>
+<pre class="r"><code>load(file=&quot;data/op_2007_16/OP_for_analysis.RData&quot;)
 # Sample of outputs
 head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["doy"],"name":[2],"type":["int"],"align":["right"]},{"label":["rain"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[5],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["risk_11111_ebh"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["risk_12111_ebh"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["risk_12211_ebh"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["risk_11211_ebh"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["risk_21111_ebh"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-04-01 00:00:00","2":"91","3":"0","4":"8.0","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401162"},{"1":"2007-04-01 01:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401163"},{"1":"2007-04-01 02:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401164"},{"1":"2007-04-01 03:00:00","2":"91","3":"0","4":"7.6","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401165"},{"1":"2007-04-01 04:00:00","2":"91","3":"0","4":"7.2","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401166"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["doy"],"name":[2],"type":["int"],"align":["right"]},{"label":["rain"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[5],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["93_13_15_rain_ebh"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["92_13_15_rain_ebh"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["91_13_15_rain_ebh"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["90_13_15_rain_ebh"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["89_13_15_rain_ebh"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-03-01 00:00:00","2":"60","3":"0","4":"6.7","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400418"},{"1":"2007-03-01 01:00:00","2":"60","3":"0","4":"6.7","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400419"},{"1":"2007-03-01 02:00:00","2":"60","3":"0","4":"6.8","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400420"},{"1":"2007-03-01 03:00:00","2":"60","3":"0","4":"6.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400421"},{"1":"2007-03-01 04:00:00","2":"60","3":"0","4":"6.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400422"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
 </div>
-<div id="section" class="section level2">
-<h2></h2>
-<pre class="r"><code>#Get subsets of data  for period before the epidemics were initiated
-dates_cut &lt;-  read_csv(&quot;./data/plantingdates.csv&quot;, col_types = cols(disease_observed_sus = col_date(format = &quot;%d/%m/%Y&quot;),
-                                                          last_assessment = col_date(format = &quot;%d/%m/%Y&quot;),
-                                                          disease_observed_res = col_date(format = &quot;%d/%m/%Y&quot;),
-                                                          disease_observed_setanta = col_date(format = &quot;%d/%m/%Y&quot;)))
-dates_cut$planting_date &lt;- as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
-dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
-dates_cut</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["year"],"name":[1],"type":["int"],"align":["right"]},{"label":["planting_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["emergence"],"name":[3],"type":["date"],"align":["right"]},{"label":["disease_observed_sus"],"name":[4],"type":["date"],"align":["right"]},{"label":["disease_observed_res"],"name":[5],"type":["date"],"align":["right"]},{"label":["disease_observed_setanta"],"name":[6],"type":["date"],"align":["right"]},{"label":["last_assessment"],"name":[7],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"2007-04-03","3":"2007-04-24","4":"2007-06-30","5":"2007-07-19","6":"2007-07-19","7":"2007-08-23"},{"1":"2008","2":"2008-04-07","3":"2008-04-28","4":"2008-07-02","5":"2008-07-15","6":"2008-07-09","7":"2008-08-13"},{"1":"2009","2":"2009-04-21","3":"2009-05-12","4":"2009-07-06","5":"2009-07-27","6":"2009-07-13","7":"2009-08-08"},{"1":"2010","2":"2010-05-04","3":"2010-05-25","4":"2010-07-19","5":"2010-08-02","6":"2010-07-19","7":"2010-08-30"},{"1":"2011","2":"2011-05-06","3":"2011-05-27","4":"2011-07-28","5":"2011-08-11","6":"2011-08-11","7":"2011-08-25"},{"1":"2012","2":"2012-05-28","3":"2012-06-18","4":"2012-07-13","5":"2012-07-19","6":"2012-07-13","7":"2012-08-28"},{"1":"2013","2":"2013-06-03","3":"2013-06-24","4":"2013-08-23","5":"2013-09-05","6":"2013-09-05","7":"2013-09-20"},{"1":"2014","2":"2014-05-23","3":"2014-06-13","4":"2014-08-01","5":"2014-08-14","6":"2014-08-22","7":"2014-09-11"},{"1":"2015","2":"2015-05-22","3":"2015-06-12","4":"2015-07-31","5":"2015-09-09","6":"2015-08-13","7":"2015-09-18"},{"1":"2016","2":"2016-05-31","3":"2016-06-21","4":"2016-07-22","5":"2016-09-09","6":"2016-08-05","7":"2016-09-16"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+<div id="analsis-of-the-outputs" class="section level1">
+<h1>Analsis of the outputs</h1>
+<pre class="r"><code>SensParametersCalc &lt;- function(y,weather_data, dates_cut, prot_duration = NULL){ 
+
+  #Set the warning threshold and run the rest of the script 
+  warning_threshold &lt;- y
+  #data
+  fun_df &lt;- weather_data
+  
+  #A function to subset the data for the period of interest in each year 
+  test.overlap = function(vals,start_date, end_date ) {
+    rowSums(mapply(function(a,b) between(vals, a, b),
+                   start_date, end_date)) &gt; 0
+  }
+  
+  #Subset  each year from emergence to disease onset and calculate number of FP and TN
+   fptn_df &lt;- 
+  fun_df  %&gt;%
+    #Subset the of the data for the duration of non-warning period for each year
+    filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %&gt;% 
+    select(ends_with(&quot;year_var&quot;),
+           ends_with(&quot;week_var&quot;),
+           ends_with(&quot;doy&quot;),
+           ends_with(&quot;_ebh&quot;)) %&gt;%
+    group_by(year_var) %&gt;%
+    #if there was an accumulation from previous day, it would triger a warning
+    #Check aal of the first five rows because of possible break of 5 hours
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold,
+                          warning_threshold, .))) %&gt;% 
+    #all five values is changed so we have to delete 4 of them and leave only one
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(row_number() &lt;= 4 &amp; . == warning_threshold, 0, .))) %&gt;%
+    # Change values coresponding to the warning threshold to 1 for calculating the sum
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+    group_by(year_var, week_var, doy) %&gt;%
+    summarise_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), .funs = sum)  
+    
+  
+  #Each warning would cause treatment that will keep the plants protected for a period of time
+   prot_duration &lt;- ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
+   
+   TreatmentWindow &lt;- function(x,prot_duration){
+     # x &lt;- fptn_df[[&quot;93_10_12_rain_ebh&quot;]]
+     y &lt;- vector(mode = &quot;numeric&quot;, length = length(x)+prot_duration)
+     for (i in seq_along(x)) {
+       if(x[i] == 1){
+         y[i:c(i+prot_duration)] &lt;- 1
+       }
+     }
+     y
+   }
+   fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))] &lt;- 
+    lapply(fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))], function(x) TreatmentWindow(x,prot_duration))
+  
+  
+  FP &lt;- summarise_all(fptn_df[,colnames(fptn_df[,grep(&quot;ebh&quot;, colnames(fptn_df))])], .funs = sum)
+  
+  #Each warning will cause a treatment 
+  total_days &lt;- nrow(fptn_df) #total  duration of non_warning period
+  
+  TN &lt;- total_days - FP
+  
+  
+  ##########################################################
+  #subset for 10 days prior to disease onset: Warning period
+  tpfn_df &lt;- 
+  fun_df %&gt;%
+    #Subset of the data for the duration WARNING period in each year
+    filter(test.overlap(short_date,  dates_cut$warning,dates_cut$disease_onset)) %&gt;% 
+    select(ends_with(&quot;year_var&quot;),
+           ends_with(&quot;week_var&quot;),
+           ends_with(&quot;doy&quot;),
+           ends_with(&quot;_ebh&quot;)) %&gt;%
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold, warning_threshold, .))) %&gt;%
+    #all five values is changed so we have to delete 4 of them and leave only one
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(row_number() &lt;= 4 &amp; . == warning_threshold,
+                          0, .))) %&gt;%
+    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+              funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+    group_by(year_var) %&gt;%
+    summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %&gt;% 
+    mutate_at(., #some years have two warnings during the warning period
+              .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),funs(ifelse(. &gt;1 , 1, 0)))
+    
+  # tpfn_df[,1:4]
+  
+  TP &lt;- summarise_all(tpfn_df[,colnames(tpfn_df[,grep(&quot;ebh&quot;, colnames(tpfn_df))])], .funs = sum)
+
+    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years. 
+  unique(tpfn_df$year_var) %&gt;% 
+    length() -&gt; no_of_outbreaks
+  FN &lt;- no_of_outbreaks - TP
+  
+  #summary
+  test &lt;- data.frame( model = names(FP), 
+                      FP = t(FP[1,]),
+                      tn = t(TN[1,]),
+                      TP = t(TP[1,]),
+                      FN = t(FN[1,]))
+  names(test) &lt;- c(&quot;model&quot;, &quot;FP&quot;, &quot;TN&quot;, &quot;TP&quot;, &quot;FN&quot;)
+  test &lt;- data.frame(test, row.names = NULL)
+  
+  
+  test$model &lt;-  str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
+  test$sens &lt;- with(test, TP/(TP + FN))  #PTP sensitivity
+  test$spec &lt;- with(test, TN/(TN + FP))  #PTN specificity
+
+  return_df &lt;- test[,c(&quot;model&quot;, &quot;sens&quot;)]
+  return_df$&quot;one_min_spec&quot; &lt;- 1-test[,&quot;spec&quot;]
+  return_df$cut_point &lt;- warning_threshold
+
+  return(return_df)
+  
+}</code></pre>
+<p>This function was applied to output of each variation of the model with varying warning threshold from 1 to 15 EBH. This function is run with paralel processing support because it takes around 40 minutes with 4cores i7(7th generation) and 12GM RAM laptop.</p>
+<pre class="r"><code>#select max warning threshold
+warning_thresholds &lt;- 1:15
+
+# cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1,1) #Detect the number of cores and set it to total minus 1 to avoid overload
+# cl &lt;- makeCluster(cores)
+# clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
+# clusterEvalQ(cl, library(&quot;tidyverse&quot;))
+# system.time(
+#   ROC &lt;- pbapply::pblapply(warning_thresholds, function(x) 
+#   {
+#     xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
+#     return(xx)
+#   },
+#   cl = cl
+#   )
+# )
+# stopCluster(cl)</code></pre>
+<p>The results of calculations can be directly loaded.</p>
+<pre class="r"><code> load( file =&quot;./data/op_2007_16/results/ROC_output.Rdata&quot;)</code></pre>
+<p>Sort the outputs for each model variation.</p>
+<pre class="r"><code>ROC_data &lt;- as.data.frame(data.table::rbindlist(ROC)) #Outputs stored for each warning threshold/cutoffs 
+ROC_data &lt;- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
+ROC_data[[1]] %&gt;% gt()</code></pre>
+<p><style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#wlnrxwwxvt .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#wlnrxwwxvt .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#wlnrxwwxvt .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#wlnrxwwxvt .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#wlnrxwwxvt .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#wlnrxwwxvt .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#wlnrxwwxvt .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#wlnrxwwxvt .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#wlnrxwwxvt .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#wlnrxwwxvt .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#wlnrxwwxvt .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#wlnrxwwxvt .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#wlnrxwwxvt .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#wlnrxwwxvt .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#wlnrxwwxvt .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#wlnrxwwxvt .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#wlnrxwwxvt .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#wlnrxwwxvt .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#wlnrxwwxvt .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#wlnrxwwxvt .gt_center {
+  text-align: center;
+}
+
+#wlnrxwwxvt .gt_left {
+  text-align: left;
+}
+
+#wlnrxwwxvt .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#wlnrxwwxvt .gt_font_normal {
+  font-weight: normal;
+}
+
+#wlnrxwwxvt .gt_font_bold {
+  font-weight: bold;
+}
+
+#wlnrxwwxvt .gt_font_italic {
+  font-style: italic;
+}
+
+#wlnrxwwxvt .gt_super {
+  font-size: 65%;
+}
+
+#wlnrxwwxvt .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="wlnrxwwxvt" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>model</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>sens</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>one_min_spec</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>cut_point</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>1.0</td>
+<td class='gt_row gt_right'>0.8067010</td>
+<td class='gt_row gt_right'>1</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>1.0</td>
+<td class='gt_row gt_right gt_striped'>0.7268041</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.9</td>
+<td class='gt_row gt_right'>0.6829897</td>
+<td class='gt_row gt_right'>3</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.9</td>
+<td class='gt_row gt_right gt_striped'>0.6108247</td>
+<td class='gt_row gt_right gt_striped'>4</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.9</td>
+<td class='gt_row gt_right'>0.5257732</td>
+<td class='gt_row gt_right'>5</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.8</td>
+<td class='gt_row gt_right gt_striped'>0.4561856</td>
+<td class='gt_row gt_right gt_striped'>6</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.8</td>
+<td class='gt_row gt_right'>0.4304124</td>
+<td class='gt_row gt_right'>7</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.6</td>
+<td class='gt_row gt_right gt_striped'>0.3350515</td>
+<td class='gt_row gt_right gt_striped'>8</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.5</td>
+<td class='gt_row gt_right'>0.3195876</td>
+<td class='gt_row gt_right'>9</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.5</td>
+<td class='gt_row gt_right gt_striped'>0.2963918</td>
+<td class='gt_row gt_right gt_striped'>10</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.5</td>
+<td class='gt_row gt_right'>0.2835052</td>
+<td class='gt_row gt_right'>11</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.4</td>
+<td class='gt_row gt_right gt_striped'>0.2654639</td>
+<td class='gt_row gt_right gt_striped'>12</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.4</td>
+<td class='gt_row gt_right'>0.2680412</td>
+<td class='gt_row gt_right'>13</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>85_10_10_90</td>
+<td class='gt_row gt_right gt_striped'>0.4</td>
+<td class='gt_row gt_right gt_striped'>0.2680412</td>
+<td class='gt_row gt_right gt_striped'>14</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>85_10_10_90</td>
+<td class='gt_row gt_right'>0.4</td>
+<td class='gt_row gt_right'>0.2268041</td>
+<td class='gt_row gt_right'>15</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div> ###Visualisation</p>
+<pre class="r"><code>df &lt;- ROC_data[[&quot;90_10_12_rain&quot;]]
+df &lt;- df[rev(df$cut_point),]
+
+#append rows for plotting
+x &lt;- rep(NA, ncol(df))
+df &lt;- rbind(x, df)
+df[nrow(df)+1,] &lt;- NA
+df$model &lt;- unique(df$model[!is.na(df$model)])
+df[1,c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 0
+df[nrow(df),c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 1
+
+
+ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
+  geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
+  geom_path(colour = &quot;gray&quot;) + 
+  geom_point(colour = &quot;black&quot;) + 
+  geom_text_repel(size = 2)+
+  scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
+  scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
+  theme_bw()+
+  ggtitle(paste(df[1,1]))+
+  theme_bw()+
+  theme(text = element_text(size=9),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_text_repel).</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<div id="section" class="section level3">
+<h3></h3>
 </div>
 <div id="description-of-variables" class="section level2">
 <h2>Description of variables</h2>
@@ -877,13 +2432,14 @@ dates_cut</code></pre>
 ##     }
 ##     invisible(names)
 ## }
-## &lt;bytecode: 0x000000001d30b8f8&gt;
+## &lt;bytecode: 0x0000000024903520&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 </div>
 <div id="download" class="section level2">
 <h2>Download</h2>
 <p>The data are deposited in xx public repositories where they can be downloaded. Check on each data repository the policies regarding data use and citation.</p>
 <p><img src = "https://osf.io/static/img/circle_logo.png" width = "25"> <a href="DOI%2010.17605/OSF.IO/7D3CH"></a></p>
+</div>
 </div>
 
 

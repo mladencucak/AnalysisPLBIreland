@@ -18,17 +18,13 @@ Met Eirean:
 University of Queensland:
 - [Adam Sparks](http://staffprofile.usq.edu.au/profile/Adam-Sparks)
 
-## Methodology
-
-Considerations about sampling, study design, randomization, factors, response variables, etc.
-
 
 ## Citation
 
 Please cite this research compendium as:
 
 
-> Authors, . Title of compendium. Online at https://doi.org/xxx/xxx
+> Cucak, . Title of compendium. Online at https://doi.org/xxx/xxx
 
 ## Licences
 

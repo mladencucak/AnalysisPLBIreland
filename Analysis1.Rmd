@@ -1,6 +1,6 @@
 % Data 
 
-## Introduction 
+# Introduction 
 
 
 
@@ -18,28 +18,39 @@ list.of.packages <-
     "imputeTS",
     "scales",
     "padr",
+    "devtools",
     "readxl",
     "stringr",
     "lubridate",
     "readr",
-    "egg"
+    "pracma",
+    "glue",
+    "remotes",
+    "parallel",
+    "pbapply",
+    "ggrepel",
+    "ggthemes"
   )
+
+
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 #Download packages that are not already present
 if(length(new.packages)) install.packages(new.packages)
 
+if("gt"%in%installed.packages()== FALSE) remotes::install_github("rstudio/gt")
+
+list.of.packages <- c(list.of.packages, "gt")
 packages_load <-lapply(list.of.packages, require, character.only = TRUE)
+
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load)==0)){
   warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
 }else {
   print("All packages were succesfully loaded.")
-}
-
-rm(list.of.packages, new.packages)
+};rm(list.of.packages, new.packages, packages_load)
 
 ```
 
@@ -51,8 +62,9 @@ Historical weather data from a Met Éireann Oak Park synoptic weather station wa
 
 ```{r message=FALSE, warning=FALSE}
 #Weather data, parameters and cut off dates
-load(file="data/OP_2007-2016.RData")
-OP[1:5,1:20]
+load(file="data/op_2007_16/OP_2007-2016.RData")
+
+OP[1:5,1:20] %>% gt()
 ```
 
 
@@ -102,43 +114,111 @@ OP %>% group_by( year_var)  %>%
             NA_rhum = sum(is.na(rhum)))
 ```
 
+##Dates
+Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field.	Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to  disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period for visible disease symptoms to be observed in the field. 
+```{r}
+#Get subsets of data  for period before the epidemics were initiated
+dates_cut <-
+  read_csv(
+  "./data/op_2007_16/plantingdates.csv",
+  col_types = cols(
+  disease_observed_sus = col_date(format = "%d/%m/%Y"),
+  last_assessment = col_date(format = "%d/%m/%Y")
+  )
+  )
+  dates_cut$planting_date <-
+  as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
+  dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
+  dates_cut %>% gt()
+  
+```
 
-## The analysis 
+# The analysis 
 
 The set of main parameters of Irish rules model is evaluated. The csv sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulnd named `risk_11111` represents set of the original model parameters. 
 
 ```{r message=FALSE, warning=FALSE}
 #read in parameters
-par <- read_csv(paste0("./data/parameters.csv"), skip = 10)
-par$param_set <-stringi::stri_replace_all_fixed(par$param_set, "\t", "")
-par
+par <- read_xlsx(paste("./data/op_2007_16/par.xlsx"), sheet = "par")
+par %>% gt()
 ```
+
+
+```{r}
+
+params <- expand.grid(par[,1:3])
+
+#set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
+params$lw_rh <- "rain"
+
+#Repeat all of the analysis considering rh >= 90% as an estimator of leaf wetness
+params2 <- params
+params2$lw_rh <- as.character(90)
+
+par <- bind_rows(params, params2)
+rm(params, params2)
+
+# set a column with a name for each model
+par<- add_column(par, model = NA, .before = 1 )
+for (i in seq_along(1 : nrow(par))) {
+  par[i,1] <- paste0( par[i,2: length(names(par))], collapse = "_" )
+}
+str(par)
+```
+
 ###The model
 Implementation of the model
 ```{r}
-IrishRulesModel <-function(data, param = NULL){
+IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
+    
+  
+  # param <- par[1,]
+  # weather <- OP[OP$year_var==2016,]
+  
+  require(data.table)
+  require(tidyverse)
+  require(zoo)
+  
+  # wetness requirement prior to infection accumulation start
+  # time window of 6 hours, 3 before/after sporulation ends
+  wet_before <- 3 
+  wet_after <- 3
+  
   # Parameter list
   if (is.null(param)){
     rh_thresh <- 90
     temp_thres <- 10
     hours <- 12   #sum of hours before EBH accumulation
-    wet_before <- 3
-    wet_after <- 3
   }else{
     #pass a vector of parameters 
     rh_thresh <- as.numeric(param[2])
     temp_thres <- as.numeric(param[3])
     hours <- as.numeric(param[4])   
-    wet_before <- as.numeric(param[5])
-    wet_after <- as.numeric(param[6])
-    lw_rhum <- param[7]           #if is NA then only rain data will be used
+    lw_rhum <- param[5]           #if is NA then only rain data will be used
   }
   
-  data  %>% collect  %>% .[["rain"]] -> rain
-  data  %>% collect  %>% .[["rhum"]] -> rh
-  data  %>% collect  %>% .[["temp"]] -> temp
-  if(sum(is.na(with(data, rain, temp,rhum)))>5){
-    stop(print("sum of NAs is more than 5"))
+  
+  weather[["rain"]] -> rain
+  if("rhum" %in% names(weather)){weather[["rhum"]] -> rh}
+  if("rh" %in% names(weather)){weather[["rh"]] -> rh}
+  weather [["temp"]] -> temp
+  
+  
+  
+  # This function to infil missing values to let the model run
+  #If maximum infill gap is not provided it is defaulted to 7
+  if (is.null(infill_gap)) {
+    infill_gap <- 7
+  } 
+  
+  if(sum(is.na(with(weather, rain, temp,rhum)))>0){
+    temp <- round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap),1)
+    rh <- round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap),0)
+    rh  <- sapply(rh, function(x) ifelse(x>100, x<-100, x))
+  }
+  
+  if(sum(is.na(with(weather, rain, temp,rhum)))>0){
+    stop(print("The sum of NAs is more than 7! Check your weather data."))
   }
   
   #"Out of boounds"
@@ -146,29 +226,18 @@ IrishRulesModel <-function(data, param = NULL){
   temp <- c(temp, rep(0,20))
   rh <- c(rh, rep(0,20))
   
-  rain <- na.approx(rain, maxgap = 5)
-  temp <- na.approx(temp, maxgap = 5)
-  rh <- na.approx(rh, maxgap = 5)
-  # rain <- as.vector(data[,9])
-  # temp <- data[,6]
-  # rh <- data[,7]
-  # class(temp)
   # check if there is 12 hours of conditions: rh >= 90 and t>= 10
-  criteria<- as.numeric(temp>=temp_thres & rh>=rh_thresh) #Specify criteria> data$crit
+    criteria<- as.numeric(temp>=temp_thres & rh>=rh_thresh)
+
+  #cumulative sum of hours that meet the criteria with restart at zero
+  criteria_sum <-  stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
   
-  #cumulative sum with restart at zero
-  #criteria_sum <-  ave(criteria, cumsum(criteria == 0), FUN = cumsum)
-  #data$rs33 <- with(rle(data$rs1!=0), sequence(lengths)*rep(values, lengths))
-  criteria_sum <- ave(coalesce(criteria, 0), data.table::rleid(zoo::na.locf(criteria != 0,maxgap = 3)), FUN = cumsum)
-  
-  
-  #cumulative sum with restart at zero
-  # criteria_sum <-  ave(criteria, cumsum(criteria == 0), FUN = cumsum)
-  #data$rs33 <- with(rle(data$rs1!=0), sequence(lengths)*rep(values, lengths))
   risk <- rep(0, length(temp))
   
-  criteria_met12  <-as.numeric( criteria_sum >= hours )
+  criteria_met12  <-as.numeric( criteria_sum >= hours ) #accumulaition of EBH starts on 10th hour
   idx             <-which(criteria_sum == hours)
+  
+  
   
   
   #If there are no accumulations return vector with zeros
@@ -225,38 +294,245 @@ IrishRulesModel <-function(data, param = NULL){
 ###Model Run
 The model is run for each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
 ```{r}
+#Not run
+# for(i in 1:nrow(par)) {
+#   loop_var <- apply(par[i,], 1, function(x) {           #Run the model with different parameters 
+#          k <-
+#         lapply(split(OP, factor(OP$year)), function(chunk)
+#         IrishRulesModel(chunk, x)) #get the list of outpus
+#         unlist(k) -> k  #make it a vector
+#         })
+#     OP[, ncol(OP) + 1] <-  as.numeric(loop_var) 
+#     rm(loop_var)
+#     names(OP)[ncol(OP)] <- paste0(par[i, 1])
+#     print(paste(i, "of", nrow(par)))
+# }
+# 
+# 
+# nn <- paste0(names(OP[,26: length(names(OP))]), "_ebh","")
+# setnames(OP, old = c(names(OP[,26: length(names(OP))])), new = nn)
+# rm(i,nn)
+```
 
-
-for(i in 1:nrow(par) ){
-  loop_var <- apply(par[i,],1, function(x) {
-    k <- lapply(split(OP, factor(OP$year)), function(chunk)  IrishRulesModel(chunk, x)) #get the list of outpus
-    unlist(k) -> k  #make it a vector
-  })
-  OP[,ncol(OP)+1] <-  as.numeric(loop_var)
-  rm(loop_var)
-  names(OP)[ncol(OP)] <- paste0(par[i,1]) #asign the name
-}
-
-nn <- paste0(names(OP[,26:73]), "_ebh","")
-names(OP[,26:73]) <-  nn
-setnames(OP, old = c(names(OP[,26:73])), new = nn)
-rm(i,nn)
+```{r}
+load(file="data/op_2007_16/OP_for_analysis.RData")
 # Sample of outputs
 head(OP[, c(1,7,9,15,24:30)],5)
 ```
 
 
-##
+
+
+#Analsis of the outputs
+
 
 ```{r}
-#Get subsets of data  for period before the epidemics were initiated
-dates_cut <-  read_csv("./data/plantingdates.csv", col_types = cols(disease_observed_sus = col_date(format = "%d/%m/%Y"),
-                                                          last_assessment = col_date(format = "%d/%m/%Y"),
-                                                          disease_observed_res = col_date(format = "%d/%m/%Y"),
-                                                          disease_observed_setanta = col_date(format = "%d/%m/%Y")))
-dates_cut$planting_date <- as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
-dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
-dates_cut
+SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){ 
+
+  #Set the warning threshold and run the rest of the script 
+  warning_threshold <- y
+  #data
+  fun_df <- weather_data
+  
+  #A function to subset the data for the period of interest in each year 
+  test.overlap = function(vals,start_date, end_date ) {
+    rowSums(mapply(function(a,b) between(vals, a, b),
+                   start_date, end_date)) > 0
+  }
+  
+  #Subset  each year from emergence to disease onset and calculate number of FP and TN
+   fptn_df <- 
+  fun_df  %>%
+    #Subset the of the data for the duration of non-warning period for each year
+    filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %>% 
+    select(ends_with("year_var"),
+           ends_with("week_var"),
+           ends_with("doy"),
+           ends_with("_ebh")) %>%
+    group_by(year_var) %>%
+    #if there was an accumulation from previous day, it would triger a warning
+    #Check aal of the first five rows because of possible break of 5 hours
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(row_number() <= 5 & . >= warning_threshold,
+                          warning_threshold, .))) %>% 
+    #all five values is changed so we have to delete 4 of them and leave only one
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(row_number() <= 4 & . == warning_threshold, 0, .))) %>%
+    # Change values coresponding to the warning threshold to 1 for calculating the sum
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(. == warning_threshold, 1, 0))) %>%
+    group_by(year_var, week_var, doy) %>%
+    summarise_at(., .vars = colnames(.[grep("ebh", colnames(.))]), .funs = sum)  
+    
+  
+  #Each warning would cause treatment that will keep the plants protected for a period of time
+   prot_duration <- ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
+   
+   TreatmentWindow <- function(x,prot_duration){
+     # x <- fptn_df[["93_10_12_rain_ebh"]]
+     y <- vector(mode = "numeric", length = length(x)+prot_duration)
+     for (i in seq_along(x)) {
+       if(x[i] == 1){
+         y[i:c(i+prot_duration)] <- 1
+       }
+     }
+     y
+   }
+   fptn_df[grep("ebh", colnames(fptn_df))] <- 
+    lapply(fptn_df[grep("ebh", colnames(fptn_df))], function(x) TreatmentWindow(x,prot_duration))
+  
+  
+  FP <- summarise_all(fptn_df[,colnames(fptn_df[,grep("ebh", colnames(fptn_df))])], .funs = sum)
+  
+  #Each warning will cause a treatment 
+  total_days <- nrow(fptn_df) #total  duration of non_warning period
+  
+  TN <- total_days - FP
+  
+  
+  ##########################################################
+  #subset for 10 days prior to disease onset: Warning period
+  tpfn_df <- 
+  fun_df %>%
+    #Subset of the data for the duration WARNING period in each year
+    filter(test.overlap(short_date,  dates_cut$warning,dates_cut$disease_onset)) %>% 
+    select(ends_with("year_var"),
+           ends_with("week_var"),
+           ends_with("doy"),
+           ends_with("_ebh")) %>%
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(row_number() <= 5 & . >= warning_threshold, warning_threshold, .))) %>%
+    #all five values is changed so we have to delete 4 of them and leave only one
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(row_number() <= 4 & . == warning_threshold,
+                          0, .))) %>%
+    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+              funs(ifelse(. == warning_threshold, 1, 0))) %>%
+    group_by(year_var) %>%
+    summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %>% 
+    mutate_at(., #some years have two warnings during the warning period
+              .vars = colnames(.[grep("ebh", colnames(.))]),funs(ifelse(. >1 , 1, 0)))
+    
+  # tpfn_df[,1:4]
+  
+  TP <- summarise_all(tpfn_df[,colnames(tpfn_df[,grep("ebh", colnames(tpfn_df))])], .funs = sum)
+
+    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years. 
+  unique(tpfn_df$year_var) %>% 
+    length() -> no_of_outbreaks
+  FN <- no_of_outbreaks - TP
+  
+  #summary
+  test <- data.frame( model = names(FP), 
+                      FP = t(FP[1,]),
+                      tn = t(TN[1,]),
+                      TP = t(TP[1,]),
+                      FN = t(FN[1,]))
+  names(test) <- c("model", "FP", "TN", "TP", "FN")
+  test <- data.frame(test, row.names = NULL)
+  
+  
+  test$model <-  str_replace(test$model, "_ebh", "")
+  test$sens <- with(test, TP/(TP + FN))  #PTP sensitivity
+  test$spec <- with(test, TN/(TN + FP))  #PTN specificity
+
+  return_df <- test[,c("model", "sens")]
+  return_df$"one_min_spec" <- 1-test[,"spec"]
+  return_df$cut_point <- warning_threshold
+
+  return(return_df)
+  
+}
+```
+
+This function was applied to output of each variation of the model with varying warning threshold from 1 to 15 EBH. This function is run with paralel processing support because it takes around 40 minutes with 4cores i7(7th generation) and 12GM RAM laptop.   
+```{r}
+#select max warning threshold
+warning_thresholds <- 1:15
+
+# cores <- ifelse(detectCores() > 1, detectCores()-1,1) #Detect the number of cores and set it to total minus 1 to avoid overload
+# cl <- makeCluster(cores)
+# clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
+# clusterEvalQ(cl, library("tidyverse"))
+# system.time(
+#   ROC <- pbapply::pblapply(warning_thresholds, function(x) 
+#   {
+#     xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
+#     return(xx)
+#   },
+#   cl = cl
+#   )
+# )
+# stopCluster(cl)
+```
+
+The results of calculations can be directly loaded. 
+```{r}
+ load( file ="./data/op_2007_16/results/ROC_output.Rdata")
+```
+
+Sort the outputs for each model variation.
+```{r}
+ROC_data <- as.data.frame(data.table::rbindlist(ROC)) #Outputs stored for each warning threshold/cutoffs 
+ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
+ROC_data[[1]] %>% gt()
+```
+###Visualisation
+
+```{r}
+df <- ROC_data[["90_10_12_rain"]]
+df <- df[rev(df$cut_point),]
+
+#append rows for plotting
+x <- rep(NA, ncol(df))
+df <- rbind(x, df)
+df[nrow(df)+1,] <- NA
+df$model <- unique(df$model[!is.na(df$model)])
+df[1,c("sens","one_min_spec")] <- 0
+df[nrow(df),c("sens","one_min_spec")] <- 1
+
+
+ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
+  geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
+  geom_path(colour = "gray") + 
+  geom_point(colour = "black") + 
+  geom_text_repel(size = 2)+
+  scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
+  scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
+  theme_bw()+
+  ggtitle(paste(df[1,1]))+
+  theme_bw()+
+  theme(text = element_text(size=9),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+###
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
 
 ```
 
