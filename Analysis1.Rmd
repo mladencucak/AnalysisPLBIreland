@@ -29,10 +29,11 @@ list.of.packages <-
     "parallel",
     "pbapply",
     "ggrepel",
-    "ggthemes"
+    "ggthemes",
+    "egg",
+    "rsm",
+    "GGally"
   )
-
-
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
@@ -58,7 +59,7 @@ if (any(as.numeric(packages_load)==0)){
 ## Data 
 
 ### Weather Data
-Historical weather data from a Met Éireann Oak Park synoptic weather station was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
+Historical weather data from Met Éireann  synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
 
 ```{r message=FALSE, warning=FALSE}
 #Weather data, parameters and cut off dates
@@ -67,7 +68,7 @@ load(file="data/op_2007_16/OP_2007-2016.RData")
 OP[1:5,1:20] %>% gt()
 ```
 
-
+Additional variables needed for the analysis.
 ```{r}
 colnames(OP)[which(names(OP) == "year")] <- "year_var"
 OP <- add_column(OP, week_var =data.table::week(OP$date), .before = "i_rain" )
@@ -79,9 +80,7 @@ OP <- subset(OP, month >3 & month < 10)
 ```
 Remove the variables we dont need for the analysis, to make some speed gains. 
 
-
-
-Get summary of missing values for the variables of interest. 
+Get a summary of missing values for the variables of interest. 
 ```{r}
 OP %>% group_by( year_var)  %>%
   summarize(NA_rain = sum(is.na(rain)),
@@ -103,8 +102,7 @@ OP %>% group_by( year_var)  %>%
             NA_rhum = sum(is.na(rhum)))
 ```
 
-Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations, which are defined within the model, we can use the same conditions to impute these missing values. 
-We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. 
+Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
 
 ```{r}
 OP[is.na(OP$rain),]$rain<- with(OP[is.na(OP$rain),],ifelse(rhum<88|temp<8, 0, rain))
@@ -113,9 +111,9 @@ OP %>% group_by( year_var)  %>%
             NA_temp = sum(is.na(temp)),
             NA_rhum = sum(is.na(rhum)))
 ```
-
+We have no missing values and it is safe to proceed. 
 ##Dates
-Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field.	Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to  disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period for visible disease symptoms to be observed in the field. 
+Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field.	Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to  disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field. 
 ```{r}
 #Get subsets of data  for period before the epidemics were initiated
 dates_cut <-
@@ -134,7 +132,7 @@ dates_cut <-
 
 # The Analysis 
 
-The set of main parameters of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulnd named `90_10_12_rain` represents set of the original model parameters. 
+The set of the most important variables of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulmn named `90_10_12_rain` represents set of the original model parameters. 
 
 ```{r message=FALSE, warning=FALSE}
 #read in parameters
@@ -144,36 +142,31 @@ par %>% gt()
 
 
 ```{r}
-
 params <- expand.grid(par[,1:3])
 
 #set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
 params$lw_rh <- "rain"
 
-#Repeat all of the analysis considering rh >= 90% as an estimator of leaf wetness
+#Repeat all of the analysis considering rh >= 90% and rain as an estimator of leaf wetness
 params2 <- params
-params2$lw_rh <- as.character(90)
+params2$lw_rh <- as.character("r+rh")
 
-par <- bind_rows(params, params2)
-rm(params, params2)
+par <- bind_rows(params, params2);rm(params, params2)
 
 # set a column with a name for each model
+
 par<- add_column(par, model = NA, .before = 1 )
 for (i in seq_along(1 : nrow(par))) {
   par[i,1] <- paste0( par[i,2: length(names(par))], collapse = "_" )
 }
 str(par)
+
 ```
 
 ###The model
 Implementation of the model
 ```{r}
 IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
-    
-  
-  # param <- par[1,]
-  # weather <- OP[OP$year_var==2016,]
-  
   require(data.table)
   require(tidyverse)
   require(zoo)
@@ -202,8 +195,6 @@ IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
   if("rh" %in% names(weather)){weather[["rh"]] -> rh}
   weather [["temp"]] -> temp
   
-  
-  
   # This function to infil missing values to let the model run
   #If maximum infill gap is not provided it is defaulted to 7
   if (is.null(infill_gap)) {
@@ -225,18 +216,17 @@ IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
   temp <- c(temp, rep(0,20))
   rh <- c(rh, rep(0,20))
   
-  # check if there is 12 hours of conditions: rh >= 90 and t>= 10
-    criteria<- as.numeric(temp>=temp_thres & rh>=rh_thresh)
+  # conditions for sporulation
+  criteria<- as.numeric(temp>=temp_thres & rh>=rh_thresh)
 
-  #cumulative sum of hours that meet the criteria with restart at zero
+  #cumulative sum of hours that meet the criteria for sporulatoion with restart at zero
   criteria_sum <-  stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
   
+  #Initiate risk accumulation vector
   risk <- rep(0, length(temp))
   
-  criteria_met12  <-as.numeric( criteria_sum >= hours ) #accumulaition of EBH starts on 10th hour
+  criteria_met12  <-as.numeric( criteria_sum >= hours ) #accumulaition of EBH starts after sporulation
   idx             <-which(criteria_sum == hours)
-  
-  
   
   
   #If there are no accumulations return vector with zeros
@@ -291,7 +281,7 @@ IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
 
 
 ###Model Run
-The model is run for each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
+The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
 ```{r}
 #Not run
 # for(i in 1:nrow(par)) {
@@ -320,11 +310,9 @@ head(OP[, c(1,7,9,15,24:30)],5)
 ```
 
 
-
-
 #Analsis of the outputs
 
-
+The function `SensParametersCalc` calculates Sensitivity and Specificty of each variation of the model.
 ```{r}
 SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){ 
 
@@ -434,20 +422,18 @@ SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){
   test$model <-  str_replace(test$model, "_ebh", "")
   test$sens <- with(test, TP/(TP + FN))  #PTP sensitivity
   test$spec <- with(test, TN/(TN + FP))  #PTN specificity
-
   return_df <- test[,c("model", "sens")]
   return_df$"one_min_spec" <- 1-test[,"spec"]
   return_df$cut_point <- warning_threshold
 
   return(return_df)
-  
 }
 ```
 
-This function was applied to output of each variation of the model with varying warning threshold from 1 to 15 EBH. This function is run with paralel processing support because it takes around 40 minutes with 4cores i7(7th generation) and 12GM RAM laptop.   
+This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with paralel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GM RAM laptop.   
 ```{r}
 #select max warning threshold
-warning_thresholds <- 1:15
+warning_thresholds <- 1:18
 
 # cores <- ifelse(detectCores() > 1, detectCores()-1,1) #Detect the number of cores and set it to total minus 1 to avoid overload
 # cl <- makeCluster(cores)
@@ -472,14 +458,14 @@ The results of calculations can be directly loaded.
 
 Sort the outputs for each model variation.
 ```{r}
-ROC_data <- as.data.frame(data.table::rbindlist(ROC)) #Outputs stored for each warning threshold/cutoffs 
+ROC_data <- as.data.frame(data.table::rbindlist(ROC));rm(ROC) #Outputs stored for each warning threshold/cutoffs 
 ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
 ROC_data[[1]] %>% gt()
 ```
 
 ###ROC 
 Empirical ROC curve was created for each variation of the model.  
-```{r}
+```{r message=FALSE, warning=FALSE, fig.dim = c(6, 4)}
 df <- ROC_data[["90_10_12_rain"]]
 df <- df[rev(df$cut_point),]
 
@@ -496,22 +482,20 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
   geom_path(colour = "gray") + 
   geom_point(colour = "black") + 
-  geom_text_repel(size = 2)+
+  geom_text_repel(size = 3)+
   scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
   scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
-  theme_bw()+
   ggtitle(paste(df[1,1]))+
   theme_bw()+
-  theme(text = element_text(size=9),
+  theme(text = element_text(size=11),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
 
 ###
-
+With ROC curves constructed AUC is calculated for each model variation. 
 ```{r}
 #function to calculate AUC for list of inputs
-
 GetAUC <- function(fun_df){
   fun_df <- fun_df[rev(order(fun_df$cut_point)),]
   auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
@@ -519,15 +503,169 @@ GetAUC <- function(fun_df){
                        auc = auc)
   return(result)
 }
-AUC_data <- lapply(ROC_data, function(x) GetAUC(x))
+AUC_data <- lapply(ROC_data, function(x) GetAUC(x));rm(ROC_data)
+AUC_data <- lapply(AUC_data, function(x) mutate_if(x,is.factor, as.character))
 AUC_data <- bind_rows(AUC_data)
 ```
 
+Each model variation is now transformed from character string to a factor vector. 
 ```{r}
 parameters <- colnames(par[,names(par) != "model"])
 AUC_data <-  separate(AUC_data, model, into =  parameters, sep = "_")
 AUC_data[AUC_data$lw_rh== "rain","lw_rh"] <- 0
-AUC_data[,parameters] <- lapply(AUC_data[,parameters], function(x) as.numeric(x))
-AUC_data<- data.frame(AUC_data)
+AUC_data[,parameters] <- lapply(AUC_data[,parameters], as.numeric); rm(parameters)
+data<- data.frame(AUC_data)
+head(data) %>% gt()
+```
+
+
+#Parameter evaluation
+##Leaf wetness estimation
+
+We shall consult visual aids to assess if distribution of differences follows normal distribution.
+
+```{r}
+t_data <- 
+  data %>% 
+  group_by(rh_thresh, temp_thres, hours) %>% 
+  unite(var, rh_thresh, temp_thres, hours) %>% 
+  spread(key = lw_rh, value = auc) %>% 
+  rename(r= "0",r_rh = "90") %>% 
+  mutate(difference = r - r_rh)
+ggplot(t_data, aes(x = difference)) +
+  geom_histogram(binwidth = 0.001)+
+  geom_density(fill = "royalblue", 
+               alpha = 0.5, 
+               color = NA) + 
+  geom_point(aes(y = 0),
+             alpha = 0.5)+
+  theme_article()
+```
+
+Compute summary statistics by groups.
+```{r}
+group_by(data, lw_rh) %>%
+  summarise(
+    count = n(),
+    median = median(auc, na.rm = TRUE),
+    IQR = IQR(auc, na.rm = TRUE)
+  ) %>% gt()
+```
+
+
+```{r}
+shapiro.test(t_data$difference)
+```
+The p-value < 0.05 implying that the distribution of the data is significantly different from normal distribution.
+Use paired-sample Wilcoxon test to determine if median auc with r as lw estimator is as good as the median auc with both r and rh as estimators. 
+
+```{r}
+w.test <- with(t_data, wilcox.test(r, r_rh, paired = TRUE,
+                                   exact = F,
+                                   alternative = "less"))
+w.test
+```
+Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `format.pval(w.test$p.value, eps = .001)`.
+Model outputs forwith rain as single predictor are removed from further analysis. 
+```{r}
+#Remove the data containg only rain as estimator
+data <- subset(data, lw_rh==90)
+data$lw_rh <- NULL
+```
+
+###T, RH and Sporulation duration
+Scatterplot matrix shows some relationships between y and other variables
+```{r}
+GGally::ggpairs(data, 
+        lower = list(continuous = "points"), 
+        upper = list(continuous = "cor")
+)
+```
+Increasing temperature threshold had positive, while reducing rh and duration of sporulation has negative with increase in AUROC.
+
+Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.  
+```{r}
+data[order(data$hours),] %>% 
+  ggplot(., aes(factor(hours), auc))+
+  geom_boxplot(width= 0.3)+
+  ggtitle("Boxplot of different durations of minimum sporulation period")+
+  geom_smooth(method = "lm", se=T, color="red", aes(group=1))+
+  xlab("Duration of sporulation period")+
+  theme_bw()
+```
+
+```{r}
+ggplot(data, aes(factor(rh_thresh), auc))+
+  geom_boxplot(width= 0.3)+
+  ggtitle("Boxplot of different rh thresholds for sporulation and infection")+
+  geom_smooth(method = "lm", se=T, color="blue", aes(group=1))+
+  theme_tufte()
+```
+
+```{r}
+ggplot(data, aes(factor(temp_thres), auc))+
+  geom_boxplot(width= 0.3)+
+  ggtitle("Boxplot of different temperature thresholds for sporulation and infection")+
+  geom_smooth(method = "lm", se=T, color="black", aes(group=1), show.legend = T)+
+  theme_tufte()
+```
+
+#Model fitting 
+
+```{r}
+lapply(data[,1:3], function(x) sort(unique(x)))
+```
+Create coded data set. Nine levels of each variable are used. 
+
+```{r}
+cd_data <- coded.data(data, t ~  (temp_thres - 10),
+                      rh ~ (rh_thresh - 90),
+                      h ~ (hours-12))
+str(cd_data)
+head(cd_data) %>% kable()
+
+```
+
+Fit a cubic model.
+```{r}
+rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 4, raw = TRUE), data = cd_data)
+rsm_fit$studres <- rstudent(rsm_fit)
+anova(rsm_fit)
+```
+
+Evaluate model fit with diagnostic plot.
+```{r}
+plot(rsm_fit$studres, main="Residuals vs Order of data")
+abline(h = 0, col = "red")
+```
+
+Visualise fitted response surface. 
+```{r out.width = '33.33%',fig.show = "hold", warning=FALSE }
+z_min <-  min(data$auc)- c(min(data$auc)*0.02)
+z_max <-  max(data$auc)+ c(max(data$auc)*0.02)
+# Create a function interpolating colors in the range of specified colors
+jet.colors <- colorRampPalette( c("red","yellow", "green") )
+# Generate the desired number of colors from this palette
+nbcol <- 100
+color <- jet.colors(nbcol)
+
+
+persp(rsm_fit, ~ h + t,zlab = "AUC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = "AUC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = "AUC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+
+persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+
+persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
+```
+
+
+Packages used
+```{r out.width = '33.33%',fig.show = "hold" }
+sessionInfo()
 ```
 
