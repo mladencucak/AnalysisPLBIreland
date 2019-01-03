@@ -474,7 +474,8 @@ div.tocify {
     &quot;ggthemes&quot;,
     &quot;egg&quot;,
     &quot;rsm&quot;,
-    &quot;GGally&quot;
+    &quot;GGally&quot;,
+    &quot;R.utils&quot;
   )
 
 new.packages &lt;- list.of.packages[!(list.of.packages %in% installed.packages()[,&quot;Package&quot;])]
@@ -496,10 +497,11 @@ if (any(as.numeric(packages_load)==0)){
 };rm(list.of.packages, new.packages, packages_load)</code></pre>
 <pre><code>## [1] &quot;All packages were succesfully loaded.&quot;</code></pre>
 </div>
-<div id="data" class="section level2">
-<h2>Data</h2>
-<div id="weather-data" class="section level3">
-<h3>Weather Data</h3>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<div id="weather-data" class="section level2">
+<h2>Weather Data</h2>
 <p>Historical weather data from Met Éireann synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years.</p>
 <pre class="r"><code>#Weather data, parameters and cut off dates
 load(file=&quot;data/op_2007_16/OP_2007-2016.RData&quot;)
@@ -509,7 +511,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#imyverpijy .gt_table {
+#jkejjfdapm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -528,13 +530,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#imyverpijy .gt_heading {
+#jkejjfdapm .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#imyverpijy .gt_title {
+#jkejjfdapm .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -545,7 +547,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#imyverpijy .gt_subtitle {
+#jkejjfdapm .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -556,7 +558,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#imyverpijy .gt_bottom_border {
+#jkejjfdapm .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -565,7 +567,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#imyverpijy .gt_column_spanner {
+#jkejjfdapm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -573,7 +575,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#imyverpijy .gt_col_heading {
+#jkejjfdapm .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -586,11 +588,11 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#imyverpijy .gt_sep_right {
+#jkejjfdapm .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#imyverpijy .gt_group_heading {
+#jkejjfdapm .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -614,7 +616,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#imyverpijy .gt_empty_group_heading {
+#jkejjfdapm .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -638,29 +640,29 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#imyverpijy .gt_striped {
+#jkejjfdapm .gt_striped {
   background-color: #f2f2f2;
 }
 
-#imyverpijy .gt_row {
+#jkejjfdapm .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#imyverpijy .gt_stub {
+#jkejjfdapm .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#imyverpijy .gt_stub.gt_row {
+#jkejjfdapm .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#imyverpijy .gt_summary_row {
+#jkejjfdapm .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -669,13 +671,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#imyverpijy .gt_first_summary_row {
+#jkejjfdapm .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#imyverpijy .gt_table_body {
+#jkejjfdapm .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -690,55 +692,55 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#imyverpijy .gt_footnote {
+#jkejjfdapm .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#imyverpijy .gt_sourcenote {
+#jkejjfdapm .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#imyverpijy .gt_center {
+#jkejjfdapm .gt_center {
   text-align: center;
 }
 
-#imyverpijy .gt_left {
+#jkejjfdapm .gt_left {
   text-align: left;
 }
 
-#imyverpijy .gt_right {
+#jkejjfdapm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#imyverpijy .gt_font_normal {
+#jkejjfdapm .gt_font_normal {
   font-weight: normal;
 }
 
-#imyverpijy .gt_font_bold {
+#jkejjfdapm .gt_font_bold {
   font-weight: bold;
 }
 
-#imyverpijy .gt_font_italic {
+#jkejjfdapm .gt_font_italic {
   font-style: italic;
 }
 
-#imyverpijy .gt_super {
+#jkejjfdapm .gt_super {
   font-size: 65%;
 }
 
-#imyverpijy .gt_footnote_glyph {
+#jkejjfdapm .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="imyverpijy" style="overflow-x:auto;"><!--gt table start-->
+<div id="jkejjfdapm" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
@@ -920,7 +922,11 @@ OP %&gt;% group_by( year_var)  %&gt;%
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"0","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>We have no missing values and it is safe to proceed. ##Dates Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field.</p>
+<p>We have no missing values and it is safe to proceed.</p>
+</div>
+<div id="bio-data" class="section level2">
+<h2>Bio data</h2>
+<p>Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field.</p>
 <pre class="r"><code>#Get subsets of data  for period before the epidemics were initiated
 dates_cut &lt;-
   read_csv(
@@ -933,324 +939,11 @@ dates_cut &lt;-
   dates_cut$planting_date &lt;-
   as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
   dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
-  dates_cut %&gt;% gt()</code></pre>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#tcbaukbuln .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #000000;
-  font-size: 16px;
-  background-color: #FFFFFF;
-  /* table.background.color */
-  width: auto;
-  /* table.width */
-  border-top-style: solid;
-  /* table.border.top.style */
-  border-top-width: 2px;
-  /* table.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table.border.top.color */
-}
-
-#tcbaukbuln .gt_heading {
-  background-color: #FFFFFF;
-  /* heading.background.color */
-  border-bottom-color: #FFFFFF;
-}
-
-#tcbaukbuln .gt_title {
-  color: #000000;
-  font-size: 125%;
-  /* heading.title.font.size */
-  padding-top: 4px;
-  /* heading.top.padding */
-  padding-bottom: 1px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#tcbaukbuln .gt_subtitle {
-  color: #000000;
-  font-size: 85%;
-  /* heading.subtitle.font.size */
-  padding-top: 1px;
-  padding-bottom: 4px;
-  /* heading.bottom.padding */
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#tcbaukbuln .gt_bottom_border {
-  border-bottom-style: solid;
-  /* heading.border.bottom.style */
-  border-bottom-width: 2px;
-  /* heading.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* heading.border.bottom.color */
-}
-
-#tcbaukbuln .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#tcbaukbuln .gt_col_heading {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* column_labels.background.color */
-  font-size: 16px;
-  /* column_labels.font.size */
-  font-weight: initial;
-  /* column_labels.font.weight */
-  vertical-align: middle;
-  padding: 10px;
-  margin: 10px;
-}
-
-#tcbaukbuln .gt_sep_right {
-  border-right: 5px solid #FFFFFF;
-}
-
-#tcbaukbuln .gt_group_heading {
-  padding: 8px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#tcbaukbuln .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#tcbaukbuln .gt_striped {
-  background-color: #f2f2f2;
-}
-
-#tcbaukbuln .gt_row {
-  padding: 10px;
-  /* row.padding */
-  margin: 10px;
-  vertical-align: middle;
-}
-
-#tcbaukbuln .gt_stub {
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #A8A8A8;
-  padding-left: 12px;
-}
-
-#tcbaukbuln .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#tcbaukbuln .gt_summary_row {
-  background-color: #FFFFFF;
-  /* summary_row.background.color */
-  padding: 6px;
-  /* summary_row.padding */
-  text-transform: inherit;
-  /* summary_row.text_transform */
-}
-
-#tcbaukbuln .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-}
-
-#tcbaukbuln .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
-  border-top-color: #A8A8A8;
-  /* field.border.top.color */
-  border-bottom-style: solid;
-  /* field.border.bottom.style */
-  border-bottom-width: 2px;
-  /* field.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
-}
-
-#tcbaukbuln .gt_footnote {
-  font-size: 90%;
-  /* footnote.font.size */
-  padding: 4px;
-  /* footnote.padding */
-}
-
-#tcbaukbuln .gt_sourcenote {
-  font-size: 90%;
-  /* sourcenote.font.size */
-  padding: 4px;
-  /* sourcenote.padding */
-}
-
-#tcbaukbuln .gt_center {
-  text-align: center;
-}
-
-#tcbaukbuln .gt_left {
-  text-align: left;
-}
-
-#tcbaukbuln .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#tcbaukbuln .gt_font_normal {
-  font-weight: normal;
-}
-
-#tcbaukbuln .gt_font_bold {
-  font-weight: bold;
-}
-
-#tcbaukbuln .gt_font_italic {
-  font-style: italic;
-}
-
-#tcbaukbuln .gt_super {
-  font-size: 65%;
-}
-
-#tcbaukbuln .gt_footnote_glyph {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="tcbaukbuln" style="overflow-x:auto;"><!--gt table start-->
-<table class='gt_table'>
-<tr>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>year</th>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>planting_date</th>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>emergence</th>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>disease_observed_sus</th>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>last_assessment</th>
-</tr>
-<tbody class='gt_table_body'>
-<tr>
-<td class='gt_row gt_right'>2007</td>
-<td class='gt_row gt_left'>2007-04-03</td>
-<td class='gt_row gt_left'>2007-04-24</td>
-<td class='gt_row gt_left'>2007-06-30</td>
-<td class='gt_row gt_left'>2007-08-23</td>
-</tr>
-<tr>
-<td class='gt_row gt_right gt_striped'>2008</td>
-<td class='gt_row gt_left gt_striped'>2008-04-07</td>
-<td class='gt_row gt_left gt_striped'>2008-04-28</td>
-<td class='gt_row gt_left gt_striped'>2008-07-02</td>
-<td class='gt_row gt_left gt_striped'>2008-08-13</td>
-</tr>
-<tr>
-<td class='gt_row gt_right'>2009</td>
-<td class='gt_row gt_left'>2009-04-21</td>
-<td class='gt_row gt_left'>2009-05-12</td>
-<td class='gt_row gt_left'>2009-07-06</td>
-<td class='gt_row gt_left'>2009-08-08</td>
-</tr>
-<tr>
-<td class='gt_row gt_right gt_striped'>2010</td>
-<td class='gt_row gt_left gt_striped'>2010-05-04</td>
-<td class='gt_row gt_left gt_striped'>2010-05-25</td>
-<td class='gt_row gt_left gt_striped'>2010-07-19</td>
-<td class='gt_row gt_left gt_striped'>2010-08-30</td>
-</tr>
-<tr>
-<td class='gt_row gt_right'>2011</td>
-<td class='gt_row gt_left'>2011-05-06</td>
-<td class='gt_row gt_left'>2011-05-27</td>
-<td class='gt_row gt_left'>2011-07-28</td>
-<td class='gt_row gt_left'>2011-08-25</td>
-</tr>
-<tr>
-<td class='gt_row gt_right gt_striped'>2012</td>
-<td class='gt_row gt_left gt_striped'>2012-05-28</td>
-<td class='gt_row gt_left gt_striped'>2012-06-18</td>
-<td class='gt_row gt_left gt_striped'>2012-07-13</td>
-<td class='gt_row gt_left gt_striped'>2012-08-28</td>
-</tr>
-<tr>
-<td class='gt_row gt_right'>2013</td>
-<td class='gt_row gt_left'>2013-06-03</td>
-<td class='gt_row gt_left'>2013-06-24</td>
-<td class='gt_row gt_left'>2013-08-23</td>
-<td class='gt_row gt_left'>2013-09-20</td>
-</tr>
-<tr>
-<td class='gt_row gt_right gt_striped'>2014</td>
-<td class='gt_row gt_left gt_striped'>2014-05-23</td>
-<td class='gt_row gt_left gt_striped'>2014-06-13</td>
-<td class='gt_row gt_left gt_striped'>2014-08-01</td>
-<td class='gt_row gt_left gt_striped'>2014-09-11</td>
-</tr>
-<tr>
-<td class='gt_row gt_right'>2015</td>
-<td class='gt_row gt_left'>2015-05-22</td>
-<td class='gt_row gt_left'>2015-06-12</td>
-<td class='gt_row gt_left'>2015-07-31</td>
-<td class='gt_row gt_left'>2015-09-18</td>
-</tr>
-<tr>
-<td class='gt_row gt_right gt_striped'>2016</td>
-<td class='gt_row gt_left gt_striped'>2016-05-31</td>
-<td class='gt_row gt_left gt_striped'>2016-06-21</td>
-<td class='gt_row gt_left gt_striped'>2016-07-22</td>
-<td class='gt_row gt_left gt_striped'>2016-09-16</td>
-</tr>
-</tbody>
-</table>
-<!--gt table end-->
-</div>
+  dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["date"],"align":["right"]},{"label":["Emergence"],"name":[3],"type":["date"],"align":["right"]},{"label":["Disease observed sus"],"name":[4],"type":["date"],"align":["right"]},{"label":["Last assessment"],"name":[5],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"2007-04-03","3":"2007-04-24","4":"2007-06-30","5":"2007-08-23"},{"1":"2008","2":"2008-04-07","3":"2008-04-28","4":"2008-07-02","5":"2008-08-13"},{"1":"2009","2":"2009-04-21","3":"2009-05-12","4":"2009-07-06","5":"2009-08-08"},{"1":"2010","2":"2010-05-04","3":"2010-05-25","4":"2010-07-19","5":"2010-08-30"},{"1":"2011","2":"2011-05-06","3":"2011-05-27","4":"2011-07-28","5":"2011-08-25"},{"1":"2012","2":"2012-05-28","3":"2012-06-18","4":"2012-07-13","5":"2012-08-28"},{"1":"2013","2":"2013-06-03","3":"2013-06-24","4":"2013-08-23","5":"2013-09-20"},{"1":"2014","2":"2014-05-23","3":"2014-06-13","4":"2014-08-01","5":"2014-09-11"},{"1":"2015","2":"2015-05-22","3":"2015-06-12","4":"2015-07-31","5":"2015-09-18"},{"1":"2016","2":"2016-05-31","3":"2016-06-21","4":"2016-07-22","5":"2016-09-16"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
 </div>
 </div>
 </div>
@@ -1264,7 +957,7 @@ par %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#sdwfxegdzc .gt_table {
+#hlynoxvato .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1283,13 +976,13 @@ par %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#sdwfxegdzc .gt_heading {
+#hlynoxvato .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#sdwfxegdzc .gt_title {
+#hlynoxvato .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1300,7 +993,7 @@ par %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#sdwfxegdzc .gt_subtitle {
+#hlynoxvato .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1311,7 +1004,7 @@ par %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#sdwfxegdzc .gt_bottom_border {
+#hlynoxvato .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1320,7 +1013,7 @@ par %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#sdwfxegdzc .gt_column_spanner {
+#hlynoxvato .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1328,7 +1021,7 @@ par %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#sdwfxegdzc .gt_col_heading {
+#hlynoxvato .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1341,11 +1034,11 @@ par %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#sdwfxegdzc .gt_sep_right {
+#hlynoxvato .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#sdwfxegdzc .gt_group_heading {
+#hlynoxvato .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1369,7 +1062,7 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#sdwfxegdzc .gt_empty_group_heading {
+#hlynoxvato .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1393,29 +1086,29 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#sdwfxegdzc .gt_striped {
+#hlynoxvato .gt_striped {
   background-color: #f2f2f2;
 }
 
-#sdwfxegdzc .gt_row {
+#hlynoxvato .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#sdwfxegdzc .gt_stub {
+#hlynoxvato .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#sdwfxegdzc .gt_stub.gt_row {
+#hlynoxvato .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#sdwfxegdzc .gt_summary_row {
+#hlynoxvato .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1424,13 +1117,13 @@ par %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#sdwfxegdzc .gt_first_summary_row {
+#hlynoxvato .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#sdwfxegdzc .gt_table_body {
+#hlynoxvato .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1445,55 +1138,55 @@ par %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#sdwfxegdzc .gt_footnote {
+#hlynoxvato .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#sdwfxegdzc .gt_sourcenote {
+#hlynoxvato .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#sdwfxegdzc .gt_center {
+#hlynoxvato .gt_center {
   text-align: center;
 }
 
-#sdwfxegdzc .gt_left {
+#hlynoxvato .gt_left {
   text-align: left;
 }
 
-#sdwfxegdzc .gt_right {
+#hlynoxvato .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#sdwfxegdzc .gt_font_normal {
+#hlynoxvato .gt_font_normal {
   font-weight: normal;
 }
 
-#sdwfxegdzc .gt_font_bold {
+#hlynoxvato .gt_font_bold {
   font-weight: bold;
 }
 
-#sdwfxegdzc .gt_font_italic {
+#hlynoxvato .gt_font_italic {
   font-style: italic;
 }
 
-#sdwfxegdzc .gt_super {
+#hlynoxvato .gt_super {
   font-size: 65%;
 }
 
-#sdwfxegdzc .gt_footnote_glyph {
+#hlynoxvato .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="sdwfxegdzc" style="overflow-x:auto;"><!--gt table start-->
+<div id="hlynoxvato" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -2235,18 +1928,17 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   geom_text_repel(size = 3)+
   scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
   scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
-  theme_bw()+
   ggtitle(paste(df[1,1]))+
   theme_bw()+
-  theme(text = element_text(size=11),
+  theme(text = element_text(size=12),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-18-1.png" width="384" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="section" class="section level3">
 <h3></h3>
-<p>With ROC curves constructed AUC is calculated for each model variation.</p>
-<pre class="r"><code>#function to calculate AUC for list of inputs
+<p>With ROC curves constructed AUROC is calculated for each model variation.</p>
+<pre class="r"><code>#function to calculate AUROC for list of inputs
 GetAUC &lt;- function(fun_df){
   fun_df &lt;- fun_df[rev(order(fun_df$cut_point)),]
   auc &lt;-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
@@ -2257,11 +1949,11 @@ GetAUC &lt;- function(fun_df){
 AUC_data &lt;- lapply(ROC_data, function(x) GetAUC(x));rm(ROC_data)
 AUC_data &lt;- lapply(AUC_data, function(x) mutate_if(x,is.factor, as.character))
 AUC_data &lt;- bind_rows(AUC_data)</code></pre>
-<p>Each model variation is now transformed from character string to a factor vector.</p>
+<p>Prepare the data for further analysis.</p>
 <pre class="r"><code>parameters &lt;- colnames(par[,names(par) != &quot;model&quot;])
 AUC_data &lt;-  separate(AUC_data, model, into =  parameters, sep = &quot;_&quot;)
-AUC_data[AUC_data$lw_rh== &quot;rain&quot;,&quot;lw_rh&quot;] &lt;- 0
-AUC_data[,parameters] &lt;- lapply(AUC_data[,parameters], as.numeric); rm(parameters)
+AUC_data[AUC_data$lw_rh== &quot;90&quot;,&quot;lw_rh&quot;] &lt;-&quot;rain_rh&quot;
+AUC_data[,1:3] &lt;- lapply(AUC_data[,1:3], as.numeric); rm(parameters)
 data&lt;- data.frame(AUC_data)
 head(data) %&gt;% gt()</code></pre>
 <style>html {
@@ -2503,7 +2195,7 @@ head(data) %&gt;% gt()</code></pre>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thres</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>hours</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>lw_rh</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>auc</th>
 </tr>
 <tbody class='gt_table_body'>
@@ -2511,42 +2203,42 @@ head(data) %&gt;% gt()</code></pre>
 <td class='gt_row gt_right'>87</td>
 <td class='gt_row gt_right'>10</td>
 <td class='gt_row gt_right'>10</td>
-<td class='gt_row gt_right'>90</td>
+<td class='gt_row gt_left'>rain_rh</td>
 <td class='gt_row gt_right'>0.7966495</td>
 </tr>
 <tr>
 <td class='gt_row gt_right gt_striped'>87</td>
 <td class='gt_row gt_right gt_striped'>10</td>
 <td class='gt_row gt_right gt_striped'>10</td>
-<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_left gt_striped'>rain</td>
 <td class='gt_row gt_right gt_striped'>0.8064433</td>
 </tr>
 <tr>
 <td class='gt_row gt_right'>87</td>
 <td class='gt_row gt_right'>10</td>
 <td class='gt_row gt_right'>11</td>
-<td class='gt_row gt_right'>90</td>
+<td class='gt_row gt_left'>rain_rh</td>
 <td class='gt_row gt_right'>0.7997423</td>
 </tr>
 <tr>
 <td class='gt_row gt_right gt_striped'>87</td>
 <td class='gt_row gt_right gt_striped'>10</td>
 <td class='gt_row gt_right gt_striped'>11</td>
-<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_left gt_striped'>rain</td>
 <td class='gt_row gt_right gt_striped'>0.7680412</td>
 </tr>
 <tr>
 <td class='gt_row gt_right'>87</td>
 <td class='gt_row gt_right'>10</td>
 <td class='gt_row gt_right'>12</td>
-<td class='gt_row gt_right'>90</td>
+<td class='gt_row gt_left'>rain_rh</td>
 <td class='gt_row gt_right'>0.7997423</td>
 </tr>
 <tr>
 <td class='gt_row gt_right gt_striped'>87</td>
 <td class='gt_row gt_right gt_striped'>10</td>
 <td class='gt_row gt_right gt_striped'>12</td>
-<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_left gt_striped'>rain</td>
 <td class='gt_row gt_right gt_striped'>0.7128866</td>
 </tr>
 </tbody>
@@ -2559,14 +2251,13 @@ head(data) %&gt;% gt()</code></pre>
 <h1>Parameter evaluation</h1>
 <div id="leaf-wetness-estimation" class="section level2">
 <h2>Leaf wetness estimation</h2>
-<p>We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
+<p>Differences between pairs of models with same parametets, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
 <pre class="r"><code>t_data &lt;- 
   data %&gt;% 
   group_by(rh_thresh, temp_thres, hours) %&gt;% 
   unite(var, rh_thresh, temp_thres, hours) %&gt;% 
   spread(key = lw_rh, value = auc) %&gt;% 
-  rename(r= &quot;0&quot;,r_rh = &quot;90&quot;) %&gt;% 
-  mutate(difference = r - r_rh)
+  mutate(difference = rain - rain_rh)
 ggplot(t_data, aes(x = difference)) +
   geom_histogram(binwidth = 0.001)+
   geom_density(fill = &quot;royalblue&quot;, 
@@ -2575,7 +2266,7 @@ ggplot(t_data, aes(x = difference)) +
   geom_point(aes(y = 0),
              alpha = 0.5)+
   theme_article()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Compute summary statistics by groups.</p>
 <pre class="r"><code>group_by(data, lw_rh) %&gt;%
   summarise(
@@ -2819,20 +2510,20 @@ ggplot(t_data, aes(x = difference)) +
 <div id="izocawpyyr" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>lw_rh</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>count</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>median</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>IQR</th>
 </tr>
 <tbody class='gt_table_body'>
 <tr>
-<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_left'>rain</td>
 <td class='gt_row gt_right'>343</td>
 <td class='gt_row gt_right'>0.6953608</td>
 <td class='gt_row gt_right'>0.06018041</td>
 </tr>
 <tr>
-<td class='gt_row gt_right gt_striped'>90</td>
+<td class='gt_row gt_left gt_striped'>rain_rh</td>
 <td class='gt_row gt_right gt_striped'>343</td>
 <td class='gt_row gt_right gt_striped'>0.7345361</td>
 <td class='gt_row gt_right gt_striped'>0.09027062</td>
@@ -2847,20 +2538,20 @@ ggplot(t_data, aes(x = difference)) +
 ## 
 ## data:  t_data$difference
 ## W = 0.8718, p-value = 2.877e-16</code></pre>
-<p>The p-value &lt; 0.05 implying that the distribution of the data is significantly different from normal distribution. Use paired-sample Wilcoxon test to determine if median auc with r as lw estimator is as good as the median auc with both r and rh as estimators.</p>
-<pre class="r"><code>w.test &lt;- with(t_data, wilcox.test(r, r_rh, paired = TRUE,
+<p>The p-value &lt; 0.05 implying that the distribution of the data is significantly different from normal distribution. Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estimator is as good as the median auc with both r and rh as estimators.</p>
+<pre class="r"><code>w.test &lt;- with(t_data, wilcox.test(rain, rain_rh, paired = TRUE,
                                    exact = F,
                                    alternative = &quot;less&quot;))
 w.test</code></pre>
 <pre><code>## 
 ##  Wilcoxon signed rank test with continuity correction
 ## 
-## data:  r and r_rh
+## data:  rain and rain_rh
 ## V = 11211, p-value &lt; 2.2e-16
 ## alternative hypothesis: true location shift is less than 0</code></pre>
 <p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p <code>format.pval(w.test$p.value, eps = .001)</code>. Model outputs forwith rain as single predictor are removed from further analysis.</p>
 <pre class="r"><code>#Remove the data containg only rain as estimator
-data &lt;- subset(data, lw_rh==90)
+data &lt;- subset(data, lw_rh==&quot;rain_rh&quot;)
 data$lw_rh &lt;- NULL</code></pre>
 <div id="t-rh-and-sporulation-duration" class="section level3">
 <h3>T, RH and Sporulation duration</h3>
@@ -2869,33 +2560,45 @@ data$lw_rh &lt;- NULL</code></pre>
         lower = list(continuous = &quot;points&quot;), 
         upper = list(continuous = &quot;cor&quot;)
 )</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-26-1.png" width="672" /> Increasing temperature threshold had positive, while reducing rh and duration of sporulation has negative with increase in AUROC.</p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC.</p>
 <p>Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.</p>
 <pre class="r"><code>data[order(data$hours),] %&gt;% 
   ggplot(., aes(factor(hours), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle(&quot;Boxplot of different durations of minimum sporulation period&quot;)+
-  geom_smooth(method = &quot;lm&quot;, se=T, color=&quot;red&quot;, aes(group=1))+
+  geom_boxplot(width= 0.4)+
+  geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
+  ggtitle(&quot;Durations of sporulation period&quot;)+
+  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;red&quot;, aes(group=1))+
   xlab(&quot;Duration of sporulation period&quot;)+
-  theme_tufte()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+  theme_article()</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggplot(data, aes(factor(rh_thresh), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle(&quot;Boxplot of different rh thresholds for sporulation and infection&quot;)+
-  geom_smooth(method = &quot;lm&quot;, se=T, color=&quot;blue&quot;, aes(group=1))+
-  theme_tufte()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+  geom_boxplot(width= 0.4)+
+    geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
+  ggtitle(&quot;RH thresholds for sporulation and infection&quot;)+
+  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;blue&quot;, aes(group=1))+
+  xlab(&quot;RH threshold&quot;)+
+  theme_article()</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggplot(data, aes(factor(temp_thres), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle(&quot;Boxplot of different temperature thresholds for sporulation and infection&quot;)+
-  geom_smooth(method = &quot;lm&quot;, se=T, color=&quot;black&quot;, aes(group=1), show.legend = T)+
-  theme_tufte()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
-</div>
-</div>
-</div>
-<div id="model-fitting" class="section level1">
-<h1>Model fitting</h1>
+  geom_boxplot(width= 0.4)+
+    geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
+
+  ggtitle(&quot;Temperature thresholds for sporulation and infection&quot;)+
+  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;black&quot;, aes(group=1), show.legend = T)+
+  xlab(&quot;Temperature thresholds&quot;)+
+  theme_article()</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Added line #Model fitting</p>
+<pre class="r"><code>lapply(data[,1:3], function(x) sort(unique(x)))</code></pre>
+<pre><code>## $rh_thresh
+## [1] 87 88 89 90 91 92 93
+## 
+## $temp_thres
+## [1]  7  8  9 10 11 12 13
+## 
+## $hours
+## [1]  9 10 11 12 13 14 15</code></pre>
 <p>Create coded data set. Nine levels of each variable are used.</p>
 <pre class="r"><code>cd_data &lt;- coded.data(data, t ~  (temp_thres - 10),
                       rh ~ (rh_thresh - 90),
@@ -2972,15 +2675,6 @@ str(cd_data)</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>lapply(data[,1:3], function(x) sort(unique(x)))</code></pre>
-<pre><code>## $rh_thresh
-## [1] 87 88 89 90 91 92 93
-## 
-## $temp_thres
-## [1]  7  8  9 10 11 12 13
-## 
-## $hours
-## [1]  9 10 11 12 13 14 15</code></pre>
 <p>Fit a cubic model.</p>
 <pre class="r"><code>rsm_fit &lt;-  lm(auc ~ poly( rh, h, t, degree = 4, raw = TRUE), data = cd_data)
 rsm_fit$studres &lt;- rstudent(rsm_fit)
@@ -2993,7 +2687,7 @@ anova(rsm_fit)</code></pre>
 <p>Evaluate model fit with diagnostic plot.</p>
 <pre class="r"><code>plot(rsm_fit$studres, main=&quot;Residuals vs Order of data&quot;)
 abline(h = 0, col = &quot;red&quot;)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>Visualise fitted response surface.</p>
 <pre class="r"><code>z_min &lt;-  min(data$auc)- c(min(data$auc)*0.02)
 z_max &lt;-  max(data$auc)+ c(max(data$auc)*0.02)
@@ -3004,18 +2698,21 @@ nbcol &lt;- 100
 color &lt;- jet.colors(nbcol)
 
 
-persp(rsm_fit, ~ h + t,zlab = &quot;AUC&quot;,at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = &quot;AUC&quot;,at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = &quot;AUC&quot;, at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;,at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;,at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
 
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUC&quot;, at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUC&quot;, at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
 
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUC&quot;, at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUC&quot;, at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-34-1.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-2.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-3.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-4.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-5.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-6.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-7.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-8.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-34-9.png" width="33.33%" /></p>
+persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-32-1.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-2.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-3.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-4.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-5.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-6.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-7.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-8.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-9.png" width="33.33%" /></p>
+<pre class="r"><code>myimages&lt;-list.files(&quot;./data/op_2007_16/graph/yearly_plots&quot;, pattern = &quot;.png&quot;, full.names = TRUE)
+include_graphics(myimages)</code></pre>
+<p><img src="data/op_2007_16/graph/yearly_plots/2007%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2008%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2009%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2010%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2011%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2012%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2013%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2014%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2015%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2016%20.png" width="100%" /></p>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.5.1 (2018-07-02)
@@ -3036,16 +2733,17 @@ persp(rsm_fit, ~ h + rh,zlab = &quot;AUC&quot;, at = data.frame(t = +3, rh = 0, 
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2.2    gt_0.1.0          GGally_1.4.0     
-##  [4] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-##  [7] ggthemes_4.0.1    ggrepel_0.8.0     pbapply_1.3-4    
-## [10] remotes_2.0.2     glue_1.3.0        pracma_2.2.2     
-## [13] lubridate_1.7.4   readxl_1.2.0      devtools_1.13.6  
-## [16] padr_0.4.1        scales_1.0.0      imputeTS_2.7     
-## [19] zoo_1.8-4         knitr_1.21        data.table_1.11.8
-## [22] forcats_0.3.0     stringr_1.3.1     dplyr_0.7.8      
-## [25] purrr_0.2.5       readr_1.3.1       tidyr_0.8.2      
-## [28] tibble_1.4.2      ggplot2_3.1.0     tidyverse_1.2.1  
+##  [1] bindrcpp_0.2.2    gt_0.1.0          R.utils_2.7.0    
+##  [4] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
+##  [7] rsm_2.10          egg_0.4.2         gridExtra_2.3    
+## [10] ggthemes_4.0.1    ggrepel_0.8.0     pbapply_1.3-4    
+## [13] remotes_2.0.2     glue_1.3.0        pracma_2.2.2     
+## [16] lubridate_1.7.4   readxl_1.2.0      devtools_1.13.6  
+## [19] padr_0.4.1        scales_1.0.0      imputeTS_2.7     
+## [22] zoo_1.8-4         knitr_1.21        data.table_1.11.8
+## [25] forcats_0.3.0     stringr_1.3.1     dplyr_0.7.8      
+## [28] purrr_0.2.5       readr_1.3.1       tidyr_0.8.2      
+## [31] tibble_1.4.2      ggplot2_3.1.0     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-137       xts_0.11-2         RColorBrewer_1.1-2
@@ -3074,6 +2772,8 @@ persp(rsm_fit, ~ h + rh,zlab = &quot;AUC&quot;, at = data.frame(t = +3, rh = 0, 
 ## [70] xtable_1.8-3       broom_0.5.1        uroot_2.0-9       
 ## [73] coda_0.19-2        survival_2.42-3    timeDate_3043.102 
 ## [76] memoise_1.1.0      TH.data_1.0-9</code></pre>
+</div>
+</div>
 </div>
 
 

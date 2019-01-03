@@ -32,7 +32,8 @@ list.of.packages <-
     "ggthemes",
     "egg",
     "rsm",
-    "GGally"
+    "GGally",
+    "R.utils"
   )
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -56,12 +57,12 @@ if (any(as.numeric(packages_load)==0)){
 ```
 
 
-## Data 
+# Data 
 
-### Weather Data
+## Weather Data
 Historical weather data from Met Éireann  synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE,fig.align='center'}
 #Weather data, parameters and cut off dates
 load(file="data/op_2007_16/OP_2007-2016.RData")
 
@@ -111,10 +112,11 @@ OP %>% group_by( year_var)  %>%
             NA_temp = sum(is.na(temp)),
             NA_rhum = sum(is.na(rhum)))
 ```
-We have no missing values and it is safe to proceed. 
-##Dates
+We have no missing values and it is safe to proceed.   
+
+##Bio data
 Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field.	Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to  disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field. 
-```{r}
+```{r fig.align='center'}
 #Get subsets of data  for period before the epidemics were initiated
 dates_cut <-
   read_csv(
@@ -127,21 +129,21 @@ dates_cut <-
   dates_cut$planting_date <-
   as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
   dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
-  dates_cut %>% gt()
+  dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 ```
 
 # The Analysis 
 
 The set of the most important variables of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulmn named `90_10_12_rain` represents set of the original model parameters. 
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE,fig.align='center'}
 #read in parameters
 par <- read_xlsx(paste("./data/op_2007_16/par.xlsx"), sheet = "par")
 par %>% gt()
 ```
 
 
-```{r}
+```{r fig.align='center'}
 params <- expand.grid(par[,1:3])
 
 #set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
@@ -165,7 +167,7 @@ str(par)
 
 ###The model
 Implementation of the model
-```{r}
+```{r }
 IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
   require(data.table)
   require(tidyverse)
@@ -303,7 +305,7 @@ The model has been run with each set of parameters, and columns with model outpu
 # rm(i,nn)
 ```
 
-```{r}
+```{r fig.align='center'}
 load(file="data/op_2007_16/OP_for_analysis.RData")
 # Sample of outputs
 head(OP[, c(1,7,9,15,24:30)],5)
@@ -457,7 +459,7 @@ The results of calculations can be directly loaded.
 ```
 
 Sort the outputs for each model variation.
-```{r}
+```{r fig.align='center'}
 ROC_data <- as.data.frame(data.table::rbindlist(ROC));rm(ROC) #Outputs stored for each warning threshold/cutoffs 
 ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
 ROC_data[[1]] %>% gt()
@@ -465,7 +467,7 @@ ROC_data[[1]] %>% gt()
 
 ###ROC 
 Empirical ROC curve was created for each variation of the model.  
-```{r message=FALSE, warning=FALSE, fig.dim = c(6, 4)}
+```{r message=FALSE, warning=FALSE,fig.align='center'}
 df <- ROC_data[["90_10_12_rain"]]
 df <- df[rev(df$cut_point),]
 
@@ -487,15 +489,15 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
   ggtitle(paste(df[1,1]))+
   theme_bw()+
-  theme(text = element_text(size=11),
+  theme(text = element_text(size=12),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
 
 ###
-With ROC curves constructed AUC is calculated for each model variation. 
+With ROC curves constructed AUROC is calculated for each model variation. 
 ```{r}
-#function to calculate AUC for list of inputs
+#function to calculate AUROC for list of inputs
 GetAUC <- function(fun_df){
   fun_df <- fun_df[rev(order(fun_df$cut_point)),]
   auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
@@ -508,12 +510,12 @@ AUC_data <- lapply(AUC_data, function(x) mutate_if(x,is.factor, as.character))
 AUC_data <- bind_rows(AUC_data)
 ```
 
-Each model variation is now transformed from character string to a factor vector. 
+Prepare the data for further analysis. 
 ```{r}
 parameters <- colnames(par[,names(par) != "model"])
 AUC_data <-  separate(AUC_data, model, into =  parameters, sep = "_")
-AUC_data[AUC_data$lw_rh== "rain","lw_rh"] <- 0
-AUC_data[,parameters] <- lapply(AUC_data[,parameters], as.numeric); rm(parameters)
+AUC_data[AUC_data$lw_rh== "90","lw_rh"] <-"rain_rh"
+AUC_data[,1:3] <- lapply(AUC_data[,1:3], as.numeric); rm(parameters)
 data<- data.frame(AUC_data)
 head(data) %>% gt()
 ```
@@ -522,16 +524,15 @@ head(data) %>% gt()
 #Parameter evaluation
 ##Leaf wetness estimation
 
-We shall consult visual aids to assess if distribution of differences follows normal distribution.
+Differences between pairs of models with same parametets, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.
 
-```{r}
+```{r fig.align='center'}
 t_data <- 
   data %>% 
   group_by(rh_thresh, temp_thres, hours) %>% 
   unite(var, rh_thresh, temp_thres, hours) %>% 
   spread(key = lw_rh, value = auc) %>% 
-  rename(r= "0",r_rh = "90") %>% 
-  mutate(difference = r - r_rh)
+  mutate(difference = rain - rain_rh)
 ggplot(t_data, aes(x = difference)) +
   geom_histogram(binwidth = 0.001)+
   geom_density(fill = "royalblue", 
@@ -557,10 +558,10 @@ group_by(data, lw_rh) %>%
 shapiro.test(t_data$difference)
 ```
 The p-value < 0.05 implying that the distribution of the data is significantly different from normal distribution.
-Use paired-sample Wilcoxon test to determine if median auc with r as lw estimator is as good as the median auc with both r and rh as estimators. 
+Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estimator is as good as the median auc with both r and rh as estimators. 
 
 ```{r}
-w.test <- with(t_data, wilcox.test(r, r_rh, paired = TRUE,
+w.test <- with(t_data, wilcox.test(rain, rain_rh, paired = TRUE,
                                    exact = F,
                                    alternative = "less"))
 w.test
@@ -569,47 +570,49 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs forwith rain as single predictor are removed from further analysis. 
 ```{r}
 #Remove the data containg only rain as estimator
-data <- subset(data, lw_rh==90)
+data <- subset(data, lw_rh=="rain_rh")
 data$lw_rh <- NULL
 ```
 
 ###T, RH and Sporulation duration
 Scatterplot matrix shows some relationships between y and other variables
-```{r}
+```{r fig.align='center'}
 GGally::ggpairs(data, 
         lower = list(continuous = "points"), 
         upper = list(continuous = "cor")
 )
 ```
-Increasing temperature threshold had positive, while reducing rh and duration of sporulation has negative with increase in AUROC.
+
+Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC. 
 
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.  
-```{r}
+```{r fig.align='center'}
 data[order(data$hours),] %>% 
   ggplot(., aes(factor(hours), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle("Boxplot of different durations of minimum sporulation period")+
-  geom_smooth(method = "lm", se=T, color="red", aes(group=1))+
+  geom_boxplot(width= 0.4)+
+  geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
+  ggtitle("Durations of sporulation period")+
+  geom_smooth(method = "loess", se=T, color="red", aes(group=1))+
   xlab("Duration of sporulation period")+
-  theme_bw()
-```
-
-```{r}
+  theme_article()
 ggplot(data, aes(factor(rh_thresh), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle("Boxplot of different rh thresholds for sporulation and infection")+
-  geom_smooth(method = "lm", se=T, color="blue", aes(group=1))+
-  theme_tufte()
-```
-
-```{r}
+  geom_boxplot(width= 0.4)+
+    geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
+  ggtitle("RH thresholds for sporulation and infection")+
+  geom_smooth(method = "loess", se=T, color="blue", aes(group=1))+
+  xlab("RH threshold")+
+  theme_article()
 ggplot(data, aes(factor(temp_thres), auc))+
-  geom_boxplot(width= 0.3)+
-  ggtitle("Boxplot of different temperature thresholds for sporulation and infection")+
-  geom_smooth(method = "lm", se=T, color="black", aes(group=1), show.legend = T)+
-  theme_tufte()
+  geom_boxplot(width= 0.4)+
+    geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
+
+  ggtitle("Temperature thresholds for sporulation and infection")+
+  geom_smooth(method = "loess", se=T, color="black", aes(group=1), show.legend = T)+
+  xlab("Temperature thresholds")+
+  theme_article()
 ```
 
+Added line
 #Model fitting 
 
 ```{r}
@@ -650,19 +653,24 @@ nbcol <- 100
 color <- jet.colors(nbcol)
 
 
-persp(rsm_fit, ~ h + t,zlab = "AUC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + t,zlab = "AUROC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
 
-persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
 
-persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
+persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
 ```
 
+
+```{r, echo = TRUE,out.width = '100%' }
+myimages<-list.files("./data/op_2007_16/graph/yearly_plots", pattern = ".png", full.names = TRUE)
+include_graphics(myimages)
+```
 
 Packages used
 ```{r out.width = '33.33%',fig.show = "hold" }
