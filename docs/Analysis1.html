@@ -11,7 +11,7 @@
 
 
 
-<title>Data</title>
+<title>Evaluation of Irish Rules model</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -440,7 +440,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Data</h1>
+<h1 class="title toc-ignore">Evaluation of Irish Rules model</h1>
 
 </div>
 
@@ -449,7 +449,7 @@ div.tocify {
 <h1>Introduction</h1>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
-<p>Packages needed for the nalysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
+<p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
   c(
     &quot;tidyverse&quot;,
@@ -497,6 +497,10 @@ if (any(as.numeric(packages_load)==0)){
 };rm(list.of.packages, new.packages, packages_load)</code></pre>
 <pre><code>## [1] &quot;All packages were succesfully loaded.&quot;</code></pre>
 </div>
+<div id="reproducibility" class="section level2">
+<h2>Reproducibility</h2>
+<p>Outputs of computationaly exaustive proceduresexaustive procedures have been stored with the data and can be loaded directly.</p>
+</div>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
@@ -511,7 +515,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nisbaopavd .gt_table {
+#fjnpmvphjt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -530,13 +534,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#nisbaopavd .gt_heading {
+#fjnpmvphjt .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#nisbaopavd .gt_title {
+#fjnpmvphjt .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -547,7 +551,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#nisbaopavd .gt_subtitle {
+#fjnpmvphjt .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -558,7 +562,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#nisbaopavd .gt_bottom_border {
+#fjnpmvphjt .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -567,7 +571,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#nisbaopavd .gt_column_spanner {
+#fjnpmvphjt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -575,7 +579,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#nisbaopavd .gt_col_heading {
+#fjnpmvphjt .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -588,11 +592,11 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#nisbaopavd .gt_sep_right {
+#fjnpmvphjt .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#nisbaopavd .gt_group_heading {
+#fjnpmvphjt .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -616,7 +620,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#nisbaopavd .gt_empty_group_heading {
+#fjnpmvphjt .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -640,29 +644,29 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#nisbaopavd .gt_striped {
+#fjnpmvphjt .gt_striped {
   background-color: #f2f2f2;
 }
 
-#nisbaopavd .gt_row {
+#fjnpmvphjt .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#nisbaopavd .gt_stub {
+#fjnpmvphjt .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#nisbaopavd .gt_stub.gt_row {
+#fjnpmvphjt .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#nisbaopavd .gt_summary_row {
+#fjnpmvphjt .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -671,13 +675,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#nisbaopavd .gt_first_summary_row {
+#fjnpmvphjt .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#nisbaopavd .gt_table_body {
+#fjnpmvphjt .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -692,55 +696,55 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#nisbaopavd .gt_footnote {
+#fjnpmvphjt .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#nisbaopavd .gt_sourcenote {
+#fjnpmvphjt .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#nisbaopavd .gt_center {
+#fjnpmvphjt .gt_center {
   text-align: center;
 }
 
-#nisbaopavd .gt_left {
+#fjnpmvphjt .gt_left {
   text-align: left;
 }
 
-#nisbaopavd .gt_right {
+#fjnpmvphjt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nisbaopavd .gt_font_normal {
+#fjnpmvphjt .gt_font_normal {
   font-weight: normal;
 }
 
-#nisbaopavd .gt_font_bold {
+#fjnpmvphjt .gt_font_bold {
   font-weight: bold;
 }
 
-#nisbaopavd .gt_font_italic {
+#fjnpmvphjt .gt_font_italic {
   font-style: italic;
 }
 
-#nisbaopavd .gt_super {
+#fjnpmvphjt .gt_super {
   font-size: 65%;
 }
 
-#nisbaopavd .gt_footnote_glyph {
+#fjnpmvphjt .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="nisbaopavd" style="overflow-x:auto;"><!--gt table start-->
+<div id="fjnpmvphjt" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
@@ -896,6 +900,15 @@ OP &lt;- add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<pre class="r"><code>OP %&gt;% group_by( year_var)  %&gt;%
+  summarize(NA_rain = sum(is.na(rain)),
+            NA_temp = sum(is.na(temp)),
+            NA_rhum = sum(is.na(rhum)))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 <p>Missing value imputation with qbic spline function works well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case.</p>
 <pre class="r"><code>infil_gap &lt;- 8 #Maximum length of the infill gap
 OP$temp &lt;- round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap),1)
@@ -946,9 +959,8 @@ dates_cut &lt;-
   </script>
 </div>
 </div>
-</div>
-<div id="the-model" class="section level1">
-<h1>The Model</h1>
+<div id="the-model" class="section level2">
+<h2>The Model</h2>
 <p>Implementation of the model</p>
 <pre class="r"><code>IrishRulesModel &lt;- function(weather, param = NULL,infill_gap = NULL){
   require(data.table)
@@ -1062,6 +1074,7 @@ dates_cut &lt;-
   
 }</code></pre>
 </div>
+</div>
 <div id="the-analysis" class="section level1">
 <h1>The Analysis</h1>
 <p>The set of the most important variables of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulmn named <code>90_10_12_rain</code> represents set of the original model parameters.</p>
@@ -1072,7 +1085,7 @@ par %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#wxruxevxau .gt_table {
+#dbntukarzd .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1091,13 +1104,13 @@ par %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#wxruxevxau .gt_heading {
+#dbntukarzd .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#wxruxevxau .gt_title {
+#dbntukarzd .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1108,7 +1121,7 @@ par %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#wxruxevxau .gt_subtitle {
+#dbntukarzd .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1119,7 +1132,7 @@ par %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#wxruxevxau .gt_bottom_border {
+#dbntukarzd .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1128,7 +1141,7 @@ par %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#wxruxevxau .gt_column_spanner {
+#dbntukarzd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1136,7 +1149,7 @@ par %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#wxruxevxau .gt_col_heading {
+#dbntukarzd .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1149,11 +1162,11 @@ par %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#wxruxevxau .gt_sep_right {
+#dbntukarzd .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#wxruxevxau .gt_group_heading {
+#dbntukarzd .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1177,7 +1190,7 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#wxruxevxau .gt_empty_group_heading {
+#dbntukarzd .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1201,29 +1214,29 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#wxruxevxau .gt_striped {
+#dbntukarzd .gt_striped {
   background-color: #f2f2f2;
 }
 
-#wxruxevxau .gt_row {
+#dbntukarzd .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#wxruxevxau .gt_stub {
+#dbntukarzd .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#wxruxevxau .gt_stub.gt_row {
+#dbntukarzd .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#wxruxevxau .gt_summary_row {
+#dbntukarzd .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1232,13 +1245,13 @@ par %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#wxruxevxau .gt_first_summary_row {
+#dbntukarzd .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#wxruxevxau .gt_table_body {
+#dbntukarzd .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1253,55 +1266,55 @@ par %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#wxruxevxau .gt_footnote {
+#dbntukarzd .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#wxruxevxau .gt_sourcenote {
+#dbntukarzd .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#wxruxevxau .gt_center {
+#dbntukarzd .gt_center {
   text-align: center;
 }
 
-#wxruxevxau .gt_left {
+#dbntukarzd .gt_left {
   text-align: left;
 }
 
-#wxruxevxau .gt_right {
+#dbntukarzd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wxruxevxau .gt_font_normal {
+#dbntukarzd .gt_font_normal {
   font-weight: normal;
 }
 
-#wxruxevxau .gt_font_bold {
+#dbntukarzd .gt_font_bold {
   font-weight: bold;
 }
 
-#wxruxevxau .gt_font_italic {
+#dbntukarzd .gt_font_italic {
   font-style: italic;
 }
 
-#wxruxevxau .gt_super {
+#dbntukarzd .gt_super {
   font-size: 65%;
 }
 
-#wxruxevxau .gt_footnote_glyph {
+#dbntukarzd .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="wxruxevxau" style="overflow-x:auto;"><!--gt table start-->
+<div id="dbntukarzd" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -1380,8 +1393,8 @@ str(par)</code></pre>
 ##  $ temp_thres: num  13 13 13 13 13 13 13 12 12 12 ...
 ##  $ hours     : num  15 15 15 15 15 15 15 15 15 15 ...
 ##  $ lw_rh     : chr  &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; ...</code></pre>
-<div id="model-run" class="section level3">
-<h3>Model Run</h3>
+<div id="model-run" class="section level2">
+<h2>Model Run</h2>
 <p>The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied.</p>
 <pre class="r"><code>#Not run
 # for(i in 1:nrow(par)) {
@@ -1410,9 +1423,8 @@ head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
   </script>
 </div>
 </div>
-</div>
-<div id="analsis-of-the-outputs" class="section level1">
-<h1>Analsis of the outputs</h1>
+<div id="evaluation-procedure" class="section level2">
+<h2>Evaluation procedure</h2>
 <p>The function <code>SensParametersCalc</code> calculates Sensitivity and Specificty of each variation of the model.</p>
 <pre class="r"><code>SensParametersCalc &lt;- function(y,weather_data, dates_cut, prot_duration = NULL){ 
 
@@ -1906,8 +1918,21 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
 </table>
 <!--gt table end-->
 </div>
-<div id="roc" class="section level3">
-<h3>ROC</h3>
+</div>
+<div id="roc" class="section level2">
+<h2>ROC</h2>
+<p>Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation.Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs.</p>
+<pre class="r"><code>#function to calculate AUROC for list of inputs
+GetAUC &lt;- function(fun_df){
+  fun_df &lt;- fun_df[rev(order(fun_df$cut_point)),]
+  auc &lt;-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
+  result &lt;- data.frame(model = unique(fun_df$model),
+                       auc = auc)
+  return(result)
+}
+AUROC_data &lt;- lapply(ROC_data, function(x) GetAUC(x))
+AUROC_data &lt;- lapply(AUROC_data, function(x) mutate_if(x,is.factor, as.character))
+AUROC_data &lt;- bind_rows(AUROC_data)</code></pre>
 <p>Empirical ROC curve was created for each variation of the model.</p>
 <pre class="r"><code>PlotROC &lt;- function(df) {
   df &lt;- df[rev(df$cut_point),]
@@ -1919,6 +1944,7 @@ df$model &lt;- unique(df$model[!is.na(df$model)])
 df[1,c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 0
 df[nrow(df),c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 1
 
+AUROC_lab &lt;- paste(&quot;AUROC =&quot;, round(AUROC_data[AUROC_data$model==unique(df$model),]$auc,3))
 
 ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
   geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
@@ -1928,38 +1954,69 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
   scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
   ggtitle(paste(df[1,1]))+
+  annotate(&quot;text&quot;, x=0.75, y=0.25,label=AUROC_lab,size =8)+  
   theme_bw()+
   theme(text = element_text(size=14),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 }
 PlotROC( ROC_data[[&quot;90_10_12_rain&quot;]])
-PlotROC( ROC_data[[&quot;88_10_10_90&quot;]])</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-18-1.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-18-2.png" width="50%" /></p>
-<p>With ROC curves constructed AUROC is calculated for each model variation.</p>
-<pre class="r"><code>#function to calculate AUROC for list of inputs
-GetAUC &lt;- function(fun_df){
-  fun_df &lt;- fun_df[rev(order(fun_df$cut_point)),]
-  auc &lt;-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
-  result &lt;- data.frame(model = unique(fun_df$model),
-                       auc = auc)
-  return(result)
-}
-AUC_data &lt;- lapply(ROC_data, function(x) GetAUC(x));rm(ROC_data)
-AUC_data &lt;- lapply(AUC_data, function(x) mutate_if(x,is.factor, as.character))
-AUC_data &lt;- bind_rows(AUC_data)</code></pre>
+PlotROC( ROC_data[[&quot;88_10_10_90&quot;]])
+PlotROC( ROC_data[[&quot;87_13_12_90&quot;]])
+PlotROC( ROC_data[[&quot;88_12_9_90&quot;]])</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-20-1.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-2.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-3.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-4.png" width="50%" /></p>
+<pre class="r"><code>ls_roc &lt;- list( ROC_data[[&quot;90_10_12_rain&quot;]], 
+                  ROC_data[[&quot;88_10_10_90&quot;]], 
+                  ROC_data[[&quot;87_13_12_90&quot;]],
+                  ROC_data[[&quot;88_12_9_90&quot;]])
+  ls_roc &lt;- lapply(ls_roc, function(x) {
+  df &lt;- x[rev(x$cut_point),]
+  #append rows for plotting
+  x &lt;- rep(NA, ncol(df))
+  df &lt;- rbind(x, df)
+  df[nrow(df)+1,] &lt;- NA
+  df$model &lt;- unique(df$model[!is.na(df$model)])
+  df[1,c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 0
+  df[nrow(df),c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 1
+  return(df)
+  })
+  df &lt;- bind_rows(ls_roc)
+  
+
+    
+  rename(df, Model = model) %&gt;% 
+  ggplot( aes(one_min_spec, sens, group = Model, color = Model, label = cut_point)) + 
+    # geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
+    geom_point()+
+    geom_text_repel(size = 2)+
+    geom_path(colour = &quot;gray&quot;) + 
+    geom_line() + 
+    scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
+    scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
+    ggtitle(paste(df[1,1]))+
+    theme_minimal()+
+    theme(text = element_text(size=14),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_rect(linetype = &quot;dashed&quot;,size=0.1, fill = &quot;NA&quot;, colour = &quot;black&quot;),
+          legend.position = c(.95, .15),
+          legend.justification = c(&quot;right&quot;, &quot;bottom&quot;),
+          # legend.box.just = &quot;right&quot;,
+          legend.margin = margin(6, 6, 6, 6))</code></pre>
+<pre><code>## Warning: Removed 8 rows containing missing values (geom_text_repel).</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-21-1.png" width="80%" height="80%" style="display: block; margin: auto;" /></p>
 <p>Prepare the data for further analysis.</p>
 <pre class="r"><code>parameters &lt;- colnames(par[,names(par) != &quot;model&quot;])
-AUC_data &lt;-  separate(AUC_data, model, into =  parameters, sep = &quot;_&quot;)
-AUC_data[AUC_data$lw_rh== &quot;90&quot;,&quot;lw_rh&quot;] &lt;-&quot;rain_rh&quot;
-AUC_data[,1:3] &lt;- lapply(AUC_data[,1:3], as.numeric); rm(parameters)
-data&lt;- data.frame(AUC_data)
+AUROC_data &lt;-  separate(AUROC_data, model, into =  parameters, sep = &quot;_&quot;)
+AUROC_data[AUROC_data$lw_rh== &quot;90&quot;,&quot;lw_rh&quot;] &lt;-&quot;rain_rh&quot;
+AUROC_data[,1:3] &lt;- lapply(AUROC_data[,1:3], as.numeric); rm(parameters)
+data&lt;- data.frame(AUROC_data)
 head(data) %&gt;% gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#cbytsrcixa .gt_table {
+#blluejspkq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1978,13 +2035,13 @@ head(data) %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#cbytsrcixa .gt_heading {
+#blluejspkq .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#cbytsrcixa .gt_title {
+#blluejspkq .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1995,7 +2052,7 @@ head(data) %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#cbytsrcixa .gt_subtitle {
+#blluejspkq .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -2006,7 +2063,7 @@ head(data) %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#cbytsrcixa .gt_bottom_border {
+#blluejspkq .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -2015,7 +2072,7 @@ head(data) %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#cbytsrcixa .gt_column_spanner {
+#blluejspkq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -2023,7 +2080,7 @@ head(data) %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#cbytsrcixa .gt_col_heading {
+#blluejspkq .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -2036,11 +2093,11 @@ head(data) %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#cbytsrcixa .gt_sep_right {
+#blluejspkq .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#cbytsrcixa .gt_group_heading {
+#blluejspkq .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2064,7 +2121,7 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#cbytsrcixa .gt_empty_group_heading {
+#blluejspkq .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2088,29 +2145,29 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#cbytsrcixa .gt_striped {
+#blluejspkq .gt_striped {
   background-color: #f2f2f2;
 }
 
-#cbytsrcixa .gt_row {
+#blluejspkq .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#cbytsrcixa .gt_stub {
+#blluejspkq .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#cbytsrcixa .gt_stub.gt_row {
+#blluejspkq .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#cbytsrcixa .gt_summary_row {
+#blluejspkq .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -2119,13 +2176,13 @@ head(data) %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#cbytsrcixa .gt_first_summary_row {
+#blluejspkq .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#cbytsrcixa .gt_table_body {
+#blluejspkq .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -2140,55 +2197,55 @@ head(data) %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#cbytsrcixa .gt_footnote {
+#blluejspkq .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#cbytsrcixa .gt_sourcenote {
+#blluejspkq .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#cbytsrcixa .gt_center {
+#blluejspkq .gt_center {
   text-align: center;
 }
 
-#cbytsrcixa .gt_left {
+#blluejspkq .gt_left {
   text-align: left;
 }
 
-#cbytsrcixa .gt_right {
+#blluejspkq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cbytsrcixa .gt_font_normal {
+#blluejspkq .gt_font_normal {
   font-weight: normal;
 }
 
-#cbytsrcixa .gt_font_bold {
+#blluejspkq .gt_font_bold {
   font-weight: bold;
 }
 
-#cbytsrcixa .gt_font_italic {
+#blluejspkq .gt_font_italic {
   font-style: italic;
 }
 
-#cbytsrcixa .gt_super {
+#blluejspkq .gt_super {
   font-size: 65%;
 }
 
-#cbytsrcixa .gt_footnote_glyph {
+#blluejspkq .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="cbytsrcixa" style="overflow-x:auto;"><!--gt table start-->
+<div id="blluejspkq" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -2265,7 +2322,7 @@ ggplot(t_data, aes(x = difference)) +
   geom_point(aes(y = 0),
              alpha = 0.5)+
   theme_article()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Compute summary statistics by groups.</p>
 <pre class="r"><code>group_by(data, lw_rh) %&gt;%
   summarise(
@@ -2277,7 +2334,7 @@ ggplot(t_data, aes(x = difference)) +
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#xzimxybtoy .gt_table {
+#gwvfentiiz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2296,13 +2353,13 @@ ggplot(t_data, aes(x = difference)) +
   /* table.border.top.color */
 }
 
-#xzimxybtoy .gt_heading {
+#gwvfentiiz .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#xzimxybtoy .gt_title {
+#gwvfentiiz .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -2313,7 +2370,7 @@ ggplot(t_data, aes(x = difference)) +
   border-bottom-width: 0;
 }
 
-#xzimxybtoy .gt_subtitle {
+#gwvfentiiz .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -2324,7 +2381,7 @@ ggplot(t_data, aes(x = difference)) +
   border-top-width: 0;
 }
 
-#xzimxybtoy .gt_bottom_border {
+#gwvfentiiz .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -2333,7 +2390,7 @@ ggplot(t_data, aes(x = difference)) +
   /* heading.border.bottom.color */
 }
 
-#xzimxybtoy .gt_column_spanner {
+#gwvfentiiz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -2341,7 +2398,7 @@ ggplot(t_data, aes(x = difference)) +
   padding-bottom: 4px;
 }
 
-#xzimxybtoy .gt_col_heading {
+#gwvfentiiz .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -2354,11 +2411,11 @@ ggplot(t_data, aes(x = difference)) +
   margin: 10px;
 }
 
-#xzimxybtoy .gt_sep_right {
+#gwvfentiiz .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#xzimxybtoy .gt_group_heading {
+#gwvfentiiz .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2382,7 +2439,7 @@ ggplot(t_data, aes(x = difference)) +
   vertical-align: middle;
 }
 
-#xzimxybtoy .gt_empty_group_heading {
+#gwvfentiiz .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2406,29 +2463,29 @@ ggplot(t_data, aes(x = difference)) +
   vertical-align: middle;
 }
 
-#xzimxybtoy .gt_striped {
+#gwvfentiiz .gt_striped {
   background-color: #f2f2f2;
 }
 
-#xzimxybtoy .gt_row {
+#gwvfentiiz .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#xzimxybtoy .gt_stub {
+#gwvfentiiz .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#xzimxybtoy .gt_stub.gt_row {
+#gwvfentiiz .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#xzimxybtoy .gt_summary_row {
+#gwvfentiiz .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -2437,13 +2494,13 @@ ggplot(t_data, aes(x = difference)) +
   /* summary_row.text_transform */
 }
 
-#xzimxybtoy .gt_first_summary_row {
+#gwvfentiiz .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#xzimxybtoy .gt_table_body {
+#gwvfentiiz .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -2458,55 +2515,55 @@ ggplot(t_data, aes(x = difference)) +
   /* field.border.bottom.color */
 }
 
-#xzimxybtoy .gt_footnote {
+#gwvfentiiz .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#xzimxybtoy .gt_sourcenote {
+#gwvfentiiz .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#xzimxybtoy .gt_center {
+#gwvfentiiz .gt_center {
   text-align: center;
 }
 
-#xzimxybtoy .gt_left {
+#gwvfentiiz .gt_left {
   text-align: left;
 }
 
-#xzimxybtoy .gt_right {
+#gwvfentiiz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#xzimxybtoy .gt_font_normal {
+#gwvfentiiz .gt_font_normal {
   font-weight: normal;
 }
 
-#xzimxybtoy .gt_font_bold {
+#gwvfentiiz .gt_font_bold {
   font-weight: bold;
 }
 
-#xzimxybtoy .gt_font_italic {
+#gwvfentiiz .gt_font_italic {
   font-style: italic;
 }
 
-#xzimxybtoy .gt_super {
+#gwvfentiiz .gt_super {
   font-size: 65%;
 }
 
-#xzimxybtoy .gt_footnote_glyph {
+#gwvfentiiz .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="xzimxybtoy" style="overflow-x:auto;"><!--gt table start-->
+<div id="gwvfentiiz" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
@@ -2549,17 +2606,58 @@ w.test</code></pre>
 ## V = 11211, p-value &lt; 2.2e-16
 ## alternative hypothesis: true location shift is less than 0</code></pre>
 <p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p <code>format.pval(w.test$p.value, eps = .001)</code>. Model outputs forwith rain as single predictor are removed from further analysis.</p>
+<pre class="r"><code>library(&quot;ggpubr&quot;)</code></pre>
+<pre><code>## Warning: package &#39;ggpubr&#39; was built under R version 3.5.2</code></pre>
+<pre><code>## Loading required package: magrittr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:R.utils&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## The following object is masked from &#39;package:R.oo&#39;:
+## 
+##     equals</code></pre>
+<pre><code>## The following objects are masked from &#39;package:pracma&#39;:
+## 
+##     and, mod, or</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggpubr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:egg&#39;:
+## 
+##     ggarrange</code></pre>
+<pre class="r"><code>data %&gt;% 
+  mutate(Leaf_Wetness=factor(ifelse(lw_rh==&quot;rain_rh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;))) %&gt;% 
+  ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
+  geom_boxplot(aes(colour = Leaf_Wetness), width=0.4)+ 
+  # geom_label(aes_string(x=1.5, y=height, label=paste(&quot;p =&quot;,w.test$p.value)), label.size =0.02 )+
+scale_color_discrete(name = &quot;Leaf Wetness&quot;, 
+                     labels = c(&quot;Rain&gt;0.01&quot;, &quot;Rain&gt;0.01&amp;RH&gt;90%&quot;))+
+  scale_x_discrete( breaks = c(0,90), labels = c(&quot;rain&quot;, &quot;rh and rain&quot;))+
+  xlab(&quot;Infection period switch&quot;)+
+  ylab(&quot;AUC&quot;)+
+  theme_article()+
+  coord_equal(10/1)</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <pre class="r"><code>#Remove the data containg only rain as estimator
 data &lt;- subset(data, lw_rh==&quot;rain_rh&quot;)
 data$lw_rh &lt;- NULL</code></pre>
-<div id="t-rh-and-sporulation-duration" class="section level3">
-<h3>T, RH and Sporulation duration</h3>
+</div>
+<div id="t-rh-and-sporulation-duration" class="section level2">
+<h2>T, RH and Sporulation duration</h2>
+<div id="visualisation" class="section level3">
+<h3>Visualisation</h3>
 <p>Scatterplot matrix shows some relationships between y and other variables</p>
 <pre class="r"><code>GGally::ggpairs(data, 
         lower = list(continuous = &quot;points&quot;), 
         upper = list(continuous = &quot;cor&quot;)
 )</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC.</p>
 <p>Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.</p>
 <pre class="r"><code>data[order(data$hours),] %&gt;% 
@@ -2568,28 +2666,31 @@ data$lw_rh &lt;- NULL</code></pre>
   geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
   ggtitle(&quot;Durations of sporulation period&quot;)+
   geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;red&quot;, aes(group=1))+
-  xlab(&quot;Duration of sporulation period&quot;)+
+  xlab(&quot;Sporulation period (hours)&quot;)+
+  ylab(&quot;AUROC&quot;)+
   theme_article()
+
 ggplot(data, aes(factor(rh_thresh), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
   ggtitle(&quot;RH thresholds for sporulation and infection&quot;)+
   geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;blue&quot;, aes(group=1))+
-  xlab(&quot;RH threshold&quot;)+
+  ylab(&quot;AUROC&quot;)+
+  xlab(&quot;RH threshold (%)&quot;)+
   theme_article()
+
 ggplot(data, aes(factor(temp_thres), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
   ggtitle(&quot;Temperature thresholds for sporulation and infection&quot;)+
   geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;black&quot;, aes(group=1), show.legend = T)+
-  xlab(&quot;Temperature thresholds&quot;)+
+  xlab(&quot;Temperature threshold (°C)&quot;)+
+  ylab(&quot;AUROC&quot;)+
   theme_article()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-27-2.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-27-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-30-2.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-30-3.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-</div>
-</div>
-<div id="model-fitting" class="section level1">
-<h1>Model fitting</h1>
+<div id="model-fitting" class="section level3">
+<h3>Model fitting</h3>
 <pre class="r"><code>lapply(data[,1:3], function(x) sort(unique(x)))</code></pre>
 <pre><code>## $rh_thresh
 ## [1] 87 88 89 90 91 92 93
@@ -2687,7 +2788,7 @@ anova(rsm_fit)</code></pre>
 <p>Evaluate model fit with diagnostic plot.</p>
 <pre class="r"><code>plot(rsm_fit$studres, main=&quot;Residuals vs Order of data&quot;)
 abline(h = 0, col = &quot;red&quot;)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 <p>Visualise fitted response surface.</p>
 <pre class="r"><code>z_min &lt;-  min(data$auc)- c(min(data$auc)*0.02)
 z_max &lt;-  max(data$auc)+ c(max(data$auc)*0.02)
@@ -2709,7 +2810,12 @@ persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0,
 persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
 persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
 persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-32-1.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-2.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-3.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-4.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-5.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-6.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-7.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-8.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-32-9.png" width="33.33%" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-35-1.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-2.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-3.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-4.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-5.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-6.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-7.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-8.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-9.png" width="33.33%" /></p>
+</div>
+</div>
+</div>
+<div id="weather-model-outputs-and-the-disease" class="section level1">
+<h1>Weather, model outputs and the disease</h1>
 <pre class="r"><code>myimages&lt;-list.files(&quot;./data/op_2007_16/graph/yearly_plots&quot;, pattern = &quot;.png&quot;, full.names = TRUE)
 include_graphics(myimages)</code></pre>
 <p><img src="data/op_2007_16/graph/yearly_plots/2007%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2008%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2009%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2010%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2011%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2012%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2013%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2014%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2015%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2016%20.png" width="100%" /></p>
@@ -2733,17 +2839,18 @@ include_graphics(myimages)</code></pre>
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2.2    gt_0.1.0          R.utils_2.7.0    
-##  [4] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
-##  [7] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-## [10] ggthemes_4.0.1    ggrepel_0.8.0     pbapply_1.3-4    
-## [13] remotes_2.0.2     glue_1.3.0        pracma_2.2.2     
-## [16] lubridate_1.7.4   readxl_1.2.0      devtools_1.13.6  
-## [19] padr_0.4.1        scales_1.0.0      imputeTS_2.7     
-## [22] zoo_1.8-4         knitr_1.21        data.table_1.11.8
-## [25] forcats_0.3.0     stringr_1.3.1     dplyr_0.7.8      
-## [28] purrr_0.2.5       readr_1.3.1       tidyr_0.8.2      
-## [31] tibble_1.4.2      ggplot2_3.1.0     tidyverse_1.2.1  
+##  [1] ggpubr_0.2        magrittr_1.5      bindrcpp_0.2.2   
+##  [4] gt_0.1.0          R.utils_2.7.0     R.oo_1.22.0      
+##  [7] R.methodsS3_1.7.1 GGally_1.4.0      rsm_2.10         
+## [10] egg_0.4.2         gridExtra_2.3     ggthemes_4.0.1   
+## [13] ggrepel_0.8.0     pbapply_1.3-4     remotes_2.0.2    
+## [16] glue_1.3.0        pracma_2.2.2      lubridate_1.7.4  
+## [19] readxl_1.2.0      devtools_1.13.6   padr_0.4.1       
+## [22] scales_1.0.0      imputeTS_2.7      zoo_1.8-4        
+## [25] knitr_1.21        data.table_1.11.8 forcats_0.3.0    
+## [28] stringr_1.3.1     dplyr_0.7.8       purrr_0.2.5      
+## [31] readr_1.3.1       tidyr_0.8.2       tibble_1.4.2     
+## [34] ggplot2_3.1.0     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-137       xts_0.11-2         RColorBrewer_1.1-2
@@ -2759,19 +2866,19 @@ include_graphics(myimages)</code></pre>
 ## [31] pkgconfig_2.0.2    htmltools_0.3.6    highr_0.7         
 ## [34] rlang_0.3.0.1      TTR_0.23-4         rstudioapi_0.8    
 ## [37] quantmod_0.4-13    bindr_0.1.1        generics_0.0.2    
-## [40] jsonlite_1.6       magrittr_1.5       Matrix_1.2-14     
-## [43] Rcpp_1.0.0         munsell_0.5.0      stringi_1.2.4     
-## [46] multcomp_1.4-8     forecast_8.4       yaml_2.2.0        
-## [49] MASS_7.3-50        plyr_1.8.4         grid_3.5.1        
-## [52] crayon_1.3.4       lattice_0.20-35    haven_2.0.0       
-## [55] splines_3.5.1      hms_0.4.2          pillar_1.3.1      
-## [58] estimability_1.3   reshape2_1.4.3     codetools_0.2-15  
-## [61] urca_1.3-0         evaluate_0.12      stinepack_1.4     
-## [64] modelr_0.1.2       cellranger_1.1.0   gtable_0.2.0      
-## [67] reshape_0.8.8      assertthat_0.2.0   xfun_0.4          
-## [70] xtable_1.8-3       broom_0.5.1        uroot_2.0-9       
-## [73] coda_0.19-2        survival_2.42-3    timeDate_3043.102 
-## [76] memoise_1.1.0      TH.data_1.0-9</code></pre>
+## [40] jsonlite_1.6       Matrix_1.2-14      Rcpp_1.0.0        
+## [43] munsell_0.5.0      stringi_1.2.4      multcomp_1.4-8    
+## [46] forecast_8.4       yaml_2.2.0         MASS_7.3-50       
+## [49] plyr_1.8.4         grid_3.5.1         crayon_1.3.4      
+## [52] lattice_0.20-35    haven_2.0.0        splines_3.5.1     
+## [55] hms_0.4.2          pillar_1.3.1       estimability_1.3  
+## [58] reshape2_1.4.3     codetools_0.2-15   urca_1.3-0        
+## [61] evaluate_0.12      stinepack_1.4      modelr_0.1.2      
+## [64] cellranger_1.1.0   gtable_0.2.0       reshape_0.8.8     
+## [67] assertthat_0.2.0   xfun_0.4           xtable_1.8-3      
+## [70] broom_0.5.1        uroot_2.0-9        coda_0.19-2       
+## [73] survival_2.42-3    timeDate_3043.102  memoise_1.1.0     
+## [76] TH.data_1.0-9</code></pre>
 </div>
 
 

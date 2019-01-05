@@ -1,4 +1,4 @@
-% Data 
+% Evaluation of Irish Rules model
 
 # Introduction 
 
@@ -6,7 +6,7 @@
 
 ## Libraries
 
-Packages needed for the nalysis are loaded. If the libraries do not exist locally, they will be downloaded.  
+Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.  
 ```{r message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
@@ -56,6 +56,8 @@ if (any(as.numeric(packages_load)==0)){
 
 ```
 
+##Reproducibility
+Outputs of computationaly exaustive proceduresexaustive procedures have been stored with the data and can be loaded directly.  
 
 # Data 
 
@@ -82,6 +84,14 @@ OP <- subset(OP, month >3 & month < 10)
 Remove the variables we dont need for the analysis, to make some speed gains. 
 
 Get a summary of missing values for the variables of interest. 
+```{r}
+OP %>% group_by( year_var)  %>%
+  summarize(NA_rain = sum(is.na(rain)),
+            NA_temp = sum(is.na(temp)),
+            NA_rhum = sum(is.na(rhum)))
+```
+
+
 ```{r}
 OP %>% group_by( year_var)  %>%
   summarize(NA_rain = sum(is.na(rain)),
@@ -134,7 +144,7 @@ dates_cut <-
 
 
 
-# The Model
+## The Model
 Implementation of the model
 ```{r }
 IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
@@ -282,7 +292,7 @@ for (i in seq_along(1 : nrow(par))) {
 str(par)
 
 ```
-###Model Run
+##Model Run
 The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
 ```{r}
 #Not run
@@ -312,7 +322,7 @@ head(OP[, c(1,7,9,15,24:30)],5)
 ```
 
 
-#Analsis of the outputs
+##Evaluation procedure
 
 The function `SensParametersCalc` calculates Sensitivity and Specificty of each variation of the model.
 ```{r}
@@ -433,6 +443,7 @@ SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){
 ```
 
 This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with paralel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GM RAM laptop.   
+
 ```{r}
 #select max warning threshold
 warning_thresholds <- 1:18
@@ -465,7 +476,23 @@ ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model out
 ROC_data[[1]] %>% gt()
 ```
 
-###ROC 
+##ROC 
+Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation.Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs. 
+
+```{r}
+#function to calculate AUROC for list of inputs
+GetAUC <- function(fun_df){
+  fun_df <- fun_df[rev(order(fun_df$cut_point)),]
+  auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
+  result <- data.frame(model = unique(fun_df$model),
+                       auc = auc)
+  return(result)
+}
+AUROC_data <- lapply(ROC_data, function(x) GetAUC(x))
+AUROC_data <- lapply(AUROC_data, function(x) mutate_if(x,is.factor, as.character))
+AUROC_data <- bind_rows(AUROC_data)
+```
+
 Empirical ROC curve was created for each variation of the model.  
 ```{r message=FALSE, warning=FALSE,out.width = '50%',fig.show = "hold"}
 PlotROC <- function(df) {
@@ -478,6 +505,7 @@ df$model <- unique(df$model[!is.na(df$model)])
 df[1,c("sens","one_min_spec")] <- 0
 df[nrow(df),c("sens","one_min_spec")] <- 1
 
+AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model==unique(df$model),]$auc,3))
 
 ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
   geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
@@ -487,6 +515,7 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
   scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
   ggtitle(paste(df[1,1]))+
+  annotate("text", x=0.75, y=0.25,label=AUROC_lab,size =8)+  
   theme_bw()+
   theme(text = element_text(size=14),
         panel.grid.major = element_blank(),
@@ -494,32 +523,61 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
 }
 PlotROC( ROC_data[["90_10_12_rain"]])
 PlotROC( ROC_data[["88_10_10_90"]])
+PlotROC( ROC_data[["87_13_12_90"]])
+PlotROC( ROC_data[["88_12_9_90"]])
+
+
 ```
 
+```{r fig.align='center', out.width = '80%',out.height = '80%'}
+ls_roc <- list( ROC_data[["90_10_12_rain"]], 
+                  ROC_data[["88_10_10_90"]], 
+                  ROC_data[["87_13_12_90"]],
+                  ROC_data[["88_12_9_90"]])
+  ls_roc <- lapply(ls_roc, function(x) {
+  df <- x[rev(x$cut_point),]
+  #append rows for plotting
+  x <- rep(NA, ncol(df))
+  df <- rbind(x, df)
+  df[nrow(df)+1,] <- NA
+  df$model <- unique(df$model[!is.na(df$model)])
+  df[1,c("sens","one_min_spec")] <- 0
+  df[nrow(df),c("sens","one_min_spec")] <- 1
+  return(df)
+  })
+  df <- bind_rows(ls_roc)
+  
 
+    
+  rename(df, Model = model) %>% 
+  ggplot( aes(one_min_spec, sens, group = Model, color = Model, label = cut_point)) + 
+    # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
+    geom_point()+
+    geom_text_repel(size = 2)+
+    geom_path(colour = "gray") + 
+    geom_line() + 
+    scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
+    scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
+    ggtitle(paste(df[1,1]))+
+    theme_minimal()+
+    theme(text = element_text(size=14),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_rect(linetype = "dashed",size=0.1, fill = "NA", colour = "black"),
+          legend.position = c(.95, .15),
+          legend.justification = c("right", "bottom"),
+          # legend.box.just = "right",
+          legend.margin = margin(6, 6, 6, 6))
 
-With ROC curves constructed AUROC is calculated for each model variation. 
-```{r}
-#function to calculate AUROC for list of inputs
-GetAUC <- function(fun_df){
-  fun_df <- fun_df[rev(order(fun_df$cut_point)),]
-  auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
-  result <- data.frame(model = unique(fun_df$model),
-                       auc = auc)
-  return(result)
-}
-AUC_data <- lapply(ROC_data, function(x) GetAUC(x));rm(ROC_data)
-AUC_data <- lapply(AUC_data, function(x) mutate_if(x,is.factor, as.character))
-AUC_data <- bind_rows(AUC_data)
 ```
 
 Prepare the data for further analysis. 
 ```{r}
 parameters <- colnames(par[,names(par) != "model"])
-AUC_data <-  separate(AUC_data, model, into =  parameters, sep = "_")
-AUC_data[AUC_data$lw_rh== "90","lw_rh"] <-"rain_rh"
-AUC_data[,1:3] <- lapply(AUC_data[,1:3], as.numeric); rm(parameters)
-data<- data.frame(AUC_data)
+AUROC_data <-  separate(AUROC_data, model, into =  parameters, sep = "_")
+AUROC_data[AUROC_data$lw_rh== "90","lw_rh"] <-"rain_rh"
+AUROC_data[,1:3] <- lapply(AUROC_data[,1:3], as.numeric); rm(parameters)
+data<- data.frame(AUROC_data)
 head(data) %>% gt()
 ```
 
@@ -570,14 +628,32 @@ w.test <- with(t_data, wilcox.test(rain, rain_rh, paired = TRUE,
 w.test
 ```
 Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `format.pval(w.test$p.value, eps = .001)`.
-Model outputs forwith rain as single predictor are removed from further analysis. 
+Model outputs forwith rain as single predictor are removed from further analysis.
+
+```{r}
+library("ggpubr")
+data %>% 
+  mutate(Leaf_Wetness=factor(ifelse(lw_rh=="rain_rh", "rain and rh", "only rain"))) %>% 
+  ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
+  geom_boxplot(aes(colour = Leaf_Wetness), width=0.4)+ 
+  # geom_label(aes_string(x=1.5, y=height, label=paste("p =",w.test$p.value)), label.size =0.02 )+
+scale_color_discrete(name = "Leaf Wetness", 
+                     labels = c("Rain>0.01", "Rain>0.01&RH>90%"))+
+  scale_x_discrete( breaks = c(0,90), labels = c("rain", "rh and rain"))+
+  xlab("Infection period switch")+
+  ylab("AUC")+
+  theme_article()+
+  coord_equal(10/1)
+```
+
 ```{r}
 #Remove the data containg only rain as estimator
 data <- subset(data, lw_rh=="rain_rh")
 data$lw_rh <- NULL
 ```
 
-###T, RH and Sporulation duration
+##T, RH and Sporulation duration
+### Visualisation
 Scatterplot matrix shows some relationships between y and other variables
 ```{r fig.align='center'}
 GGally::ggpairs(data, 
@@ -596,27 +672,32 @@ data[order(data$hours),] %>%
   geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
   ggtitle("Durations of sporulation period")+
   geom_smooth(method = "loess", se=T, color="red", aes(group=1))+
-  xlab("Duration of sporulation period")+
+  xlab("Sporulation period (hours)")+
+  ylab("AUROC")+
   theme_article()
+
 ggplot(data, aes(factor(rh_thresh), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
   ggtitle("RH thresholds for sporulation and infection")+
   geom_smooth(method = "loess", se=T, color="blue", aes(group=1))+
-  xlab("RH threshold")+
+  ylab("AUROC")+
+  xlab("RH threshold (%)")+
   theme_article()
+
 ggplot(data, aes(factor(temp_thres), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
   ggtitle("Temperature thresholds for sporulation and infection")+
   geom_smooth(method = "loess", se=T, color="black", aes(group=1), show.legend = T)+
-  xlab("Temperature thresholds")+
+  xlab("Temperature threshold (°C)")+
+  ylab("AUROC")+
   theme_article()
 ```
 
 
 
-#Model fitting 
+### Model fitting 
 
 ```{r}
 lapply(data[,1:3], function(x) sort(unique(x)))
@@ -669,14 +750,14 @@ persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), 
 persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
 ```
 
-
+# Weather, model outputs and the disease
 ```{r, echo = TRUE,out.width = '100%' }
 myimages<-list.files("./data/op_2007_16/graph/yearly_plots", pattern = ".png", full.names = TRUE)
 include_graphics(myimages)
 ```
 
 Packages used
-```{r out.width = '33.33%',fig.show = "hold" }
+```{r }
 sessionInfo()
 ```
 
