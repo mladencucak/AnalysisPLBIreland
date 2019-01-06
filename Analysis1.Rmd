@@ -631,7 +631,6 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs forwith rain as single predictor are removed from further analysis.
 
 ```{r}
-library("ggpubr")
 data %>% 
   mutate(Leaf_Wetness=factor(ifelse(lw_rh=="rain_rh", "rain and rh", "only rain"))) %>% 
   ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
