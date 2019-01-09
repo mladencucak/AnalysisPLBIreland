@@ -712,46 +712,9 @@ head(cd_data) %>% kable()
 
 ```
 
-Fit a quadratic model.
-```{r}
-rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 3, raw = TRUE), data = cd_data)
-rsm_fit$studres <- rstudent(rsm_fit)
-anova(rsm_fit)
-```
-
-Evaluate model fit with diagnostic plot.
-```{r}
-plot(rsm_fit$studres, main="Residuals vs Order of data")
-abline(h = 0, col = "red")
-```
-
-Visualise fitted response surface. 
-```{r out.width = '33.33%',fig.show = "hold", warning=FALSE }
-z_min <-  min(data$auc)- c(min(data$auc)*0.02)
-z_max <-  max(data$auc)+ c(max(data$auc)*0.02)
-# Create a function interpolating colors in the range of specified colors
-jet.colors <- colorRampPalette( c("red","yellow", "green") )
-# Generate the desired number of colors from this palette
-nbcol <- 100
-color <- jet.colors(nbcol)
-
-
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
-```
-
 Fit a cubic model.
 ```{r}
-rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 3, raw = TRUE), data = cd_data)
+rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 3), data = cd_data)
 rsm_fit$studres <- rstudent(rsm_fit)
 anova(rsm_fit)
 ```
@@ -787,42 +750,6 @@ persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ),
 ```
 
 
-Fit a 4th order model.
-```{r}
-rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 4, raw = TRUE), data = cd_data)
-rsm_fit$studres <- rstudent(rsm_fit)
-anova(rsm_fit)
-```
-
-Evaluate model fit with diagnostic plot.
-```{r}
-plot(rsm_fit$studres, main="Residuals vs Order of data")
-abline(h = 0, col = "red")
-```
-
-Visualise fitted response surface. 
-```{r out.width = '33.33%',fig.show = "hold", warning=FALSE }
-z_min <-  min(data$auc)- c(min(data$auc)*0.02)
-z_max <-  max(data$auc)+ c(max(data$auc)*0.02)
-# Create a function interpolating colors in the range of specified colors
-jet.colors <- colorRampPalette( c("red","yellow", "green") )
-# Generate the desired number of colors from this palette
-nbcol <- 100
-color <- jet.colors(nbcol)
-
-
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
-```
 
 
 # Weather, model outputs and the disease
