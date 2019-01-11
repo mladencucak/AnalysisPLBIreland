@@ -2,11 +2,10 @@
 
 # Introduction 
 
-
-
 ## Libraries
 
-Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.  
+Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
+
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
@@ -112,7 +111,7 @@ OP %>% group_by(year_var)  %>%
   )
 ```
 
-Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
+Rain is somewhat harder to impute but there are ways around this problem, especially when there are only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88&nbsp;% and temperature of 8&nbsp;C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
 
 ```{r imput-rain}
 OP[is.na(OP$rain), ]$rain <-
@@ -133,16 +132,16 @@ Planting date and first observation of the disease are loaded. Emergence takes u
 #Get subsets of data for period before the epidemics were initiated
 dates_cut <-
   read_csv(
-  "./data/op_2007_16/plantingdates.csv",
-  col_types = cols(
-  disease_observed_sus = col_date(format = "%d/%m/%Y"),
-  last_assessment = col_date(format = "%d/%m/%Y")
+    "./data/op_2007_16/plantingdates.csv",
+    col_types = cols(
+      disease_observed_sus = col_date(format = "%d/%m/%Y"),
+      last_assessment = col_date(format = "%d/%m/%Y")
+    )
   )
-  )
-  dates_cut$planting_date <-
+dates_cut$planting_date <-
   as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
-  dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
-  dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
+dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
+dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 ```
 
 ## The Model
@@ -217,7 +216,7 @@ IrishRulesModel <- function(weather,
   risk <- rep(0, length(temp))
   
   criteria_met12  <-
-    as.numeric(criteria_sum >= hours) #accumulaition of EBH starts after sporulation
+    as.numeric(criteria_sum >= hours) #accumulation of EBH starts after sporulation
   idx             <- which(criteria_sum == hours)
   
   
@@ -389,13 +388,13 @@ SensParametersCalc <-
       ) %>%
       group_by(year_var) %>%
       #if there was an accumulation from previous day, it would triger a warning
-      #Check aal of the first five rows because of possible break of 5 hours
+      #Check all of the first five rows because of possible break of 5 hours
       mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
                 funs(
                   ifelse(row_number() <= 5 & . >= warning_threshold,
                          warning_threshold, .)
                 )) %>%
-      #all five values is changed so we have to delete 4 of them and leave only one
+      #all five values all changed so we have to delete 4 of them and leave only 1
       mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
                 funs(ifelse(
                   row_number() <= 4 & . == warning_threshold, 0, .
@@ -412,8 +411,10 @@ SensParametersCalc <-
       ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
     
     TreatmentWindow <- function(x, prot_duration) {
+      # don't leave commented code. Use or remove
       # x <- fptn_df[["93_10_12_rain_ebh"]]
-      y <- vector(mode = "numeric", length = length(x) + prot_duration)
+      y <-
+        vector(mode = "numeric", length = length(x) + prot_duration)
       for (i in seq_along(x)) {
         if (x[i] == 1) {
           y[i:c(i + prot_duration)] <- 1
@@ -430,7 +431,8 @@ SensParametersCalc <-
       summarise_all(fptn_df[, colnames(fptn_df[, grep("ebh", colnames(fptn_df))])], .funs = sum)
     
     #Each warning will cause a treatment
-    total_days <- nrow(fptn_df) #total  duration of non_warning period
+    total_days <-
+      nrow(fptn_df) #total  duration of non_warning period
     
     TN <- total_days - FP
     
@@ -478,10 +480,10 @@ SensParametersCalc <-
     #summary
     test <- data.frame(
       model = names(FP),
-      FP = t(FP[1, ]),
-      tn = t(TN[1, ]),
-      TP = t(TP[1, ]),
-      FN = t(FN[1, ])
+      FP = t(FP[1,]),
+      tn = t(TN[1,]),
+      TP = t(TP[1,]),
+      FN = t(FN[1,])
     )
     names(test) <- c("model", "FP", "TN", "TP", "FN")
     test <- data.frame(test, row.names = NULL)
@@ -501,6 +503,7 @@ SensParametersCalc <-
 This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.
 
 ```{r apply-sense-spec-calc, eval=FALSE}
+# this chunk not evaluated
 #select max warning threshold
 warning_thresholds <- 1:18
 
@@ -538,7 +541,7 @@ ROC_data[[1]] %>% gt()
 
 ## ROC
 
-Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation.Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs. 
+Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation. Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs. 
 
 ```{r calculate-AUROC}
 #function to calculate AUROC for list of inputs
@@ -648,7 +651,6 @@ rename(df, Model = model) %>%
   scale_x_continuous(limits = c(0, 1),
                      expand = c(0, 0),
                      name = "1- Specificity") +
-  ggtitle(paste(df[1, 1])) +
   theme_minimal() +
   theme(
     text = element_text(size = 14),
@@ -667,7 +669,7 @@ rename(df, Model = model) %>%
   )
 ```
 
-Prepare the data for further analysis.
+Prepare the data for further analysis and check the resulting data frame.
 
 ```{r}
 parameters <- colnames(parameters[, names(parameters) != "model"])
@@ -733,7 +735,8 @@ w.test <- with(t_data,
                ))
 w.test
 ```
-Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `format.pval(w.test$p.value, eps = .001)`.
+
+Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `r {format.pval(w.test$p.value, eps = .001)}`.
 Model outputs with rain as single predictor are removed from further analysis.
 
 ```{r remove-single-rain}
@@ -862,15 +865,18 @@ anova(rsm_fit)
 ```
 
 Evaluate model fit with diagnostic plot.
+
 ```{r}
 plot(rsm_fit$studres, main = "Residuals vs Order of Data")
 abline(h = 0, col = "red")
 ```
 
-Visualise fitted response surface. 
+Visualise fitted response surface. Note that AUROC Z values are multiplied by 10,
+scaled 0 - 1.0, for graphing purposes only.
+
 ```{r persp, fig.show = "hold", warning=FALSE, message=FALSE}
-z_min <- min(data$auc) - c(min(data$auc) * 0.02)
-z_max <- max(data$auc) + c(max(data$auc) * 0.02)
+z_min <- min(data$auc) - c(min(data$auc) * 0.02) * 10
+z_max <- max(data$auc) + c(max(data$auc) * 0.02) * 10
 
 # use a viridis palette for usability
 library(viridis)
@@ -878,7 +884,7 @@ color <- plasma(256)
 
 par(mar = c(5, 2, 0.5, 0.5),
     mfrow = c(3, 3),
-    cex = 0.35)
+    cex = 0.4)
 
 persp(
   rsm_fit,
