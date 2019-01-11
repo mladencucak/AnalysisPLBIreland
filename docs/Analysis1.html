@@ -11,7 +11,7 @@
 
 
 
-<title>Evaluation of Irish Rules model</title>
+<title>Analysis1.utf8.md</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -453,20 +453,14 @@ div.tocify {
 <pre class="r"><code>list.of.packages &lt;-
   c(
     &quot;tidyverse&quot;,
+    &quot;readxl&quot;,
     &quot;data.table&quot;,
-    &quot;ggplot2&quot;,
     &quot;knitr&quot;,
     &quot;zoo&quot;,
     &quot;imputeTS&quot;,
-    &quot;scales&quot;,
     &quot;padr&quot;,
     &quot;devtools&quot;,
-    &quot;readxl&quot;,
-    &quot;stringr&quot;,
-    &quot;lubridate&quot;,
-    &quot;readr&quot;,
     &quot;pracma&quot;,
-    &quot;glue&quot;,
     &quot;remotes&quot;,
     &quot;parallel&quot;,
     &quot;pbapply&quot;,
@@ -478,28 +472,32 @@ div.tocify {
     &quot;R.utils&quot;
   )
 
-new.packages &lt;- list.of.packages[!(list.of.packages %in% installed.packages()[,&quot;Package&quot;])]
+new.packages &lt;-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
 
 #Download packages that are not already present
-if(length(new.packages)) install.packages(new.packages)
+if (length(new.packages))
+  install.packages(new.packages)
 
-if(&quot;gt&quot;%in%installed.packages()== FALSE) remotes::install_github(&quot;rstudio/gt&quot;)
+if (&quot;gt&quot; %in% installed.packages() == FALSE)
+  remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
-packages_load &lt;-lapply(list.of.packages, require, character.only = TRUE)
-
+packages_load &lt;-
+  lapply(list.of.packages, require, character.only = TRUE)
 
 #Print warning if there is a problem with installing/loading some of packages
-if (any(as.numeric(packages_load)==0)){
+if (any(as.numeric(packages_load) == 0)) {
   warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
-}else {
-  print(&quot;All packages were succesfully loaded.&quot;)
-};rm(list.of.packages, new.packages, packages_load)</code></pre>
-<pre><code>## [1] &quot;All packages were succesfully loaded.&quot;</code></pre>
+} else {
+  print(&quot;All packages were successfully loaded.&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
+<pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
 </div>
 <div id="reproducibility" class="section level2">
 <h2>Reproducibility</h2>
-<p>Outputs of computationaly exaustive proceduresexaustive procedures have been stored with the data and can be loaded directly.</p>
+<p>Outputs of computational exhaustive procedures have been stored with the data and can be loaded directly.</p>
 </div>
 </div>
 <div id="data" class="section level1">
@@ -508,14 +506,14 @@ if (any(as.numeric(packages_load)==0)){
 <h2>Weather Data</h2>
 <p>Historical weather data from Met Éireann synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years.</p>
 <pre class="r"><code>#Weather data, parameters and cut off dates
-load(file=&quot;data/op_2007_16/OP_2007-2016.RData&quot;)
+load(file = &quot;data/op_2007_16/OP_2007-2016.RData&quot;)
 
-OP[1:5,1:20] %&gt;% gt()</code></pre>
+OP[1:5, 1:20] %&gt;% gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ukpctfzgcg .gt_table {
+#puadracamp .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -534,13 +532,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#ukpctfzgcg .gt_heading {
+#puadracamp .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#ukpctfzgcg .gt_title {
+#puadracamp .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -551,7 +549,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#ukpctfzgcg .gt_subtitle {
+#puadracamp .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -562,7 +560,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#ukpctfzgcg .gt_bottom_border {
+#puadracamp .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -571,7 +569,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#ukpctfzgcg .gt_column_spanner {
+#puadracamp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -579,7 +577,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#ukpctfzgcg .gt_col_heading {
+#puadracamp .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -592,11 +590,11 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#ukpctfzgcg .gt_sep_right {
+#puadracamp .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#ukpctfzgcg .gt_group_heading {
+#puadracamp .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -620,7 +618,7 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#ukpctfzgcg .gt_empty_group_heading {
+#puadracamp .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -644,29 +642,29 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#ukpctfzgcg .gt_striped {
+#puadracamp .gt_striped {
   background-color: #f2f2f2;
 }
 
-#ukpctfzgcg .gt_row {
+#puadracamp .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#ukpctfzgcg .gt_stub {
+#puadracamp .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#ukpctfzgcg .gt_stub.gt_row {
+#puadracamp .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#ukpctfzgcg .gt_summary_row {
+#puadracamp .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -675,13 +673,13 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#ukpctfzgcg .gt_first_summary_row {
+#puadracamp .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#ukpctfzgcg .gt_table_body {
+#puadracamp .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -696,55 +694,55 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#ukpctfzgcg .gt_footnote {
+#puadracamp .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#ukpctfzgcg .gt_sourcenote {
+#puadracamp .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#ukpctfzgcg .gt_center {
+#puadracamp .gt_center {
   text-align: center;
 }
 
-#ukpctfzgcg .gt_left {
+#puadracamp .gt_left {
   text-align: left;
 }
 
-#ukpctfzgcg .gt_right {
+#puadracamp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ukpctfzgcg .gt_font_normal {
+#puadracamp .gt_font_normal {
   font-weight: normal;
 }
 
-#ukpctfzgcg .gt_font_bold {
+#puadracamp .gt_font_bold {
   font-weight: bold;
 }
 
-#ukpctfzgcg .gt_font_italic {
+#puadracamp .gt_font_italic {
   font-style: italic;
 }
 
-#ukpctfzgcg .gt_super {
+#puadracamp .gt_super {
   font-size: 65%;
 }
 
-#ukpctfzgcg .gt_footnote_glyph {
+#puadracamp .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ukpctfzgcg" style="overflow-x:auto;"><!--gt table start-->
+<div id="puadracamp" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
@@ -885,25 +883,20 @@ OP[1:5,1:20] %&gt;% gt()</code></pre>
 </div>
 <p>Additional variables needed for the analysis.</p>
 <pre class="r"><code>colnames(OP)[which(names(OP) == &quot;year&quot;)] &lt;- &quot;year_var&quot;
-OP &lt;- add_column(OP, week_var =data.table::week(OP$date), .before = &quot;i_rain&quot; )
-OP &lt;- add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&quot; )</code></pre>
+OP &lt;-
+  add_column(OP, week_var = data.table::week(OP$date), .before = &quot;i_rain&quot;)
+OP &lt;-
+  add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&quot;)</code></pre>
 <p>Subset the data to exclude the months of the year which we do not need for the analysis.</p>
-<pre class="r"><code>OP &lt;- subset(OP, month &gt;3 &amp; month &lt; 10)</code></pre>
-<p>Remove the variables we dont need for the analysis, to make some speed gains.</p>
+<pre class="r"><code>OP &lt;- subset(OP, month &gt; 3 &amp; month &lt; 10)</code></pre>
+<p>Remove the variables we don’t need for the analysis, to make some speed gains.</p>
 <p>Get a summary of missing values for the variables of interest.</p>
-<pre class="r"><code>OP %&gt;% group_by( year_var)  %&gt;%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<pre class="r"><code>OP %&gt;% group_by( year_var)  %&gt;%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))</code></pre>
+<pre class="r"><code>OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -911,25 +904,33 @@ OP &lt;- add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&
 </div>
 <p>Missing value imputation with qbic spline function works well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case.</p>
 <pre class="r"><code>infil_gap &lt;- 8 #Maximum length of the infill gap
-OP$temp &lt;- round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap),1)
-OP$rhum &lt;- round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap),0)
-OP$rhum  &lt;- sapply(OP$rhum, function(x) ifelse(x&gt;100, x&lt;-100, x))
+OP$temp &lt;-
+  round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap), 1)
+OP$rhum &lt;-
+  round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap), 0)
+OP$rhum  &lt;- sapply(OP$rhum, function(x)
+  ifelse(x &gt; 100, x &lt;- 100, x))
 #Check if the imputation worked
-OP %&gt;% group_by( year_var)  %&gt;%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))</code></pre>
+OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.</p>
-<pre class="r"><code>OP[is.na(OP$rain),]$rain&lt;- with(OP[is.na(OP$rain),],ifelse(rhum&lt;88|temp&lt;8, 0, rain))
-OP %&gt;% group_by( year_var)  %&gt;%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))</code></pre>
+<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.</p>
+<pre class="r"><code>OP[is.na(OP$rain), ]$rain &lt;-
+  with(OP[is.na(OP$rain), ], ifelse(rhum &lt; 88 | temp &lt; 8, 0, rain))
+OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"0","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -939,8 +940,8 @@ OP %&gt;% group_by( year_var)  %&gt;%
 </div>
 <div id="bio-data" class="section level2">
 <h2>Bio data</h2>
-<p>Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field.</p>
-<pre class="r"><code>#Get subsets of data  for period before the epidemics were initiated
+<p>Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under Irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field.</p>
+<pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
 dates_cut &lt;-
   read_csv(
   &quot;./data/op_2007_16/plantingdates.csv&quot;,
@@ -962,130 +963,153 @@ dates_cut &lt;-
 <div id="the-model" class="section level2">
 <h2>The Model</h2>
 <p>Implementation of the model</p>
-<pre class="r"><code>IrishRulesModel &lt;- function(weather, param = NULL,infill_gap = NULL){
-  require(data.table)
-  require(tidyverse)
-  require(zoo)
-  
+<pre class="r"><code>IrishRulesModel &lt;- function(weather,
+                            param = NULL,
+                            infill_gap = NULL) {
+
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
-  wet_before &lt;- 3 
+  wet_before &lt;- 3
   wet_after &lt;- 3
   
   # Parameter list
-  if (is.null(param)){
+  if (is.null(param)) {
     rh_thresh &lt;- 90
-    temp_thres &lt;- 10
+    temp_thresh &lt;- 10
     hours &lt;- 12   #sum of hours before EBH accumulation
-  }else{
-    #pass a vector of parameters 
+  } else{
+    #pass a vector of parameters
     rh_thresh &lt;- as.numeric(param[2])
-    temp_thres &lt;- as.numeric(param[3])
-    hours &lt;- as.numeric(param[4])   
-    lw_rhum &lt;- param[5]           #if is NA then only rain data will be used
+    temp_thresh &lt;- as.numeric(param[3])
+    hours &lt;- as.numeric(param[4])
+    lw_rhum &lt;-
+      param[5]           #if is NA then only rain data will be used
   }
   
   
   weather[[&quot;rain&quot;]] -&gt; rain
-  if(&quot;rhum&quot; %in% names(weather)){weather[[&quot;rhum&quot;]] -&gt; rh}
-  if(&quot;rh&quot; %in% names(weather)){weather[[&quot;rh&quot;]] -&gt; rh}
-  weather [[&quot;temp&quot;]] -&gt; temp
+  if (&quot;rhum&quot; %in% names(weather)) {
+    weather[[&quot;rhum&quot;]] -&gt; rh
+  }
+  if (&quot;rh&quot; %in% names(weather)) {
+    weather[[&quot;rh&quot;]] -&gt; rh
+  }
+  weather[[&quot;temp&quot;]] -&gt; temp
   
   # This function to infil missing values to let the model run
   #If maximum infill gap is not provided it is defaulted to 7
   if (is.null(infill_gap)) {
     infill_gap &lt;- 7
-  } 
-  
-  if(sum(is.na(with(weather, rain, temp,rhum)))&gt;0){
-    temp &lt;- round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap),1)
-    rh &lt;- round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap),0)
-    rh  &lt;- sapply(rh, function(x) ifelse(x&gt;100, x&lt;-100, x))
   }
   
-  if(sum(is.na(with(weather, rain, temp,rhum)))&gt;0){
+  if (sum(is.na(with(weather, rain, temp, rhum))) &gt; 0) {
+    temp &lt;-
+      round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap), 1)
+    rh &lt;-
+      round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap), 0)
+    rh  &lt;- sapply(rh, function(x) ifelse(x &gt; 100, x &lt;- 100, x))
+  }
+  
+  if (sum(is.na(with(weather, rain, temp, rhum))) &gt; 0) {
     stop(print(&quot;The sum of NAs is more than 7! Check your weather data.&quot;))
   }
   
   #&quot;Out of boounds&quot;
-  rain &lt;- c(rain, rep(0,20))
-  temp &lt;- c(temp, rep(0,20))
-  rh &lt;- c(rh, rep(0,20))
+  rain &lt;- c(rain, rep(0, 20))
+  temp &lt;- c(temp, rep(0, 20))
+  rh &lt;- c(rh, rep(0, 20))
   
   # conditions for sporulation
-  criteria&lt;- as.numeric(temp&gt;=temp_thres &amp; rh&gt;=rh_thresh)
-
+  criteria &lt;- as.numeric(temp &gt;= temp_thresh &amp; rh &gt;= rh_thresh)
+  
   #cumulative sum of hours that meet the criteria for sporulatoion with restart at zero
-  criteria_sum &lt;-  stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+  criteria_sum &lt;-
+    stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
   
   #Initiate risk accumulation vector
   risk &lt;- rep(0, length(temp))
   
-  criteria_met12  &lt;-as.numeric( criteria_sum &gt;= hours ) #accumulaition of EBH starts after sporulation
-  idx             &lt;-which(criteria_sum == hours)
+  criteria_met12  &lt;-
+    as.numeric(criteria_sum &gt;= hours) #accumulaition of EBH starts after sporulation
+  idx             &lt;- which(criteria_sum == hours)
   
   
   #If there are no accumulations return vector with zeros
-  if (sum(criteria_sum == hours)==0){                #breaks the loop if there is no initial accumulation of 12 hours
-    head(risk,-20)
-    } else{
-        for (j in 1 : length(idx)){   
-       
-          #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-          if(if (is.na(lw_rhum)){                                            #if thee is no input for rhum threshold
-            (sum(rain[(idx[j]-wet_before):(idx[j]+wet_after)])&gt;= 0.1)           #just see rain sum
-          }else{
-            any((any(rh[(idx[j]-wet_before):(idx[j]+wet_after)]&gt;= lw_rhum)) |   #take both as possible switches
-                (sum(rain[(idx[j]-wet_before):(idx[j]+wet_after)])&gt;= 0.1))   
-          }) # outputs true or false
-          {         
-            n &lt;- idx[j]        #start accumulation from 12th hour
-          } else {         
-            n &lt;- idx[j]+4      #start accumulation from 16th hour
-          }    
-          s &lt;- criteria_met12[n]
-          # if a break of less than or equal to 5 hours  
-          m &lt;- n-1;
-          while (s==1)
-          { 
-            risk[n] &lt;- risk[m]+1  
-            n &lt;- n+1;
-            m &lt;- n-1;
-            s &lt;- criteria[n] 
-            if ( s==0 &amp;&amp; (criteria[n+2]==1)) {
-              n = n+2;
-              s=1;
-            } else if ( s==0 &amp;&amp; (criteria[n+3]==1)) {
-              n = n+3;
-              s=1;
-            } else if ( s==0 &amp;&amp; (criteria[n+4]==1)) {
-              n = n+4;
-              s=1;
-            } else if( s==0 &amp;&amp; (criteria[n+5]==1)) {
-              n = n+5;
-              s=1;
-            }      
-          }  
+  if (sum(criteria_sum == hours) == 0) {
+    #breaks the loop if there is no initial accumulation of 12 hours
+    head(risk, -20)
+  } else{
+    for (j in 1:length(idx)) {
+      #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
+      if (if (is.na(lw_rhum)) {
+        #if thee is no input for rhum threshold
+        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1)           #just see rain sum
+      } else{
+        any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] &gt;= lw_rhum)) |
+            #take both as possible switches
+            (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1))
+      })
+        # outputs true or false
+      {
+        n &lt;- idx[j]        #start accumulation from 12th hour
+      } else {
+        n &lt;- idx[j] + 4      #start accumulation from 16th hour
+      }
+      s &lt;- criteria_met12[n]
+      # if a break of less than or equal to 5 hours
+      m &lt;- n - 1
+      
+      while (s == 1)
+      {
+        risk[n] &lt;- risk[m] + 1
+        n &lt;- n + 1
+        
+        m &lt;- n - 1
+        
+        s &lt;- criteria[n]
+        if (s == 0 &amp;&amp; (criteria[n + 2] == 1)) {
+          n = n + 2
           
-      }   
-      head(risk,-20) #remove last 20 values that were added to vectors to prevent &quot;Out of bounds&quot; issue
-    
+          s = 1
+          
+        } else if (s == 0 &amp;&amp; (criteria[n + 3] == 1)) {
+          n = n + 3
+          
+          s = 1
+          
+        } else if (s == 0 &amp;&amp; (criteria[n + 4] == 1)) {
+          n = n + 4
+          
+          s = 1
+          
+        } else if (s == 0 &amp;&amp; (criteria[n + 5] == 1)) {
+          n = n + 5
+          
+          s = 1
+          
+        }
+      }
+      
     }
+    head(risk, -20) #remove last 20 values that were added to vectors to prevent &quot;Out of bounds&quot; issue
+    
+  }
   
 }</code></pre>
 </div>
 </div>
 <div id="the-analysis" class="section level1">
 <h1>The Analysis</h1>
-<p>The set of the most important variables of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulmn named <code>90_10_12_rain</code> represents set of the original model parameters.</p>
+<p>The set of the most important variables of Irish rules model is evaluated. The Excel sheet with parameters under evaluation is available in data folder and can be changed and used for model evaluation in other locations. Column named <code>90_10_12_rain</code> represents set of the original model parameters.</p>
 <pre class="r"><code>#read in parameters
-par &lt;- read_xlsx(paste(&quot;./data/op_2007_16/par.xlsx&quot;), sheet = &quot;par&quot;)
-par %&gt;% gt()</code></pre>
+parameters &lt;-
+  read_excel(paste(&quot;./data/op_2007_16/par.xlsx&quot;), sheet = &quot;par&quot;)
+parameters %&gt;% gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#jpojpwizie .gt_table {
+#rrpcgbyktj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1104,13 +1128,13 @@ par %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#jpojpwizie .gt_heading {
+#rrpcgbyktj .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#jpojpwizie .gt_title {
+#rrpcgbyktj .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1121,7 +1145,7 @@ par %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#jpojpwizie .gt_subtitle {
+#rrpcgbyktj .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1132,7 +1156,7 @@ par %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#jpojpwizie .gt_bottom_border {
+#rrpcgbyktj .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1141,7 +1165,7 @@ par %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#jpojpwizie .gt_column_spanner {
+#rrpcgbyktj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1149,7 +1173,7 @@ par %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#jpojpwizie .gt_col_heading {
+#rrpcgbyktj .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1162,11 +1186,11 @@ par %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#jpojpwizie .gt_sep_right {
+#rrpcgbyktj .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#jpojpwizie .gt_group_heading {
+#rrpcgbyktj .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1190,7 +1214,7 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#jpojpwizie .gt_empty_group_heading {
+#rrpcgbyktj .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1214,29 +1238,29 @@ par %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#jpojpwizie .gt_striped {
+#rrpcgbyktj .gt_striped {
   background-color: #f2f2f2;
 }
 
-#jpojpwizie .gt_row {
+#rrpcgbyktj .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#jpojpwizie .gt_stub {
+#rrpcgbyktj .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#jpojpwizie .gt_stub.gt_row {
+#rrpcgbyktj .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#jpojpwizie .gt_summary_row {
+#rrpcgbyktj .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1245,13 +1269,13 @@ par %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#jpojpwizie .gt_first_summary_row {
+#rrpcgbyktj .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#jpojpwizie .gt_table_body {
+#rrpcgbyktj .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1266,59 +1290,59 @@ par %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#jpojpwizie .gt_footnote {
+#rrpcgbyktj .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#jpojpwizie .gt_sourcenote {
+#rrpcgbyktj .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#jpojpwizie .gt_center {
+#rrpcgbyktj .gt_center {
   text-align: center;
 }
 
-#jpojpwizie .gt_left {
+#rrpcgbyktj .gt_left {
   text-align: left;
 }
 
-#jpojpwizie .gt_right {
+#rrpcgbyktj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jpojpwizie .gt_font_normal {
+#rrpcgbyktj .gt_font_normal {
   font-weight: normal;
 }
 
-#jpojpwizie .gt_font_bold {
+#rrpcgbyktj .gt_font_bold {
   font-weight: bold;
 }
 
-#jpojpwizie .gt_font_italic {
+#rrpcgbyktj .gt_font_italic {
   font-style: italic;
 }
 
-#jpojpwizie .gt_super {
+#rrpcgbyktj .gt_super {
   font-size: 65%;
 }
 
-#jpojpwizie .gt_footnote_glyph {
+#rrpcgbyktj .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="jpojpwizie" style="overflow-x:auto;"><!--gt table start-->
+<div id="rrpcgbyktj" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thres</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thresh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>hours</th>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
 </tr>
@@ -1369,7 +1393,7 @@ par %&gt;% gt()</code></pre>
 </table>
 <!--gt table end-->
 </div>
-<pre class="r"><code>params &lt;- expand.grid(par[,1:3])
+<pre class="r"><code>params &lt;- expand.grid(parameters[, 1:3])
 
 #set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
 params$lw_rh &lt;- &quot;rain&quot;
@@ -1378,45 +1402,49 @@ params$lw_rh &lt;- &quot;rain&quot;
 params2 &lt;- params
 params2$lw_rh &lt;- as.character(&quot;r+rh&quot;)
 
-par &lt;- bind_rows(params, params2);rm(params, params2)
+parameters &lt;- bind_rows(params, params2)
+rm(params, params2)
 
 # set a column with a name for each model
-
-par&lt;- add_column(par, model = NA, .before = 1 )
-for (i in seq_along(1 : nrow(par))) {
-  par[i,1] &lt;- paste0( par[i,2: length(names(par))], collapse = &quot;_&quot; )
+parameters &lt;- add_column(parameters, model = NA, .before = 1)
+for (i in seq_along(1:nrow(parameters))) {
+  parameters[i, 1] &lt;-
+    paste0(parameters[i, 2:length(names(parameters))], collapse = &quot;_&quot;)
 }
-str(par)</code></pre>
+str(parameters)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    686 obs. of  5 variables:
-##  $ model     : chr  &quot;93_13_15_rain&quot; &quot;92_13_15_rain&quot; &quot;91_13_15_rain&quot; &quot;90_13_15_rain&quot; ...
-##  $ rh_thresh : num  93 92 91 90 89 88 87 93 92 91 ...
-##  $ temp_thres: num  13 13 13 13 13 13 13 12 12 12 ...
-##  $ hours     : num  15 15 15 15 15 15 15 15 15 15 ...
-##  $ lw_rh     : chr  &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; ...</code></pre>
+##  $ model      : chr  &quot;93_13_15_rain&quot; &quot;92_13_15_rain&quot; &quot;91_13_15_rain&quot; &quot;90_13_15_rain&quot; ...
+##  $ rh_thresh  : num  93 92 91 90 89 88 87 93 92 91 ...
+##  $ temp_thresh: num  13 13 13 13 13 13 13 12 12 12 ...
+##  $ hours      : num  15 15 15 15 15 15 15 15 15 15 ...
+##  $ lw_rh      : chr  &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; ...</code></pre>
 <div id="model-run" class="section level2">
 <h2>Model Run</h2>
-<p>The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied.</p>
-<pre class="r"><code>#Not run
-# for(i in 1:nrow(par)) {
-#   loop_var &lt;- apply(par[i,], 1, function(x) {           #Run the model with different parameters 
-#          k &lt;-
-#         lapply(split(OP, factor(OP$year)), function(chunk)
-#         IrishRulesModel(chunk, x)) #get the list of outpus
-#         unlist(k) -&gt; k  #make it a vector
-#         })
-#     OP[, ncol(OP) + 1] &lt;-  as.numeric(loop_var) 
-#     rm(loop_var)
-#     names(OP)[ncol(OP)] &lt;- paste0(par[i, 1])
-#     print(paste(i, &quot;of&quot;, nrow(par)))
-# }
-# 
-# 
-# nn &lt;- paste0(names(OP[,26: length(names(OP))]), &quot;_ebh&quot;,&quot;&quot;)
-# setnames(OP, old = c(names(OP[,26: length(names(OP))])), new = nn)
-# rm(i,nn)</code></pre>
-<pre class="r"><code>load(file=&quot;data/op_2007_16/OP_for_analysis.RData&quot;)
+<p>The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns correspond to the set of parameters supplied.</p>
+<pre class="r"><code># This chunk is not run
+for(i in 1:nrow(par)) {
+  loop_var &lt;- apply(par[i, ], 1, function(x) {
+    #run the model with different parameters
+    k &lt;-
+      lapply(split(OP, factor(OP$year)), function(chunk)
+        IrishRulesModel(chunk, x)) #get the list of outputs
+    unlist(k) -&gt; k  #make it a vector
+  })
+  OP[, ncol(OP) + 1] &lt;-  as.numeric(loop_var)
+  rm(loop_var)
+  names(OP)[ncol(OP)] &lt;- paste0(par[i, 1])
+  print(paste(i, &quot;of&quot;, nrow(par)))
+}
+
+
+nn &lt;- paste0(names(OP[, 26:length(names(OP))]), &quot;_ebh&quot;, &quot;&quot;)
+setnames(OP, old = c(names(OP[, 26:length(names(OP))])), new = nn)
+rm(i, nn
+)</code></pre>
+<p>Instead, just load the output from a prior model run to save time.</p>
+<pre class="r"><code>load(file = &quot;data/op_2007_16/OP_for_analysis.RData&quot;)
 # Sample of outputs
-head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
+head(OP[, c(1, 7, 9, 15, 24:30)], 5)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["doy"],"name":[2],"type":["int"],"align":["right"]},{"label":["rain"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[5],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["93_13_15_rain_ebh"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["92_13_15_rain_ebh"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["91_13_15_rain_ebh"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["90_13_15_rain_ebh"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["89_13_15_rain_ebh"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-03-01 00:00:00","2":"60","3":"0","4":"6.7","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400418"},{"1":"2007-03-01 01:00:00","2":"60","3":"0","4":"6.7","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400419"},{"1":"2007-03-01 02:00:00","2":"60","3":"0","4":"6.8","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400420"},{"1":"2007-03-01 03:00:00","2":"60","3":"0","4":"6.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400421"},{"1":"2007-03-01 04:00:00","2":"60","3":"0","4":"6.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2400422"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -1425,144 +1453,170 @@ head(OP[, c(1,7,9,15,24:30)],5)</code></pre>
 </div>
 <div id="evaluation-procedure" class="section level2">
 <h2>Evaluation procedure</h2>
-<p>The function <code>SensParametersCalc</code> calculates Sensitivity and Specificty of each variation of the model.</p>
-<pre class="r"><code>SensParametersCalc &lt;- function(y,weather_data, dates_cut, prot_duration = NULL){ 
-
-  #Set the warning threshold and run the rest of the script 
-  warning_threshold &lt;- y
-  #data
-  fun_df &lt;- weather_data
-  
-  #A function to subset the data for the period of interest in each year 
-  test.overlap = function(vals,start_date, end_date ) {
-    rowSums(mapply(function(a,b) between(vals, a, b),
-                   start_date, end_date)) &gt; 0
-  }
-  
-  #Subset  each year from emergence to disease onset and calculate number of FP and TN
-   fptn_df &lt;- 
-  fun_df  %&gt;%
-    #Subset the of the data for the duration of non-warning period for each year
-    filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %&gt;% 
-    select(ends_with(&quot;year_var&quot;),
-           ends_with(&quot;week_var&quot;),
-           ends_with(&quot;doy&quot;),
-           ends_with(&quot;_ebh&quot;)) %&gt;%
-    group_by(year_var) %&gt;%
-    #if there was an accumulation from previous day, it would triger a warning
-    #Check aal of the first five rows because of possible break of 5 hours
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold,
-                          warning_threshold, .))) %&gt;% 
-    #all five values is changed so we have to delete 4 of them and leave only one
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(row_number() &lt;= 4 &amp; . == warning_threshold, 0, .))) %&gt;%
-    # Change values coresponding to the warning threshold to 1 for calculating the sum
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
-    group_by(year_var, week_var, doy) %&gt;%
-    summarise_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), .funs = sum)  
+<p>The function <code>SensParametersCalc</code> calculates Sensitivity and Specificity of each variation of the model.</p>
+<pre class="r"><code>SensParametersCalc &lt;-
+  function(y,
+           weather_data,
+           dates_cut,
+           prot_duration = NULL) {
+    #Set the warning threshold and run the rest of the script
+    warning_threshold &lt;- y
+    #data
+    fun_df &lt;- weather_data
     
-  
-  #Each warning would cause treatment that will keep the plants protected for a period of time
-   prot_duration &lt;- ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
-   
-   TreatmentWindow &lt;- function(x,prot_duration){
-     # x &lt;- fptn_df[[&quot;93_10_12_rain_ebh&quot;]]
-     y &lt;- vector(mode = &quot;numeric&quot;, length = length(x)+prot_duration)
-     for (i in seq_along(x)) {
-       if(x[i] == 1){
-         y[i:c(i+prot_duration)] &lt;- 1
-       }
-     }
-     y
-   }
-   fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))] &lt;- 
-    lapply(fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))], function(x) TreatmentWindow(x,prot_duration))
-  
-  
-  FP &lt;- summarise_all(fptn_df[,colnames(fptn_df[,grep(&quot;ebh&quot;, colnames(fptn_df))])], .funs = sum)
-  
-  #Each warning will cause a treatment 
-  total_days &lt;- nrow(fptn_df) #total  duration of non_warning period
-  
-  TN &lt;- total_days - FP
-  
-  
-  ##########################################################
-  #subset for 10 days prior to disease onset: Warning period
-  tpfn_df &lt;- 
-  fun_df %&gt;%
-    #Subset of the data for the duration WARNING period in each year
-    filter(test.overlap(short_date,  dates_cut$warning,dates_cut$disease_onset)) %&gt;% 
-    select(ends_with(&quot;year_var&quot;),
-           ends_with(&quot;week_var&quot;),
-           ends_with(&quot;doy&quot;),
-           ends_with(&quot;_ebh&quot;)) %&gt;%
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold, warning_threshold, .))) %&gt;%
-    #all five values is changed so we have to delete 4 of them and leave only one
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(row_number() &lt;= 4 &amp; . == warning_threshold,
-                          0, .))) %&gt;%
-    mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
-              funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
-    group_by(year_var) %&gt;%
-    summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %&gt;% 
-    mutate_at(., #some years have two warnings during the warning period
-              .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),funs(ifelse(. &gt;= 1 , 1, 0)))
+    #A function to subset the data for the period of interest in each year
+    test.overlap = function(vals, start_date, end_date) {
+      rowSums(mapply(function(a, b)
+        between(vals, a, b),
+        start_date, end_date)) &gt; 0
+    }
     
-  # tpfn_df[,1:4]
-  
-  TP &lt;- summarise_all(tpfn_df[,colnames(tpfn_df[,grep(&quot;ebh&quot;, colnames(tpfn_df))])], .funs = sum)
-
-    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years. 
-  unique(tpfn_df$year_var) %&gt;% 
-    length() -&gt; no_of_outbreaks
-  FN &lt;- no_of_outbreaks - TP
-  
-  #summary
-  test &lt;- data.frame( model = names(FP), 
-                      FP = t(FP[1,]),
-                      tn = t(TN[1,]),
-                      TP = t(TP[1,]),
-                      FN = t(FN[1,]))
-  names(test) &lt;- c(&quot;model&quot;, &quot;FP&quot;, &quot;TN&quot;, &quot;TP&quot;, &quot;FN&quot;)
-  test &lt;- data.frame(test, row.names = NULL)
-  
-  
-  test$model &lt;-  str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
-  test$sens &lt;- with(test, TP/(TP + FN))  #PTP sensitivity
-  test$spec &lt;- with(test, TN/(TN + FP))  #PTN specificity
-  return_df &lt;- test[,c(&quot;model&quot;, &quot;sens&quot;)]
-  return_df$&quot;one_min_spec&quot; &lt;- 1-test[,&quot;spec&quot;]
-  return_df$cut_point &lt;- warning_threshold
-
-  return(return_df)
-}</code></pre>
-<p>This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with paralel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GM RAM laptop.</p>
+    #Subset  each year from emergence to disease onset and calculate number of FP and TN
+    fptn_df &lt;-
+      fun_df  %&gt;%
+      #Subset the of the data for the duration of non-warning period for each year
+      filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %&gt;%
+      select(
+        ends_with(&quot;year_var&quot;),
+        ends_with(&quot;week_var&quot;),
+        ends_with(&quot;doy&quot;),
+        ends_with(&quot;_ebh&quot;)
+      ) %&gt;%
+      group_by(year_var) %&gt;%
+      #if there was an accumulation from previous day, it would triger a warning
+      #Check aal of the first five rows because of possible break of 5 hours
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(
+                  ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold,
+                         warning_threshold, .)
+                )) %&gt;%
+      #all five values is changed so we have to delete 4 of them and leave only one
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(
+                  row_number() &lt;= 4 &amp; . == warning_threshold, 0, .
+                ))) %&gt;%
+      # Change values coresponding to the warning threshold to 1 for calculating the sum
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+      group_by(year_var, week_var, doy) %&gt;%
+      summarise_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), .funs = sum)
+    
+    
+    #Each warning would cause treatment that will keep the plants protected for a period of time
+    prot_duration &lt;-
+      ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
+    
+    TreatmentWindow &lt;- function(x, prot_duration) {
+      # x &lt;- fptn_df[[&quot;93_10_12_rain_ebh&quot;]]
+      y &lt;- vector(mode = &quot;numeric&quot;, length = length(x) + prot_duration)
+      for (i in seq_along(x)) {
+        if (x[i] == 1) {
+          y[i:c(i + prot_duration)] &lt;- 1
+        }
+      }
+      y
+    }
+    fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))] &lt;-
+      lapply(fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))], function(x)
+        TreatmentWindow(x, prot_duration))
+    
+    
+    FP &lt;-
+      summarise_all(fptn_df[, colnames(fptn_df[, grep(&quot;ebh&quot;, colnames(fptn_df))])], .funs = sum)
+    
+    #Each warning will cause a treatment
+    total_days &lt;- nrow(fptn_df) #total  duration of non_warning period
+    
+    TN &lt;- total_days - FP
+    
+    
+    ##########################################################
+    #subset for 10 days prior to disease onset: Warning period
+    tpfn_df &lt;-
+      fun_df %&gt;%
+      #Subset of the data for the duration WARNING period in each year
+      filter(test.overlap(short_date,  dates_cut$warning, dates_cut$disease_onset)) %&gt;%
+      select(
+        ends_with(&quot;year_var&quot;),
+        ends_with(&quot;week_var&quot;),
+        ends_with(&quot;doy&quot;),
+        ends_with(&quot;_ebh&quot;)
+      ) %&gt;%
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(
+                  ifelse(row_number() &lt;= 5 &amp;
+                           . &gt;= warning_threshold, warning_threshold, .)
+                )) %&gt;%
+      #all five values is changed so we have to delete 4 of them and leave only one
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(
+                  row_number() &lt;= 4 &amp; . == warning_threshold,
+                  0, .
+                ))) %&gt;%
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+      group_by(year_var) %&gt;%
+      summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %&gt;%
+      mutate_at(., #some years have two warnings during the warning period
+                .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), funs(ifelse(. &gt;= 1 , 1, 0)))
+    
+    # tpfn_df[,1:4]
+    
+    TP &lt;-
+      summarise_all(tpfn_df[, colnames(tpfn_df[, grep(&quot;ebh&quot;, colnames(tpfn_df))])], .funs = sum)
+    
+    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years.
+    unique(tpfn_df$year_var) %&gt;%
+      length() -&gt; no_of_outbreaks
+    FN &lt;- no_of_outbreaks - TP
+    
+    #summary
+    test &lt;- data.frame(
+      model = names(FP),
+      FP = t(FP[1, ]),
+      tn = t(TN[1, ]),
+      TP = t(TP[1, ]),
+      FN = t(FN[1, ])
+    )
+    names(test) &lt;- c(&quot;model&quot;, &quot;FP&quot;, &quot;TN&quot;, &quot;TP&quot;, &quot;FN&quot;)
+    test &lt;- data.frame(test, row.names = NULL)
+    
+    
+    test$model &lt;-  str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
+    test$sens &lt;- with(test, TP / (TP + FN))  #PTP sensitivity
+    test$spec &lt;- with(test, TN / (TN + FP))  #PTN specificity
+    return_df &lt;- test[, c(&quot;model&quot;, &quot;sens&quot;)]
+    return_df$&quot;one_min_spec&quot; &lt;- 1 - test[, &quot;spec&quot;]
+    return_df$cut_point &lt;- warning_threshold
+    
+    return(return_df)
+  }</code></pre>
+<p>This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.</p>
 <pre class="r"><code>#select max warning threshold
 warning_thresholds &lt;- 1:18
 
-# cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1,1) #Detect the number of cores and set it to total minus 1 to avoid overload
-# cl &lt;- makeCluster(cores)
-# clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
-# clusterEvalQ(cl, library(&quot;tidyverse&quot;))
-# system.time(
-#   ROC &lt;- pbapply::pblapply(warning_thresholds, function(x) 
-#   {
-#     xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
-#     return(xx)
-#   },
-#   cl = cl
-#   )
-# )
-# stopCluster(cl)</code></pre>
-<p>The results of calculations can be directly loaded.</p>
-<pre class="r"><code> load( file =&quot;./data/op_2007_16/results/ROC_output.Rdata&quot;)</code></pre>
+cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1, 1) #Detect the number of cores and set it to total minus 1 to avoid overload
+cl &lt;- makeCluster(cores)
+clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
+clusterEvalQ(cl, library(&quot;tidyverse&quot;))
+system.time(
+  ROC &lt;- pbapply::pblapply(warning_thresholds, function(x)
+  {
+    xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
+    return(xx)
+  },
+  cl = cl
+  )
+)
+stopCluster(cl)</code></pre>
+<p>Rather, the results of calculations from a prior run can be directly loaded.</p>
+<pre class="r"><code>load(file = &quot;./data/op_2007_16/results/ROC_output.Rdata&quot;)</code></pre>
 <p>Sort the outputs for each model variation.</p>
-<pre class="r"><code>ROC_data &lt;- as.data.frame(data.table::rbindlist(ROC));rm(ROC) #Outputs stored for each warning threshold/cutoffs 
-ROC_data &lt;- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
+<pre class="r"><code>ROC_data &lt;-
+  as.data.frame(data.table::rbindlist(ROC))
+rm(ROC) #Outputs stored for each warning threshold/cutoffs
+ROC_data &lt;-
+  base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
 ROC_data[[1]] %&gt;% gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -1923,94 +1977,134 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
 <h2>ROC</h2>
 <p>Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation.Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs.</p>
 <pre class="r"><code>#function to calculate AUROC for list of inputs
-GetAUC &lt;- function(fun_df){
-  fun_df &lt;- fun_df[rev(order(fun_df$cut_point)),]
-  auc &lt;-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
+GetAUC &lt;- function(fun_df) {
+  fun_df &lt;- fun_df[rev(order(fun_df$cut_point)), ]
+  auc &lt;-
+    pracma::trapz(c(0, fun_df$one_min_spec, 1), c(0, fun_df$sens, 1))
   result &lt;- data.frame(model = unique(fun_df$model),
                        auc = auc)
   return(result)
 }
-AUROC_data &lt;- lapply(ROC_data, function(x) GetAUC(x))
-AUROC_data &lt;- lapply(AUROC_data, function(x) mutate_if(x,is.factor, as.character))
+AUROC_data &lt;- lapply(ROC_data, function(x)
+  GetAUC(x))
+AUROC_data &lt;-
+  lapply(AUROC_data, function(x)
+    mutate_if(x, is.factor, as.character))
 AUROC_data &lt;- bind_rows(AUROC_data)</code></pre>
 <p>Empirical ROC curve was created for each variation of the model.</p>
 <pre class="r"><code>PlotROC &lt;- function(df) {
-  df &lt;- df[rev(df$cut_point),]
-#append rows for plotting
-x &lt;- rep(NA, ncol(df))
-df &lt;- rbind(x, df)
-df[nrow(df)+1,] &lt;- NA
-df$model &lt;- unique(df$model[!is.na(df$model)])
-df[1,c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 0
-df[nrow(df),c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 1
-
-AUROC_lab &lt;- paste(&quot;AUROC =&quot;, round(AUROC_data[AUROC_data$model==unique(df$model),]$auc,3))
-
-ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
-  geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
-  geom_path(colour = &quot;gray&quot;) + 
-  geom_point(colour = &quot;black&quot;) + 
-  geom_text_repel(size = 4)+
-  scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
-  scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
-  ggtitle(paste(df[1,1]))+
-  annotate(&quot;text&quot;, x=0.75, y=0.25,label=AUROC_lab,size =8)+  
-  theme_bw()+
-  theme(text = element_text(size=14),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+  df &lt;- df[rev(df$cut_point), ]
+  #append rows for plotting
+  x &lt;- rep(NA, ncol(df))
+  df &lt;- rbind(x, df)
+  df[nrow(df) + 1, ] &lt;- NA
+  df$model &lt;- unique(df$model[!is.na(df$model)])
+  df[1, c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 0
+  df[nrow(df), c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 1
+  
+  AUROC_lab &lt;-
+    paste(&quot;AUROC =&quot;, round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+  
+  ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
+    geom_abline(
+      intercept = 0,
+      slope = 1,
+      color = &quot;black&quot;,
+      linetype = &quot;dashed&quot;
+    ) +
+    geom_path(colour = &quot;gray&quot;) +
+    geom_point(colour = &quot;black&quot;) +
+    geom_text_repel(size = 4) +
+    scale_y_continuous(limits = c(0, 1),
+                       expand = c(0, 0),
+                       name = &quot;Sensitivity&quot;) +
+    scale_x_continuous(limits = c(0, 1),
+                       expand = c(0, 0),
+                       name = &quot;1- Specificity&quot;) +
+    ggtitle(paste(df[1, 1])) +
+    annotate(
+      &quot;text&quot;,
+      x = 0.75,
+      y = 0.25,
+      label = AUROC_lab,
+      size = 8
+    ) +
+    theme_bw() +
+    theme(
+      text = element_text(size = 14),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
 }
-PlotROC( ROC_data[[&quot;90_10_12_rain&quot;]])
-PlotROC( ROC_data[[&quot;88_10_10_90&quot;]])
-PlotROC( ROC_data[[&quot;87_13_12_90&quot;]])
-PlotROC( ROC_data[[&quot;88_12_9_90&quot;]])</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-20-1.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-2.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-3.png" width="50%" /><img src="Analysis1_files/figure-html/unnamed-chunk-20-4.png" width="50%" /></p>
+PlotROC(ROC_data[[&quot;90_10_12_rain&quot;]])
+PlotROC(ROC_data[[&quot;88_10_10_90&quot;]])
+PlotROC(ROC_data[[&quot;87_13_12_90&quot;]])
+PlotROC(ROC_data[[&quot;88_12_9_90&quot;]])</code></pre>
+<p><img src="Analysis1_files/figure-html/plotROC-1.png" width="50%" /><img src="Analysis1_files/figure-html/plotROC-2.png" width="50%" /><img src="Analysis1_files/figure-html/plotROC-3.png" width="50%" /><img src="Analysis1_files/figure-html/plotROC-4.png" width="50%" /></p>
 <pre class="r"><code>ls_roc &lt;- list( ROC_data[[&quot;90_10_12_rain&quot;]], 
-                  ROC_data[[&quot;88_10_10_90&quot;]], 
-                  ROC_data[[&quot;87_13_12_90&quot;]],
-                  ROC_data[[&quot;88_12_9_90&quot;]])
-  ls_roc &lt;- lapply(ls_roc, function(x) {
+                ROC_data[[&quot;88_10_10_90&quot;]], 
+                ROC_data[[&quot;87_13_12_90&quot;]],
+                ROC_data[[&quot;88_12_9_90&quot;]])
+ls_roc &lt;- lapply(ls_roc, function(x) {
   df &lt;- x[rev(x$cut_point),]
   #append rows for plotting
   x &lt;- rep(NA, ncol(df))
   df &lt;- rbind(x, df)
-  df[nrow(df)+1,] &lt;- NA
+  df[nrow(df) + 1,] &lt;- NA
   df$model &lt;- unique(df$model[!is.na(df$model)])
   df[1,c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 0
   df[nrow(df),c(&quot;sens&quot;,&quot;one_min_spec&quot;)] &lt;- 1
   return(df)
-  })
-  df &lt;- bind_rows(ls_roc)
-  
+})
+df &lt;- bind_rows(ls_roc)
 
-    
-  rename(df, Model = model) %&gt;% 
-  ggplot( aes(one_min_spec, sens, group = Model, color = Model, label = cut_point)) + 
-    # geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
-    geom_point()+
-    geom_text_repel(size = 2)+
-    geom_path(colour = &quot;gray&quot;) + 
-    geom_line() + 
-    scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = &quot;Sensitivity&quot;)+
-    scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = &quot;1- Specificity&quot;)+
-    ggtitle(paste(df[1,1]))+
-    theme_minimal()+
-    theme(text = element_text(size=14),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          panel.border = element_rect(linetype = &quot;dashed&quot;,size=0.1, fill = &quot;NA&quot;, colour = &quot;black&quot;),
-          legend.position = c(.95, .15),
-          legend.justification = c(&quot;right&quot;, &quot;bottom&quot;),
-          # legend.box.just = &quot;right&quot;,
-          legend.margin = margin(6, 6, 6, 6))</code></pre>
+rename(df, Model = model) %&gt;%
+  ggplot(aes(
+    one_min_spec,
+    sens,
+    group = Model,
+    color = Model,
+    label = cut_point
+  )) +
+  # geom_abline(intercept=0, slope = 1, color=&quot;black&quot;, linetype=&quot;dashed&quot;)+
+  geom_point() +
+  geom_text_repel(size = 2) +
+  geom_path(colour = &quot;gray&quot;) +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = &quot;Sensitivity&quot;) +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = &quot;1- Specificity&quot;) +
+  ggtitle(paste(df[1, 1])) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(
+      linetype = &quot;dashed&quot;,
+      size = 0.1,
+      fill = &quot;NA&quot;,
+      colour = &quot;black&quot;
+    ),
+    legend.position = c(.95, .15),
+    legend.justification = c(&quot;right&quot;, &quot;bottom&quot;),
+    # legend.box.just = &quot;right&quot;,
+    legend.margin = margin(6, 6, 6, 6)
+  )</code></pre>
 <pre><code>## Warning: Removed 8 rows containing missing values (geom_text_repel).</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-21-1.png" width="80%" height="80%" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/plot-ROC-figures-1.png" width="80%" height="80%" style="display: block; margin: auto;" /></p>
 <p>Prepare the data for further analysis.</p>
-<pre class="r"><code>parameters &lt;- colnames(par[,names(par) != &quot;model&quot;])
-AUROC_data &lt;-  separate(AUROC_data, model, into =  parameters, sep = &quot;_&quot;)
-AUROC_data[AUROC_data$lw_rh== &quot;90&quot;,&quot;lw_rh&quot;] &lt;-&quot;rain_rh&quot;
-AUROC_data[,1:3] &lt;- lapply(AUROC_data[,1:3], as.numeric); rm(parameters)
-data&lt;- data.frame(AUROC_data)
+<pre class="r"><code>parameters &lt;- colnames(parameters[, names(parameters) != &quot;model&quot;])
+AUROC_data &lt;-
+  separate(AUROC_data, model, into =  parameters, sep = &quot;_&quot;)
+AUROC_data[AUROC_data$lw_rh == &quot;90&quot;, &quot;lw_rh&quot;] &lt;- &quot;rain_rh&quot;
+AUROC_data[, 1:3] &lt;-
+  lapply(AUROC_data[, 1:3], as.numeric)
+rm(parameters)
+data &lt;- data.frame(AUROC_data)
 head(data) %&gt;% gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -2249,7 +2343,7 @@ head(data) %&gt;% gt()</code></pre>
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thres</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp_thresh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>hours</th>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>auc</th>
@@ -2307,22 +2401,22 @@ head(data) %&gt;% gt()</code></pre>
 <h1>Parameter evaluation</h1>
 <div id="leaf-wetness-estimation" class="section level2">
 <h2>Leaf wetness estimation</h2>
-<p>Differences between pairs of models with same parametets, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
-<pre class="r"><code>t_data &lt;- 
-  data %&gt;% 
-  group_by(rh_thresh, temp_thres, hours) %&gt;% 
-  unite(var, rh_thresh, temp_thres, hours) %&gt;% 
-  spread(key = lw_rh, value = auc) %&gt;% 
+<p>Differences between pairs of models with same parameters, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
+<pre class="r"><code>t_data &lt;-
+  data %&gt;%
+  group_by(rh_thresh, temp_thresh, hours) %&gt;%
+  unite(var, rh_thresh, temp_thresh, hours) %&gt;%
+  spread(key = lw_rh, value = auc) %&gt;%
   mutate(difference = rain - rain_rh)
 ggplot(t_data, aes(x = difference)) +
-  geom_histogram(binwidth = 0.001)+
-  geom_density(fill = &quot;royalblue&quot;, 
-               alpha = 0.5, 
-               color = NA) + 
+  geom_histogram(binwidth = 0.001) +
+  geom_density(fill = &quot;royalblue&quot;,
+               alpha = 0.5,
+               color = NA) +
   geom_point(aes(y = 0),
-             alpha = 0.5)+
+             alpha = 0.5) +
   theme_article()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/leaf-wet-graphs-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Compute summary statistics by groups.</p>
 <pre class="r"><code>group_by(data, lw_rh) %&gt;%
   summarise(
@@ -2595,9 +2689,14 @@ ggplot(t_data, aes(x = difference)) +
 ## data:  t_data$difference
 ## W = 0.8718, p-value = 2.877e-16</code></pre>
 <p>The p-value &lt; 0.05 implying that the distribution of the data is significantly different from normal distribution. Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estimator is as good as the median auc with both r and rh as estimators.</p>
-<pre class="r"><code>w.test &lt;- with(t_data, wilcox.test(rain, rain_rh, paired = TRUE,
-                                   exact = F,
-                                   alternative = &quot;less&quot;))
+<pre class="r"><code>w.test &lt;- with(t_data,
+               wilcox.test(
+                 rain,
+                 rain_rh,
+                 paired = TRUE,
+                 exact = F,
+                 alternative = &quot;less&quot;
+               ))
 w.test</code></pre>
 <pre><code>## 
 ##  Wilcoxon signed rank test with continuity correction
@@ -2605,80 +2704,114 @@ w.test</code></pre>
 ## data:  rain and rain_rh
 ## V = 11211, p-value &lt; 2.2e-16
 ## alternative hypothesis: true location shift is less than 0</code></pre>
-<p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p <code>format.pval(w.test$p.value, eps = .001)</code>. Model outputs forwith rain as single predictor are removed from further analysis.</p>
-<pre class="r"><code>data %&gt;% 
-  mutate(Leaf_Wetness=factor(ifelse(lw_rh==&quot;rain_rh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;))) %&gt;% 
-  ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
-  geom_boxplot(aes(colour = Leaf_Wetness), width=0.4)+ 
+<p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p <code>format.pval(w.test$p.value, eps = .001)</code>. Model outputs with rain as single predictor are removed from further analysis.</p>
+<pre class="r"><code>data %&gt;%
+  mutate(Leaf_Wetness = factor(ifelse(
+    lw_rh == &quot;rain_rh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;
+  ))) %&gt;%
+  ggplot(aes(
+    x = factor(lw_rh),
+    y = auc,
+    group = Leaf_Wetness
+  )) +
+  geom_boxplot(aes(colour = Leaf_Wetness), width = 0.4) +
   # geom_label(aes_string(x=1.5, y=height, label=paste(&quot;p =&quot;,w.test$p.value)), label.size =0.02 )+
-scale_color_discrete(name = &quot;Leaf Wetness&quot;, 
-                     labels = c(&quot;Rain&gt;0.01&quot;, &quot;Rain&gt;0.01&amp;RH&gt;90%&quot;))+
-  scale_x_discrete( breaks = c(0,90), labels = c(&quot;rain&quot;, &quot;rh and rain&quot;))+
-  xlab(&quot;Infection period switch&quot;)+
-  ylab(&quot;AUC&quot;)+
-  theme_article()+
-  coord_equal(10/1)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+  scale_color_discrete(name = &quot;Leaf Wetness&quot;,
+                       labels = c(&quot;Rain&gt;0.01&quot;, &quot;Rain&gt;0.01&amp;RH&gt;90%&quot;)) +
+  scale_x_discrete(breaks = c(0, 90),
+                   labels = c(&quot;rain&quot;, &quot;rh and rain&quot;)) +
+  xlab(&quot;Infection period switch&quot;) +
+  ylab(&quot;AUC&quot;) +
+  theme_article() +
+  coord_equal(10 / 1)</code></pre>
+<p><img src="Analysis1_files/figure-html/remove-single-rain-1.png" width="672" /></p>
 <pre class="r"><code>#Remove the data containg only rain as estimator
-data &lt;- subset(data, lw_rh==&quot;rain_rh&quot;)
+data &lt;- subset(data, lw_rh == &quot;rain_rh&quot;)
 data$lw_rh &lt;- NULL</code></pre>
 </div>
 <div id="t-rh-and-sporulation-duration" class="section level2">
 <h2>T, RH and Sporulation duration</h2>
 <div id="visualisation" class="section level3">
 <h3>Visualisation</h3>
-<p>Scatterplot matrix shows some relationships between y and other variables</p>
-<pre class="r"><code>GGally::ggpairs(data, 
-        lower = list(continuous = &quot;points&quot;), 
-        upper = list(continuous = &quot;cor&quot;)
-)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Scatter plot matrix shows some relationships between y and other variables</p>
+<pre class="r"><code>GGally::ggpairs(data,
+                lower = list(continuous = &quot;points&quot;),
+                upper = list(continuous = &quot;cor&quot;))</code></pre>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC.</p>
 <p>Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.</p>
-<pre class="r"><code>data[order(data$hours),] %&gt;% 
-  ggplot(., aes(factor(hours), auc))+
-  geom_boxplot(width= 0.4)+
-  geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
-  ggtitle(&quot;Durations of sporulation period&quot;)+
-  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;red&quot;, aes(group=1))+
-  xlab(&quot;Sporulation period (hours)&quot;)+
-  ylab(&quot;AUROC&quot;)+
+<pre class="r"><code>data[order(data$hours), ] %&gt;%
+  ggplot(., aes(factor(hours), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;Durations of sporulation period&quot;) +
+  geom_smooth(method = &quot;loess&quot;,
+              se = T,
+              color = &quot;red&quot;,
+              aes(group = 1)) +
+  xlab(&quot;Sporulation period (hours)&quot;) +
+  ylab(&quot;AUROC&quot;) +
   theme_article()
 
-ggplot(data, aes(factor(rh_thresh), auc))+
-  geom_boxplot(width= 0.4)+
-    geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
-  ggtitle(&quot;RH thresholds for sporulation and infection&quot;)+
-  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;blue&quot;, aes(group=1))+
-  ylab(&quot;AUROC&quot;)+
-  xlab(&quot;RH threshold (%)&quot;)+
+ggplot(data, aes(factor(rh_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;RH thresholds for sporulation and infection&quot;) +
+  geom_smooth(method = &quot;loess&quot;,
+              se = T,
+              color = &quot;blue&quot;,
+              aes(group = 1)) +
+  ylab(&quot;AUROC&quot;) +
+  xlab(&quot;RH threshold (%)&quot;) +
   theme_article()
 
-ggplot(data, aes(factor(temp_thres), auc))+
-  geom_boxplot(width= 0.4)+
-    geom_jitter(position = position_jitter(width = 0.2), colour= &quot;black&quot;, alpha = 0.6,size = 0.7)+
-  ggtitle(&quot;Temperature thresholds for sporulation and infection&quot;)+
-  geom_smooth(method = &quot;loess&quot;, se=T, color=&quot;black&quot;, aes(group=1), show.legend = T)+
-  xlab(&quot;Temperature threshold (°C)&quot;)+
-  ylab(&quot;AUROC&quot;)+
+ggplot(data, aes(factor(temp_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;Temperature thresholds for sporulation and infection&quot;) +
+  geom_smooth(
+    method = &quot;loess&quot;,
+    se = T,
+    color = &quot;black&quot;,
+    aes(group = 1),
+    show.legend = T
+  ) +
+  xlab(&quot;Temperature threshold (°C)&quot;) +
+  ylab(&quot;AUROC&quot;) +
   theme_article()</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-30-2.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-30-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="Analysis1_files/figure-html/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="model-fitting" class="section level3">
 <h3>Model fitting</h3>
-<pre class="r"><code>lapply(data[,1:3], function(x) sort(unique(x)))</code></pre>
+<pre class="r"><code>lapply(data[, 1:3], function(x)
+  sort(unique(x)))</code></pre>
 <pre><code>## $rh_thresh
 ## [1] 87 88 89 90 91 92 93
 ## 
-## $temp_thres
+## $temp_thresh
 ## [1]  7  8  9 10 11 12 13
 ## 
 ## $hours
 ## [1]  9 10 11 12 13 14 15</code></pre>
 <p>Create coded data set. Nine levels of each variable are used.</p>
-<pre class="r"><code>cd_data &lt;- coded.data(data, t ~  (temp_thres - 10),
+<pre class="r"><code>cd_data &lt;- coded.data(data, t ~  (temp_thresh - 10),
                       rh ~ (rh_thresh - 90),
-                      h ~ (hours-12))
+                      h ~ (hours - 12))
 str(cd_data)</code></pre>
 <pre><code>## Classes &#39;coded.data&#39; and &#39;data.frame&#39;:   343 obs. of  4 variables:
 ##  $ rh : num  -3 -3 -3 -3 -3 -3 -3 -3 -3 -3 ...
@@ -2686,7 +2819,7 @@ str(cd_data)</code></pre>
 ##  $ h  : num  -2 -1 0 1 2 3 -3 -2 -1 0 ...
 ##  $ auc: num  0.797 0.8 0.8 0.805 0.761 ...
 ##  - attr(*, &quot;codings&quot;)=List of 3
-##   ..$ t :Class &#39;formula&#39;  language t ~ (temp_thres - 10)
+##   ..$ t :Class &#39;formula&#39;  language t ~ (temp_thresh - 10)
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
 ##   ..$ rh:Class &#39;formula&#39;  language rh ~ (rh_thresh - 90)
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
@@ -2694,7 +2827,7 @@ str(cd_data)</code></pre>
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
 ##  - attr(*, &quot;rsdes&quot;)=List of 2
 ##   ..$ primary: chr  &quot;t&quot; &quot;rh&quot; &quot;h&quot;
-##   ..$ call   : language coded.data(data = data, t ~ (temp_thres - 10), rh ~ (rh_thresh - 90),      h ~ (hours - 12))</code></pre>
+##   ..$ call   : language coded.data(data = data, t ~ (temp_thresh - 10), rh ~ (rh_thresh -      90), h ~ (hours - 12))</code></pre>
 <pre class="r"><code>head(cd_data) %&gt;% kable()</code></pre>
 <table>
 <thead>
@@ -2752,107 +2885,221 @@ str(cd_data)</code></pre>
 </tbody>
 </table>
 <p>Fit a cubic model.</p>
-<pre class="r"><code>rsm_fit &lt;-  lm(auc ~ poly( rh, h, t, degree = 4, raw = TRUE), data = cd_data)
+<pre class="r"><code>rsm_fit &lt;- lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
 rsm_fit$studres &lt;- rstudent(rsm_fit)
 anova(rsm_fit)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Df"],"name":[1],"type":["int"],"align":["right"]},{"label":["Sum Sq"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Mean Sq"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"34","2":"1.1317621","3":"0.0332871219","4":"67.11653","5":"5.836985e-122","_rn_":"poly(rh, h, t, degree = 4, raw = TRUE)"},{"1":"308","2":"0.1527557","3":"0.0004959601","4":"NA","5":"NA","_rn_":"Residuals"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Df"],"name":[1],"type":["int"],"align":["right"]},{"label":["Sum Sq"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Mean Sq"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"19","2":"1.1068221","3":"0.0582537953","4":"105.8887","5":"3.271891e-126","_rn_":"poly(rh, h, t, degree = 3)"},{"1":"323","2":"0.1776957","3":"0.0005501416","4":"NA","5":"NA","_rn_":"Residuals"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Evaluate model fit with diagnostic plot.</p>
-<pre class="r"><code>plot(rsm_fit$studres, main=&quot;Residuals vs Order of data&quot;)
+<pre class="r"><code>plot(rsm_fit$studres, main = &quot;Residuals vs Order of Data&quot;)
 abline(h = 0, col = &quot;red&quot;)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>Visualise fitted response surface.</p>
-<pre class="r"><code>z_min &lt;-  min(data$auc)- c(min(data$auc)*0.02)
-z_max &lt;-  max(data$auc)+ c(max(data$auc)*0.02)
-# Create a function interpolating colors in the range of specified colors
-jet.colors &lt;- colorRampPalette( c(&quot;red&quot;,&quot;yellow&quot;, &quot;green&quot;) )
-# Generate the desired number of colors from this palette
-nbcol &lt;- 100
-color &lt;- jet.colors(nbcol)
+<pre class="r"><code>z_min &lt;- min(data$auc) - c(min(data$auc) * 0.02)
+z_max &lt;- max(data$auc) + c(max(data$auc) * 0.02)
 
+# use a viridis palette for usability
+library(viridis)
+color &lt;- plasma(256)
 
-persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;,at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;,at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+par(mar = c(5, 2, 0.5, 0.5),
+    mfrow = c(3, 3),
+    cex = 0.35)
 
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = -3, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
 
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = &quot;AUROC&quot;, at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)</code></pre>
-<p><img src="Analysis1_files/figure-html/unnamed-chunk-35-1.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-2.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-3.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-4.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-5.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-6.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-7.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-8.png" width="33.33%" /><img src="Analysis1_files/figure-html/unnamed-chunk-35-9.png" width="33.33%" /></p>
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = +3, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = 0, h = -3),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = 0, h = +3),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = -3, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = &quot;\n\n\nAUROC&quot;,
+  at = data.frame(t = +3, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = &quot;grey15&quot;,
+  lwd = 0.5
+)</code></pre>
+<p><img src="Analysis1_files/figure-html/persp-1.png" width="672" /></p>
 </div>
 </div>
 </div>
 <div id="weather-model-outputs-and-the-disease" class="section level1">
 <h1>Weather, model outputs and the disease</h1>
-<pre class="r"><code>myimages&lt;-list.files(&quot;./data/op_2007_16/graph/yearly_plots&quot;, pattern = &quot;.png&quot;, full.names = TRUE)
+<pre class="r"><code>myimages &lt;-
+  list.files(
+    &quot;./data/op_2007_16/graph/yearly_plots&quot;,
+    pattern = &quot;.png&quot;,
+    full.names = TRUE
+  )
 include_graphics(myimages)</code></pre>
 <p><img src="data/op_2007_16/graph/yearly_plots/2007%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2008%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2009%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2010%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2011%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2012%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2013%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2014%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2015%20.png" width="100%" /><img src="data/op_2007_16/graph/yearly_plots/2016%20.png" width="100%" /></p>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>## R version 3.5.1 (2018-07-02)
-## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 17134)
+<pre><code>## R version 3.5.2 (2018-12-20)
+## Platform: x86_64-apple-darwin18.2.0 (64-bit)
+## Running under: macOS Mojave 10.14.2
 ## 
 ## Matrix products: default
+## BLAS/LAPACK: /usr/local/Cellar/openblas/0.3.5/lib/libopenblas_haswellp-r0.3.5.dylib
 ## 
 ## locale:
-## [1] LC_COLLATE=English_United States.1252 
-## [2] LC_CTYPE=English_United States.1252   
-## [3] LC_MONETARY=English_United States.1252
-## [4] LC_NUMERIC=C                          
-## [5] LC_TIME=English_United States.1252    
+## [1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
 ## 
 ## attached base packages:
 ## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2.2    gt_0.1.0          R.utils_2.7.0    
-##  [4] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
-##  [7] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-## [10] ggthemes_4.0.1    ggrepel_0.8.0     pbapply_1.3-4    
-## [13] remotes_2.0.2     glue_1.3.0        pracma_2.2.2     
-## [16] lubridate_1.7.4   readxl_1.2.0      devtools_1.13.6  
-## [19] padr_0.4.1        scales_1.0.0      imputeTS_2.7     
-## [22] zoo_1.8-4         knitr_1.21        data.table_1.11.8
+##  [1] viridis_0.5.1     viridisLite_0.3.0 bindrcpp_0.2.2   
+##  [4] gt_0.1.0          R.utils_2.7.0     R.oo_1.22.0      
+##  [7] R.methodsS3_1.7.1 GGally_1.4.0      rsm_2.10         
+## [10] egg_0.4.2         gridExtra_2.3     ggthemes_4.0.1   
+## [13] ggrepel_0.8.0     pbapply_1.3-4     remotes_2.0.2    
+## [16] pracma_2.2.2      usethis_1.4.0     devtools_2.0.1   
+## [19] padr_0.4.1        imputeTS_2.7      zoo_1.8-4        
+## [22] knitr_1.21        data.table_1.11.8 readxl_1.2.0     
 ## [25] forcats_0.3.0     stringr_1.3.1     dplyr_0.7.8      
 ## [28] purrr_0.2.5       readr_1.3.1       tidyr_0.8.2      
-## [31] tibble_1.4.2      ggplot2_3.1.0     tidyverse_1.2.1  
+## [31] tibble_2.0.0      ggplot2_3.1.0     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-137       xts_0.11-2         RColorBrewer_1.1-2
-##  [4] httr_1.4.0         tools_3.5.1        backports_1.1.3   
-##  [7] R6_2.3.0           lazyeval_0.2.1     colorspace_1.3-2  
-## [10] nnet_7.3-12        withr_2.1.2        tidyselect_0.2.5  
-## [13] emmeans_1.3.1      curl_3.2           compiler_3.5.1    
-## [16] cli_1.0.1          rvest_0.3.2        xml2_1.2.0        
-## [19] sandwich_2.5-0     labeling_0.3       sass_0.1.0.9000   
-## [22] tseries_0.10-46    checkmate_1.8.5    lmtest_0.9-36     
-## [25] fracdiff_1.4-2     mvtnorm_1.0-8      quadprog_1.5-5    
-## [28] commonmark_1.7     digest_0.6.18      rmarkdown_1.11.3  
-## [31] pkgconfig_2.0.2    htmltools_0.3.6    highr_0.7         
-## [34] rlang_0.3.0.1      TTR_0.23-4         rstudioapi_0.8    
-## [37] quantmod_0.4-13    bindr_0.1.1        generics_0.0.2    
-## [40] jsonlite_1.6       magrittr_1.5       Matrix_1.2-14     
-## [43] Rcpp_1.0.0         munsell_0.5.0      stringi_1.2.4     
-## [46] multcomp_1.4-8     forecast_8.4       yaml_2.2.0        
-## [49] MASS_7.3-50        plyr_1.8.4         grid_3.5.1        
-## [52] crayon_1.3.4       lattice_0.20-35    haven_2.0.0       
-## [55] splines_3.5.1      hms_0.4.2          pillar_1.3.1      
-## [58] estimability_1.3   reshape2_1.4.3     codetools_0.2-15  
-## [61] urca_1.3-0         evaluate_0.12      stinepack_1.4     
-## [64] modelr_0.1.2       cellranger_1.1.0   gtable_0.2.0      
-## [67] reshape_0.8.8      assertthat_0.2.0   xfun_0.4          
-## [70] xtable_1.8-3       broom_0.5.1        uroot_2.0-9       
-## [73] coda_0.19-2        survival_2.42-3    timeDate_3043.102 
-## [76] memoise_1.1.0      TH.data_1.0-9</code></pre>
+##  [1] TH.data_1.0-9      colorspace_1.3-2   rprojroot_1.3-2   
+##  [4] estimability_1.3   fs_1.2.6           rstudioapi_0.9.0  
+##  [7] mvtnorm_1.0-8      lubridate_1.7.4    xml2_1.2.0        
+## [10] codetools_0.2-15   splines_3.5.2      pkgload_1.0.2     
+## [13] jsonlite_1.6       broom_0.5.1        compiler_3.5.2    
+## [16] httr_1.4.0         emmeans_1.3.1      backports_1.1.3   
+## [19] assertthat_0.2.0   Matrix_1.2-15      lazyeval_0.2.1    
+## [22] cli_1.0.1          htmltools_0.3.6    prettyunits_1.0.2 
+## [25] tools_3.5.2        coda_0.19-2        gtable_0.2.0      
+## [28] glue_1.3.0         reshape2_1.4.3     Rcpp_1.0.0        
+## [31] cellranger_1.1.0   fracdiff_1.4-2     urca_1.3-0        
+## [34] nlme_3.1-137       lmtest_0.9-36      timeDate_3043.102 
+## [37] xfun_0.4           ps_1.3.0           testthat_2.0.1    
+## [40] rvest_0.3.2        MASS_7.3-51.1      scales_1.0.0      
+## [43] hms_0.4.2          sandwich_2.5-0     RColorBrewer_1.1-2
+## [46] yaml_2.2.0         quantmod_0.4-13    curl_3.2          
+## [49] memoise_1.1.0      sass_0.1.0.9000    uroot_2.0-9       
+## [52] reshape_0.8.8      stringi_1.2.4      highr_0.7         
+## [55] tseries_0.10-46    desc_1.2.0         checkmate_1.9.0   
+## [58] TTR_0.23-4         pkgbuild_1.0.2     rlang_0.3.1       
+## [61] pkgconfig_2.0.2    commonmark_1.7     evaluate_0.12     
+## [64] lattice_0.20-38    bindr_0.1.1        stinepack_1.4     
+## [67] labeling_0.3       processx_3.2.1     tidyselect_0.2.5  
+## [70] plyr_1.8.4         magrittr_1.5       R6_2.3.0          
+## [73] generics_0.0.2     multcomp_1.4-8     pillar_1.3.1      
+## [76] haven_2.0.0        withr_2.1.2        xts_0.11-2        
+## [79] survival_2.43-3    nnet_7.3-12        modelr_0.1.2      
+## [82] crayon_1.3.4       rmarkdown_1.11     grid_3.5.2        
+## [85] callr_3.1.1        forecast_8.4       digest_0.6.18     
+## [88] xtable_1.8-3       munsell_0.5.0      sessioninfo_1.1.1 
+## [91] quadprog_1.5-5</code></pre>
 </div>
 
 

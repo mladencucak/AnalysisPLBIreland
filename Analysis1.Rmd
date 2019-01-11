@@ -7,24 +7,18 @@
 ## Libraries
 
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.  
-```{r message=FALSE, warning=FALSE}
+```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
     "tidyverse",
+    "readxl",
     "data.table",
-    "ggplot2",
     "knitr",
     "zoo",
     "imputeTS",
-    "scales",
     "padr",
     "devtools",
-    "readxl",
-    "stringr",
-    "lubridate",
-    "readr",
     "pracma",
-    "glue",
     "remotes",
     "parallel",
     "pbapply",
@@ -36,98 +30,107 @@ list.of.packages <-
     "R.utils"
   )
 
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+new.packages <-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 
 #Download packages that are not already present
-if(length(new.packages)) install.packages(new.packages)
+if (length(new.packages))
+  install.packages(new.packages)
 
-if("gt"%in%installed.packages()== FALSE) remotes::install_github("rstudio/gt")
+if ("gt" %in% installed.packages() == FALSE)
+  remotes::install_github("rstudio/gt")
 
 list.of.packages <- c(list.of.packages, "gt")
-packages_load <-lapply(list.of.packages, require, character.only = TRUE)
-
+packages_load <-
+  lapply(list.of.packages, require, character.only = TRUE)
 
 #Print warning if there is a problem with installing/loading some of packages
-if (any(as.numeric(packages_load)==0)){
+if (any(as.numeric(packages_load) == 0)) {
   warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
-}else {
-  print("All packages were succesfully loaded.")
-};rm(list.of.packages, new.packages, packages_load)
-
+} else {
+  print("All packages were successfully loaded.")
+}
+rm(list.of.packages, new.packages, packages_load)
 ```
 
-##Reproducibility
-Outputs of computationaly exaustive proceduresexaustive procedures have been stored with the data and can be loaded directly.  
+## Reproducibility
+Outputs of computational exhaustive procedures have been stored with the data and can be loaded directly.  
 
 # Data 
 
 ## Weather Data
 Historical weather data from Met Éireann  synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
 
-```{r message=FALSE, warning=FALSE,fig.align='center'}
+```{r weather-data, message=FALSE, warning=FALSE,fig.align='center'}
 #Weather data, parameters and cut off dates
-load(file="data/op_2007_16/OP_2007-2016.RData")
+load(file = "data/op_2007_16/OP_2007-2016.RData")
 
-OP[1:5,1:20] %>% gt()
+OP[1:5, 1:20] %>% gt()
 ```
 
 Additional variables needed for the analysis.
-```{r}
+```{r add-vars-OP}
 colnames(OP)[which(names(OP) == "year")] <- "year_var"
-OP <- add_column(OP, week_var =data.table::week(OP$date), .before = "i_rain" )
-OP <- add_column(OP, doy = data.table::yday(OP$date), .before = "i_rain" )
+OP <-
+  add_column(OP, week_var = data.table::week(OP$date), .before = "i_rain")
+OP <-
+  add_column(OP, doy = data.table::yday(OP$date), .before = "i_rain")
 ```
 Subset the data to exclude the months of the year which we do not need for the analysis. 
-```{r}
-OP <- subset(OP, month >3 & month < 10)
+```{r subset-OP}
+OP <- subset(OP, month > 3 & month < 10)
 ```
-Remove the variables we dont need for the analysis, to make some speed gains. 
+Remove the variables we don't need for the analysis, to make some speed gains. 
 
 Get a summary of missing values for the variables of interest. 
-```{r}
-OP %>% group_by( year_var)  %>%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))
+```{r summarise-missing-OP}
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
 ```
 
-
-```{r}
-OP %>% group_by( year_var)  %>%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))
-```
 
 Missing value imputation with qbic spline function works well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case. 
 
-```{r message=FALSE, warning=FALSE}
+```{r impute-missing, message=FALSE, warning=FALSE}
 infil_gap <- 8 #Maximum length of the infill gap
-OP$temp <- round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap),1)
-OP$rhum <- round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap),0)
-OP$rhum  <- sapply(OP$rhum, function(x) ifelse(x>100, x<-100, x))
+OP$temp <-
+  round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap), 1)
+OP$rhum <-
+  round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap), 0)
+OP$rhum  <- sapply(OP$rhum, function(x)
+  ifelse(x > 100, x <- 100, x))
 #Check if the imputation worked
-OP %>% group_by( year_var)  %>%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
 ```
 
-Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
+Rain is somewhat harder to impute but there are ways around this problem, especially when there is only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88% and temperature of 8C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
 
-```{r}
-OP[is.na(OP$rain),]$rain<- with(OP[is.na(OP$rain),],ifelse(rhum<88|temp<8, 0, rain))
-OP %>% group_by( year_var)  %>%
-  summarize(NA_rain = sum(is.na(rain)),
-            NA_temp = sum(is.na(temp)),
-            NA_rhum = sum(is.na(rhum)))
+```{r imput-rain}
+OP[is.na(OP$rain), ]$rain <-
+  with(OP[is.na(OP$rain), ], ifelse(rhum < 88 | temp < 8, 0, rain))
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
 ```
 We have no missing values and it is safe to proceed.   
 
-##Bio data
-Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field.	Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to  disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field. 
-```{r fig.align='center'}
-#Get subsets of data  for period before the epidemics were initiated
+## Bio data
+Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under Irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for establishment of visible disease symptoms in the field.
+
+```{r epidemic-initiation, fig.align='center'}
+#Get subsets of data for period before the epidemics were initiated
 dates_cut <-
   read_csv(
   "./data/op_2007_16/plantingdates.csv",
@@ -142,137 +145,160 @@ dates_cut <-
   dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 ```
 
-
-
 ## The Model
+
 Implementation of the model
-```{r }
-IrishRulesModel <- function(weather, param = NULL,infill_gap = NULL){
-  require(data.table)
-  require(tidyverse)
-  require(zoo)
-  
+
+```{r irish-model}
+IrishRulesModel <- function(weather,
+                            param = NULL,
+                            infill_gap = NULL) {
+
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
-  wet_before <- 3 
+  wet_before <- 3
   wet_after <- 3
   
   # Parameter list
-  if (is.null(param)){
+  if (is.null(param)) {
     rh_thresh <- 90
-    temp_thres <- 10
+    temp_thresh <- 10
     hours <- 12   #sum of hours before EBH accumulation
-  }else{
-    #pass a vector of parameters 
+  } else{
+    #pass a vector of parameters
     rh_thresh <- as.numeric(param[2])
-    temp_thres <- as.numeric(param[3])
-    hours <- as.numeric(param[4])   
-    lw_rhum <- param[5]           #if is NA then only rain data will be used
+    temp_thresh <- as.numeric(param[3])
+    hours <- as.numeric(param[4])
+    lw_rhum <-
+      param[5]           #if is NA then only rain data will be used
   }
   
   
   weather[["rain"]] -> rain
-  if("rhum" %in% names(weather)){weather[["rhum"]] -> rh}
-  if("rh" %in% names(weather)){weather[["rh"]] -> rh}
-  weather [["temp"]] -> temp
+  if ("rhum" %in% names(weather)) {
+    weather[["rhum"]] -> rh
+  }
+  if ("rh" %in% names(weather)) {
+    weather[["rh"]] -> rh
+  }
+  weather[["temp"]] -> temp
   
   # This function to infil missing values to let the model run
   #If maximum infill gap is not provided it is defaulted to 7
   if (is.null(infill_gap)) {
     infill_gap <- 7
-  } 
-  
-  if(sum(is.na(with(weather, rain, temp,rhum)))>0){
-    temp <- round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap),1)
-    rh <- round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap),0)
-    rh  <- sapply(rh, function(x) ifelse(x>100, x<-100, x))
   }
   
-  if(sum(is.na(with(weather, rain, temp,rhum)))>0){
+  if (sum(is.na(with(weather, rain, temp, rhum))) > 0) {
+    temp <-
+      round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap), 1)
+    rh <-
+      round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap), 0)
+    rh  <- sapply(rh, function(x) ifelse(x > 100, x <- 100, x))
+  }
+  
+  if (sum(is.na(with(weather, rain, temp, rhum))) > 0) {
     stop(print("The sum of NAs is more than 7! Check your weather data."))
   }
   
   #"Out of boounds"
-  rain <- c(rain, rep(0,20))
-  temp <- c(temp, rep(0,20))
-  rh <- c(rh, rep(0,20))
+  rain <- c(rain, rep(0, 20))
+  temp <- c(temp, rep(0, 20))
+  rh <- c(rh, rep(0, 20))
   
   # conditions for sporulation
-  criteria<- as.numeric(temp>=temp_thres & rh>=rh_thresh)
-
+  criteria <- as.numeric(temp >= temp_thresh & rh >= rh_thresh)
+  
   #cumulative sum of hours that meet the criteria for sporulatoion with restart at zero
-  criteria_sum <-  stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+  criteria_sum <-
+    stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
   
   #Initiate risk accumulation vector
   risk <- rep(0, length(temp))
   
-  criteria_met12  <-as.numeric( criteria_sum >= hours ) #accumulaition of EBH starts after sporulation
-  idx             <-which(criteria_sum == hours)
+  criteria_met12  <-
+    as.numeric(criteria_sum >= hours) #accumulaition of EBH starts after sporulation
+  idx             <- which(criteria_sum == hours)
   
   
   #If there are no accumulations return vector with zeros
-  if (sum(criteria_sum == hours)==0){                #breaks the loop if there is no initial accumulation of 12 hours
-    head(risk,-20)
-    } else{
-        for (j in 1 : length(idx)){   
-       
-          #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-          if(if (is.na(lw_rhum)){                                            #if thee is no input for rhum threshold
-            (sum(rain[(idx[j]-wet_before):(idx[j]+wet_after)])>= 0.1)           #just see rain sum
-          }else{
-            any((any(rh[(idx[j]-wet_before):(idx[j]+wet_after)]>= lw_rhum)) |   #take both as possible switches
-                (sum(rain[(idx[j]-wet_before):(idx[j]+wet_after)])>= 0.1))   
-          }) # outputs true or false
-          {         
-            n <- idx[j]        #start accumulation from 12th hour
-          } else {         
-            n <- idx[j]+4      #start accumulation from 16th hour
-          }    
-          s <- criteria_met12[n]
-          # if a break of less than or equal to 5 hours  
-          m <- n-1;
-          while (s==1)
-          { 
-            risk[n] <- risk[m]+1  
-            n <- n+1;
-            m <- n-1;
-            s <- criteria[n] 
-            if ( s==0 && (criteria[n+2]==1)) {
-              n = n+2;
-              s=1;
-            } else if ( s==0 && (criteria[n+3]==1)) {
-              n = n+3;
-              s=1;
-            } else if ( s==0 && (criteria[n+4]==1)) {
-              n = n+4;
-              s=1;
-            } else if( s==0 && (criteria[n+5]==1)) {
-              n = n+5;
-              s=1;
-            }      
-          }  
+  if (sum(criteria_sum == hours) == 0) {
+    #breaks the loop if there is no initial accumulation of 12 hours
+    head(risk, -20)
+  } else{
+    for (j in 1:length(idx)) {
+      #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
+      if (if (is.na(lw_rhum)) {
+        #if thee is no input for rhum threshold
+        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1)           #just see rain sum
+      } else{
+        any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] >= lw_rhum)) |
+            #take both as possible switches
+            (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1))
+      })
+        # outputs true or false
+      {
+        n <- idx[j]        #start accumulation from 12th hour
+      } else {
+        n <- idx[j] + 4      #start accumulation from 16th hour
+      }
+      s <- criteria_met12[n]
+      # if a break of less than or equal to 5 hours
+      m <- n - 1
+      
+      while (s == 1)
+      {
+        risk[n] <- risk[m] + 1
+        n <- n + 1
+        
+        m <- n - 1
+        
+        s <- criteria[n]
+        if (s == 0 && (criteria[n + 2] == 1)) {
+          n = n + 2
           
-      }   
-      head(risk,-20) #remove last 20 values that were added to vectors to prevent "Out of bounds" issue
-    
+          s = 1
+          
+        } else if (s == 0 && (criteria[n + 3] == 1)) {
+          n = n + 3
+          
+          s = 1
+          
+        } else if (s == 0 && (criteria[n + 4] == 1)) {
+          n = n + 4
+          
+          s = 1
+          
+        } else if (s == 0 && (criteria[n + 5] == 1)) {
+          n = n + 5
+          
+          s = 1
+          
+        }
+      }
+      
     }
+    head(risk, -20) #remove last 20 values that were added to vectors to prevent "Out of bounds" issue
+    
+  }
   
 }
 ```
 
 # The Analysis 
 
-The set of the most important variables of Irish rules model is evaluated. The excell sheet with parameters under evaluation is avaialbe in data folder and can be changed and used for model evaluation in other locations. Coulmn named `90_10_12_rain` represents set of the original model parameters. 
+The set of the most important variables of Irish rules model is evaluated. The Excel sheet with parameters under evaluation is available in data folder and can be changed and used for model evaluation in other locations. Column named `90_10_12_rain` represents set of the original model parameters. 
 
-```{r message=FALSE, warning=FALSE,fig.align='center'}
+```{r load-parameters, message=FALSE, warning=FALSE, fig.align='center'}
 #read in parameters
-par <- read_xlsx(paste("./data/op_2007_16/par.xlsx"), sheet = "par")
-par %>% gt()
+parameters <-
+  read_excel(paste("./data/op_2007_16/par.xlsx"), sheet = "par")
+parameters %>% gt()
 ```
 
 
 ```{r fig.align='center'}
-params <- expand.grid(par[,1:3])
+params <- expand.grid(parameters[, 1:3])
 
 #set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
 params$lw_rh <- "rain"
@@ -281,331 +307,406 @@ params$lw_rh <- "rain"
 params2 <- params
 params2$lw_rh <- as.character("r+rh")
 
-par <- bind_rows(params, params2);rm(params, params2)
+parameters <- bind_rows(params, params2)
+rm(params, params2)
 
 # set a column with a name for each model
-
-par<- add_column(par, model = NA, .before = 1 )
-for (i in seq_along(1 : nrow(par))) {
-  par[i,1] <- paste0( par[i,2: length(names(par))], collapse = "_" )
+parameters <- add_column(parameters, model = NA, .before = 1)
+for (i in seq_along(1:nrow(parameters))) {
+  parameters[i, 1] <-
+    paste0(parameters[i, 2:length(names(parameters))], collapse = "_")
 }
-str(par)
-
-```
-##Model Run
-The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns corespond to the set of parameters supplied. 
-```{r}
-#Not run
-# for(i in 1:nrow(par)) {
-#   loop_var <- apply(par[i,], 1, function(x) {           #Run the model with different parameters 
-#          k <-
-#         lapply(split(OP, factor(OP$year)), function(chunk)
-#         IrishRulesModel(chunk, x)) #get the list of outpus
-#         unlist(k) -> k  #make it a vector
-#         })
-#     OP[, ncol(OP) + 1] <-  as.numeric(loop_var) 
-#     rm(loop_var)
-#     names(OP)[ncol(OP)] <- paste0(par[i, 1])
-#     print(paste(i, "of", nrow(par)))
-# }
-# 
-# 
-# nn <- paste0(names(OP[,26: length(names(OP))]), "_ebh","")
-# setnames(OP, old = c(names(OP[,26: length(names(OP))])), new = nn)
-# rm(i,nn)
+str(parameters)
 ```
 
-```{r fig.align='center'}
-load(file="data/op_2007_16/OP_for_analysis.RData")
+## Model Run
+
+The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns correspond to the set of parameters supplied. 
+
+```{r run-model, eval=FALSE}
+# This chunk is not run
+for(i in 1:nrow(par)) {
+  loop_var <- apply(par[i, ], 1, function(x) {
+    #run the model with different parameters
+    k <-
+      lapply(split(OP, factor(OP$year)), function(chunk)
+        IrishRulesModel(chunk, x)) #get the list of outputs
+    unlist(k) -> k  #make it a vector
+  })
+  OP[, ncol(OP) + 1] <-  as.numeric(loop_var)
+  rm(loop_var)
+  names(OP)[ncol(OP)] <- paste0(par[i, 1])
+  print(paste(i, "of", nrow(par)))
+}
+
+
+nn <- paste0(names(OP[, 26:length(names(OP))]), "_ebh", "")
+setnames(OP, old = c(names(OP[, 26:length(names(OP))])), new = nn)
+rm(i, nn
+)
+```
+
+Instead, just load the output from a prior model run to save time.
+
+```{r load-model-run, fig.align='center'}
+load(file = "data/op_2007_16/OP_for_analysis.RData")
 # Sample of outputs
-head(OP[, c(1,7,9,15,24:30)],5)
+head(OP[, c(1, 7, 9, 15, 24:30)], 5)
 ```
 
+## Evaluation procedure
 
-##Evaluation procedure
+The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
 
-The function `SensParametersCalc` calculates Sensitivity and Specificty of each variation of the model.
-```{r}
-SensParametersCalc <- function(y,weather_data, dates_cut, prot_duration = NULL){ 
-
-  #Set the warning threshold and run the rest of the script 
-  warning_threshold <- y
-  #data
-  fun_df <- weather_data
-  
-  #A function to subset the data for the period of interest in each year 
-  test.overlap = function(vals,start_date, end_date ) {
-    rowSums(mapply(function(a,b) between(vals, a, b),
-                   start_date, end_date)) > 0
+```{r sens-spec-calc}
+SensParametersCalc <-
+  function(y,
+           weather_data,
+           dates_cut,
+           prot_duration = NULL) {
+    #Set the warning threshold and run the rest of the script
+    warning_threshold <- y
+    #data
+    fun_df <- weather_data
+    
+    #A function to subset the data for the period of interest in each year
+    test.overlap = function(vals, start_date, end_date) {
+      rowSums(mapply(function(a, b)
+        between(vals, a, b),
+        start_date, end_date)) > 0
+    }
+    
+    #Subset  each year from emergence to disease onset and calculate number of FP and TN
+    fptn_df <-
+      fun_df  %>%
+      #Subset the of the data for the duration of non-warning period for each year
+      filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %>%
+      select(
+        ends_with("year_var"),
+        ends_with("week_var"),
+        ends_with("doy"),
+        ends_with("_ebh")
+      ) %>%
+      group_by(year_var) %>%
+      #if there was an accumulation from previous day, it would triger a warning
+      #Check aal of the first five rows because of possible break of 5 hours
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(
+                  ifelse(row_number() <= 5 & . >= warning_threshold,
+                         warning_threshold, .)
+                )) %>%
+      #all five values is changed so we have to delete 4 of them and leave only one
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(
+                  row_number() <= 4 & . == warning_threshold, 0, .
+                ))) %>%
+      # Change values coresponding to the warning threshold to 1 for calculating the sum
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %>%
+      group_by(year_var, week_var, doy) %>%
+      summarise_at(., .vars = colnames(.[grep("ebh", colnames(.))]), .funs = sum)
+    
+    
+    #Each warning would cause treatment that will keep the plants protected for a period of time
+    prot_duration <-
+      ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
+    
+    TreatmentWindow <- function(x, prot_duration) {
+      # x <- fptn_df[["93_10_12_rain_ebh"]]
+      y <- vector(mode = "numeric", length = length(x) + prot_duration)
+      for (i in seq_along(x)) {
+        if (x[i] == 1) {
+          y[i:c(i + prot_duration)] <- 1
+        }
+      }
+      y
+    }
+    fptn_df[grep("ebh", colnames(fptn_df))] <-
+      lapply(fptn_df[grep("ebh", colnames(fptn_df))], function(x)
+        TreatmentWindow(x, prot_duration))
+    
+    
+    FP <-
+      summarise_all(fptn_df[, colnames(fptn_df[, grep("ebh", colnames(fptn_df))])], .funs = sum)
+    
+    #Each warning will cause a treatment
+    total_days <- nrow(fptn_df) #total  duration of non_warning period
+    
+    TN <- total_days - FP
+    
+    
+    ##########################################################
+    #subset for 10 days prior to disease onset: Warning period
+    tpfn_df <-
+      fun_df %>%
+      #Subset of the data for the duration WARNING period in each year
+      filter(test.overlap(short_date,  dates_cut$warning, dates_cut$disease_onset)) %>%
+      select(
+        ends_with("year_var"),
+        ends_with("week_var"),
+        ends_with("doy"),
+        ends_with("_ebh")
+      ) %>%
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(
+                  ifelse(row_number() <= 5 &
+                           . >= warning_threshold, warning_threshold, .)
+                )) %>%
+      #all five values is changed so we have to delete 4 of them and leave only one
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(
+                  row_number() <= 4 & . == warning_threshold,
+                  0, .
+                ))) %>%
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %>%
+      group_by(year_var) %>%
+      summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %>%
+      mutate_at(., #some years have two warnings during the warning period
+                .vars = colnames(.[grep("ebh", colnames(.))]), funs(ifelse(. >= 1 , 1, 0)))
+    
+    # tpfn_df[,1:4]
+    
+    TP <-
+      summarise_all(tpfn_df[, colnames(tpfn_df[, grep("ebh", colnames(tpfn_df))])], .funs = sum)
+    
+    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years.
+    unique(tpfn_df$year_var) %>%
+      length() -> no_of_outbreaks
+    FN <- no_of_outbreaks - TP
+    
+    #summary
+    test <- data.frame(
+      model = names(FP),
+      FP = t(FP[1, ]),
+      tn = t(TN[1, ]),
+      TP = t(TP[1, ]),
+      FN = t(FN[1, ])
+    )
+    names(test) <- c("model", "FP", "TN", "TP", "FN")
+    test <- data.frame(test, row.names = NULL)
+    
+    
+    test$model <-  str_replace(test$model, "_ebh", "")
+    test$sens <- with(test, TP / (TP + FN))  #PTP sensitivity
+    test$spec <- with(test, TN / (TN + FP))  #PTN specificity
+    return_df <- test[, c("model", "sens")]
+    return_df$"one_min_spec" <- 1 - test[, "spec"]
+    return_df$cut_point <- warning_threshold
+    
+    return(return_df)
   }
-  
-  #Subset  each year from emergence to disease onset and calculate number of FP and TN
-   fptn_df <- 
-  fun_df  %>%
-    #Subset the of the data for the duration of non-warning period for each year
-    filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %>% 
-    select(ends_with("year_var"),
-           ends_with("week_var"),
-           ends_with("doy"),
-           ends_with("_ebh")) %>%
-    group_by(year_var) %>%
-    #if there was an accumulation from previous day, it would triger a warning
-    #Check aal of the first five rows because of possible break of 5 hours
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(row_number() <= 5 & . >= warning_threshold,
-                          warning_threshold, .))) %>% 
-    #all five values is changed so we have to delete 4 of them and leave only one
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(row_number() <= 4 & . == warning_threshold, 0, .))) %>%
-    # Change values coresponding to the warning threshold to 1 for calculating the sum
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(. == warning_threshold, 1, 0))) %>%
-    group_by(year_var, week_var, doy) %>%
-    summarise_at(., .vars = colnames(.[grep("ebh", colnames(.))]), .funs = sum)  
-    
-  
-  #Each warning would cause treatment that will keep the plants protected for a period of time
-   prot_duration <- ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
-   
-   TreatmentWindow <- function(x,prot_duration){
-     # x <- fptn_df[["93_10_12_rain_ebh"]]
-     y <- vector(mode = "numeric", length = length(x)+prot_duration)
-     for (i in seq_along(x)) {
-       if(x[i] == 1){
-         y[i:c(i+prot_duration)] <- 1
-       }
-     }
-     y
-   }
-   fptn_df[grep("ebh", colnames(fptn_df))] <- 
-    lapply(fptn_df[grep("ebh", colnames(fptn_df))], function(x) TreatmentWindow(x,prot_duration))
-  
-  
-  FP <- summarise_all(fptn_df[,colnames(fptn_df[,grep("ebh", colnames(fptn_df))])], .funs = sum)
-  
-  #Each warning will cause a treatment 
-  total_days <- nrow(fptn_df) #total  duration of non_warning period
-  
-  TN <- total_days - FP
-  
-  
-  ##########################################################
-  #subset for 10 days prior to disease onset: Warning period
-  tpfn_df <- 
-  fun_df %>%
-    #Subset of the data for the duration WARNING period in each year
-    filter(test.overlap(short_date,  dates_cut$warning,dates_cut$disease_onset)) %>% 
-    select(ends_with("year_var"),
-           ends_with("week_var"),
-           ends_with("doy"),
-           ends_with("_ebh")) %>%
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(row_number() <= 5 & . >= warning_threshold, warning_threshold, .))) %>%
-    #all five values is changed so we have to delete 4 of them and leave only one
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(row_number() <= 4 & . == warning_threshold,
-                          0, .))) %>%
-    mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
-              funs(ifelse(. == warning_threshold, 1, 0))) %>%
-    group_by(year_var) %>%
-    summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %>% 
-    mutate_at(., #some years have two warnings during the warning period
-              .vars = colnames(.[grep("ebh", colnames(.))]),funs(ifelse(. >= 1 , 1, 0)))
-    
-  # tpfn_df[,1:4]
-  
-  TP <- summarise_all(tpfn_df[,colnames(tpfn_df[,grep("ebh", colnames(tpfn_df))])], .funs = sum)
-
-    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years. 
-  unique(tpfn_df$year_var) %>% 
-    length() -> no_of_outbreaks
-  FN <- no_of_outbreaks - TP
-  
-  #summary
-  test <- data.frame( model = names(FP), 
-                      FP = t(FP[1,]),
-                      tn = t(TN[1,]),
-                      TP = t(TP[1,]),
-                      FN = t(FN[1,]))
-  names(test) <- c("model", "FP", "TN", "TP", "FN")
-  test <- data.frame(test, row.names = NULL)
-  
-  
-  test$model <-  str_replace(test$model, "_ebh", "")
-  test$sens <- with(test, TP/(TP + FN))  #PTP sensitivity
-  test$spec <- with(test, TN/(TN + FP))  #PTN specificity
-  return_df <- test[,c("model", "sens")]
-  return_df$"one_min_spec" <- 1-test[,"spec"]
-  return_df$cut_point <- warning_threshold
-
-  return(return_df)
-}
 ```
 
-This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with paralel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GM RAM laptop.   
+This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.
 
-```{r}
+```{r apply-sense-spec-calc, eval=FALSE}
 #select max warning threshold
 warning_thresholds <- 1:18
 
-# cores <- ifelse(detectCores() > 1, detectCores()-1,1) #Detect the number of cores and set it to total minus 1 to avoid overload
-# cl <- makeCluster(cores)
-# clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
-# clusterEvalQ(cl, library("tidyverse"))
-# system.time(
-#   ROC <- pbapply::pblapply(warning_thresholds, function(x) 
-#   {
-#     xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
-#     return(xx)
-#   },
-#   cl = cl
-#   )
-# )
-# stopCluster(cl)
+cores <- ifelse(detectCores() > 1, detectCores()-1, 1) #Detect the number of cores and set it to total minus 1 to avoid overload
+cl <- makeCluster(cores)
+clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
+clusterEvalQ(cl, library("tidyverse"))
+system.time(
+  ROC <- pbapply::pblapply(warning_thresholds, function(x)
+  {
+    xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
+    return(xx)
+  },
+  cl = cl
+  )
+)
+stopCluster(cl)
 ```
 
-The results of calculations can be directly loaded. 
-```{r}
- load( file ="./data/op_2007_16/results/ROC_output.Rdata")
+Rather, the results of calculations from a prior run can be directly loaded.
+
+```{r load-ROC}
+load(file = "./data/op_2007_16/results/ROC_output.Rdata")
 ```
 
 Sort the outputs for each model variation.
-```{r fig.align='center'}
-ROC_data <- as.data.frame(data.table::rbindlist(ROC));rm(ROC) #Outputs stored for each warning threshold/cutoffs 
-ROC_data <- base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
+```{r sort-ROC, fig.align='center'}
+ROC_data <-
+  as.data.frame(data.table::rbindlist(ROC))
+rm(ROC) #Outputs stored for each warning threshold/cutoffs
+ROC_data <-
+  base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
 ROC_data[[1]] %>% gt()
 ```
 
-##ROC 
+## ROC
+
 Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation.Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs. 
 
-```{r}
+```{r calculate-AUROC}
 #function to calculate AUROC for list of inputs
-GetAUC <- function(fun_df){
-  fun_df <- fun_df[rev(order(fun_df$cut_point)),]
-  auc <-  pracma::trapz(c(0,fun_df$one_min_spec,1), c(0,fun_df$sens,1))
+GetAUC <- function(fun_df) {
+  fun_df <- fun_df[rev(order(fun_df$cut_point)), ]
+  auc <-
+    pracma::trapz(c(0, fun_df$one_min_spec, 1), c(0, fun_df$sens, 1))
   result <- data.frame(model = unique(fun_df$model),
                        auc = auc)
   return(result)
 }
-AUROC_data <- lapply(ROC_data, function(x) GetAUC(x))
-AUROC_data <- lapply(AUROC_data, function(x) mutate_if(x,is.factor, as.character))
+AUROC_data <- lapply(ROC_data, function(x)
+  GetAUC(x))
+AUROC_data <-
+  lapply(AUROC_data, function(x)
+    mutate_if(x, is.factor, as.character))
 AUROC_data <- bind_rows(AUROC_data)
 ```
 
 Empirical ROC curve was created for each variation of the model.  
-```{r message=FALSE, warning=FALSE,out.width = '50%',fig.show = "hold"}
+
+```{r plotROC, message=FALSE, warning=FALSE,out.width = '50%',fig.show = "hold"}
 PlotROC <- function(df) {
-  df <- df[rev(df$cut_point),]
-#append rows for plotting
-x <- rep(NA, ncol(df))
-df <- rbind(x, df)
-df[nrow(df)+1,] <- NA
-df$model <- unique(df$model[!is.na(df$model)])
-df[1,c("sens","one_min_spec")] <- 0
-df[nrow(df),c("sens","one_min_spec")] <- 1
-
-AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model==unique(df$model),]$auc,3))
-
-ggplot(df, aes(one_min_spec, sens, label = cut_point)) + 
-  geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
-  geom_path(colour = "gray") + 
-  geom_point(colour = "black") + 
-  geom_text_repel(size = 4)+
-  scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
-  scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
-  ggtitle(paste(df[1,1]))+
-  annotate("text", x=0.75, y=0.25,label=AUROC_lab,size =8)+  
-  theme_bw()+
-  theme(text = element_text(size=14),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+  df <- df[rev(df$cut_point), ]
+  #append rows for plotting
+  x <- rep(NA, ncol(df))
+  df <- rbind(x, df)
+  df[nrow(df) + 1, ] <- NA
+  df$model <- unique(df$model[!is.na(df$model)])
+  df[1, c("sens", "one_min_spec")] <- 0
+  df[nrow(df), c("sens", "one_min_spec")] <- 1
+  
+  AUROC_lab <-
+    paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+  
+  ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
+    geom_abline(
+      intercept = 0,
+      slope = 1,
+      color = "black",
+      linetype = "dashed"
+    ) +
+    geom_path(colour = "gray") +
+    geom_point(colour = "black") +
+    geom_text_repel(size = 4) +
+    scale_y_continuous(limits = c(0, 1),
+                       expand = c(0, 0),
+                       name = "Sensitivity") +
+    scale_x_continuous(limits = c(0, 1),
+                       expand = c(0, 0),
+                       name = "1- Specificity") +
+    ggtitle(paste(df[1, 1])) +
+    annotate(
+      "text",
+      x = 0.75,
+      y = 0.25,
+      label = AUROC_lab,
+      size = 8
+    ) +
+    theme_bw() +
+    theme(
+      text = element_text(size = 14),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
 }
-PlotROC( ROC_data[["90_10_12_rain"]])
-PlotROC( ROC_data[["88_10_10_90"]])
-PlotROC( ROC_data[["87_13_12_90"]])
-PlotROC( ROC_data[["88_12_9_90"]])
-
-
+PlotROC(ROC_data[["90_10_12_rain"]])
+PlotROC(ROC_data[["88_10_10_90"]])
+PlotROC(ROC_data[["87_13_12_90"]])
+PlotROC(ROC_data[["88_12_9_90"]])
 ```
 
-```{r fig.align='center', out.width = '80%',out.height = '80%'}
+```{r plot-ROC-figures, fig.align='center', out.width = '80%',out.height = '80%'}
 ls_roc <- list( ROC_data[["90_10_12_rain"]], 
-                  ROC_data[["88_10_10_90"]], 
-                  ROC_data[["87_13_12_90"]],
-                  ROC_data[["88_12_9_90"]])
-  ls_roc <- lapply(ls_roc, function(x) {
+                ROC_data[["88_10_10_90"]], 
+                ROC_data[["87_13_12_90"]],
+                ROC_data[["88_12_9_90"]])
+ls_roc <- lapply(ls_roc, function(x) {
   df <- x[rev(x$cut_point),]
   #append rows for plotting
   x <- rep(NA, ncol(df))
   df <- rbind(x, df)
-  df[nrow(df)+1,] <- NA
+  df[nrow(df) + 1,] <- NA
   df$model <- unique(df$model[!is.na(df$model)])
   df[1,c("sens","one_min_spec")] <- 0
   df[nrow(df),c("sens","one_min_spec")] <- 1
   return(df)
-  })
-  df <- bind_rows(ls_roc)
-  
+})
+df <- bind_rows(ls_roc)
 
-    
-  rename(df, Model = model) %>% 
-  ggplot( aes(one_min_spec, sens, group = Model, color = Model, label = cut_point)) + 
-    # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
-    geom_point()+
-    geom_text_repel(size = 2)+
-    geom_path(colour = "gray") + 
-    geom_line() + 
-    scale_y_continuous(limits = c(0, 1),expand = c(0, 0),name = "Sensitivity")+
-    scale_x_continuous(limits = c(0,1),expand = c(0, 0), name = "1- Specificity")+
-    ggtitle(paste(df[1,1]))+
-    theme_minimal()+
-    theme(text = element_text(size=14),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          panel.border = element_rect(linetype = "dashed",size=0.1, fill = "NA", colour = "black"),
-          legend.position = c(.95, .15),
-          legend.justification = c("right", "bottom"),
-          # legend.box.just = "right",
-          legend.margin = margin(6, 6, 6, 6))
-
+rename(df, Model = model) %>%
+  ggplot(aes(
+    one_min_spec,
+    sens,
+    group = Model,
+    color = Model,
+    label = cut_point
+  )) +
+  # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
+  geom_point() +
+  geom_text_repel(size = 2) +
+  geom_path(colour = "gray") +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = "Sensitivity") +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = "1- Specificity") +
+  ggtitle(paste(df[1, 1])) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(
+      linetype = "dashed",
+      size = 0.1,
+      fill = "NA",
+      colour = "black"
+    ),
+    legend.position = c(.95, .15),
+    legend.justification = c("right", "bottom"),
+    # legend.box.just = "right",
+    legend.margin = margin(6, 6, 6, 6)
+  )
 ```
 
-Prepare the data for further analysis. 
+Prepare the data for further analysis.
+
 ```{r}
-parameters <- colnames(par[,names(par) != "model"])
-AUROC_data <-  separate(AUROC_data, model, into =  parameters, sep = "_")
-AUROC_data[AUROC_data$lw_rh== "90","lw_rh"] <-"rain_rh"
-AUROC_data[,1:3] <- lapply(AUROC_data[,1:3], as.numeric); rm(parameters)
-data<- data.frame(AUROC_data)
+parameters <- colnames(parameters[, names(parameters) != "model"])
+AUROC_data <-
+  separate(AUROC_data, model, into =  parameters, sep = "_")
+AUROC_data[AUROC_data$lw_rh == "90", "lw_rh"] <- "rain_rh"
+AUROC_data[, 1:3] <-
+  lapply(AUROC_data[, 1:3], as.numeric)
+rm(parameters)
+data <- data.frame(AUROC_data)
 head(data) %>% gt()
 ```
 
 
-#Parameter evaluation
-##Leaf wetness estimation
+# Parameter evaluation
 
-Differences between pairs of models with same parametets, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.
+## Leaf wetness estimation
 
-```{r fig.align='center'}
-t_data <- 
-  data %>% 
-  group_by(rh_thresh, temp_thres, hours) %>% 
-  unite(var, rh_thresh, temp_thres, hours) %>% 
-  spread(key = lw_rh, value = auc) %>% 
+Differences between pairs of models with same parameters, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.
+
+```{r leaf-wet-graphs, fig.align='center'}
+t_data <-
+  data %>%
+  group_by(rh_thresh, temp_thresh, hours) %>%
+  unite(var, rh_thresh, temp_thresh, hours) %>%
+  spread(key = lw_rh, value = auc) %>%
   mutate(difference = rain - rain_rh)
 ggplot(t_data, aes(x = difference)) +
-  geom_histogram(binwidth = 0.001)+
-  geom_density(fill = "royalblue", 
-               alpha = 0.5, 
-               color = NA) + 
+  geom_histogram(binwidth = 0.001) +
+  geom_density(fill = "royalblue",
+               alpha = 0.5,
+               color = NA) +
   geom_point(aes(y = 0),
-             alpha = 0.5)+
+             alpha = 0.5) +
   theme_article()
 ```
 
 Compute summary statistics by groups.
-```{r}
+```{r leaf-wet summary}
 group_by(data, lw_rh) %>%
   summarise(
     count = n(),
@@ -615,146 +716,297 @@ group_by(data, lw_rh) %>%
 ```
 
 
-```{r}
+```{r leaf-wet-shapiro}
 shapiro.test(t_data$difference)
 ```
 The p-value < 0.05 implying that the distribution of the data is significantly different from normal distribution.
 Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estimator is as good as the median auc with both r and rh as estimators. 
 
-```{r}
-w.test <- with(t_data, wilcox.test(rain, rain_rh, paired = TRUE,
-                                   exact = F,
-                                   alternative = "less"))
+```{r wilcoxon-test}
+w.test <- with(t_data,
+               wilcox.test(
+                 rain,
+                 rain_rh,
+                 paired = TRUE,
+                 exact = F,
+                 alternative = "less"
+               ))
 w.test
 ```
 Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `format.pval(w.test$p.value, eps = .001)`.
-Model outputs forwith rain as single predictor are removed from further analysis.
+Model outputs with rain as single predictor are removed from further analysis.
 
-```{r}
-data %>% 
-  mutate(Leaf_Wetness=factor(ifelse(lw_rh=="rain_rh", "rain and rh", "only rain"))) %>% 
-  ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
-  geom_boxplot(aes(colour = Leaf_Wetness), width=0.4)+ 
+```{r remove-single-rain}
+data %>%
+  mutate(Leaf_Wetness = factor(ifelse(
+    lw_rh == "rain_rh", "rain and rh", "only rain"
+  ))) %>%
+  ggplot(aes(
+    x = factor(lw_rh),
+    y = auc,
+    group = Leaf_Wetness
+  )) +
+  geom_boxplot(aes(colour = Leaf_Wetness), width = 0.4) +
   # geom_label(aes_string(x=1.5, y=height, label=paste("p =",w.test$p.value)), label.size =0.02 )+
-scale_color_discrete(name = "Leaf Wetness", 
-                     labels = c("Rain>0.01", "Rain>0.01&RH>90%"))+
-  scale_x_discrete( breaks = c(0,90), labels = c("rain", "rh and rain"))+
-  xlab("Infection period switch")+
-  ylab("AUC")+
-  theme_article()+
-  coord_equal(10/1)
+  scale_color_discrete(name = "Leaf Wetness",
+                       labels = c("Rain>0.01", "Rain>0.01&RH>90%")) +
+  scale_x_discrete(breaks = c(0, 90),
+                   labels = c("rain", "rh and rain")) +
+  xlab("Infection period switch") +
+  ylab("AUC") +
+  theme_article() +
+  coord_equal(10 / 1)
 ```
 
 ```{r}
 #Remove the data containg only rain as estimator
-data <- subset(data, lw_rh=="rain_rh")
+data <- subset(data, lw_rh == "rain_rh")
 data$lw_rh <- NULL
 ```
 
-##T, RH and Sporulation duration
+## T, RH and Sporulation duration
+
 ### Visualisation
-Scatterplot matrix shows some relationships between y and other variables
+
+Scatter plot matrix shows some relationships between y and other variables
+
 ```{r fig.align='center'}
-GGally::ggpairs(data, 
-        lower = list(continuous = "points"), 
-        upper = list(continuous = "cor")
-)
+GGally::ggpairs(data,
+                lower = list(continuous = "points"),
+                upper = list(continuous = "cor"))
 ```
 
 Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC. 
 
-Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.  
+Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.
+
 ```{r fig.align='center',fig.show = "hold"}
-data[order(data$hours),] %>% 
-  ggplot(., aes(factor(hours), auc))+
-  geom_boxplot(width= 0.4)+
-  geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
-  ggtitle("Durations of sporulation period")+
-  geom_smooth(method = "loess", se=T, color="red", aes(group=1))+
-  xlab("Sporulation period (hours)")+
-  ylab("AUROC")+
+data[order(data$hours), ] %>%
+  ggplot(., aes(factor(hours), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = "black",
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle("Durations of sporulation period") +
+  geom_smooth(method = "loess",
+              se = T,
+              color = "red",
+              aes(group = 1)) +
+  xlab("Sporulation period (hours)") +
+  ylab("AUROC") +
   theme_article()
 
-ggplot(data, aes(factor(rh_thresh), auc))+
-  geom_boxplot(width= 0.4)+
-    geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
-  ggtitle("RH thresholds for sporulation and infection")+
-  geom_smooth(method = "loess", se=T, color="blue", aes(group=1))+
-  ylab("AUROC")+
-  xlab("RH threshold (%)")+
+ggplot(data, aes(factor(rh_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = "black",
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle("RH thresholds for sporulation and infection") +
+  geom_smooth(method = "loess",
+              se = T,
+              color = "blue",
+              aes(group = 1)) +
+  ylab("AUROC") +
+  xlab("RH threshold (%)") +
   theme_article()
 
-ggplot(data, aes(factor(temp_thres), auc))+
-  geom_boxplot(width= 0.4)+
-    geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
-  ggtitle("Temperature thresholds for sporulation and infection")+
-  geom_smooth(method = "loess", se=T, color="black", aes(group=1), show.legend = T)+
-  xlab("Temperature threshold (°C)")+
-  ylab("AUROC")+
+ggplot(data, aes(factor(temp_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = "black",
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle("Temperature thresholds for sporulation and infection") +
+  geom_smooth(
+    method = "loess",
+    se = T,
+    color = "black",
+    aes(group = 1),
+    show.legend = T
+  ) +
+  xlab("Temperature threshold (°C)") +
+  ylab("AUROC") +
   theme_article()
 ```
-
 
 
 ### Model fitting 
 
 ```{r}
-lapply(data[,1:3], function(x) sort(unique(x)))
+lapply(data[, 1:3], function(x)
+  sort(unique(x)))
 ```
 Create coded data set. Nine levels of each variable are used. 
 
 ```{r}
-cd_data <- coded.data(data, t ~  (temp_thres - 10),
+cd_data <- coded.data(data, t ~  (temp_thresh - 10),
                       rh ~ (rh_thresh - 90),
-                      h ~ (hours-12))
+                      h ~ (hours - 12))
 str(cd_data)
 head(cd_data) %>% kable()
-
 ```
 
 Fit a cubic model.
 ```{r}
-rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 3), data = cd_data)
+rsm_fit <- lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
 rsm_fit$studres <- rstudent(rsm_fit)
 anova(rsm_fit)
 ```
 
 Evaluate model fit with diagnostic plot.
 ```{r}
-plot(rsm_fit$studres, main="Residuals vs Order of data")
+plot(rsm_fit$studres, main = "Residuals vs Order of Data")
 abline(h = 0, col = "red")
 ```
 
 Visualise fitted response surface. 
-```{r out.width = '33.33%',fig.show = "hold", warning=FALSE }
-z_min <-  min(data$auc)- c(min(data$auc)*0.02)
-z_max <-  max(data$auc)+ c(max(data$auc)*0.02)
-# Create a function interpolating colors in the range of specified colors
-jet.colors <- colorRampPalette( c("red","yellow", "green") )
-# Generate the desired number of colors from this palette
-nbcol <- 100
-color <- jet.colors(nbcol)
+```{r persp, fig.show = "hold", warning=FALSE, message=FALSE}
+z_min <- min(data$auc) - c(min(data$auc) * 0.02)
+z_max <- max(data$auc) + c(max(data$auc) * 0.02)
 
+# use a viridis palette for usability
+library(viridis)
+color <- plasma(256)
 
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = -3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC",at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + t,zlab = "AUROC", at = data.frame(t = 0, rh = +3, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+par(mar = c(5, 2, 0.5, 0.5),
+    mfrow = c(3, 3),
+    cex = 0.35)
 
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = -3 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ rh + t,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = +3 ), col = color, zlim = c(z_min,z_max),theta = 50, phi = 10,  shade  = .2)
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = -3, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
 
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = -3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = 0, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10,  shade  = .2)
-persp(rsm_fit, ~ h + rh,zlab = "AUROC", at = data.frame(t = +3, rh = 0, h = 0 ), col = color, zlim = c(z_min,z_max),theta = 60, phi = 10, r = 1.9,  shade  = .2)
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = +3, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = 0, h = -3),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ rh + t,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = 0, h = +3),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = -3, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = 0, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
+
+persp(
+  rsm_fit,
+  ~ h + rh,
+  zlab = "\n\n\nAUROC",
+  at = data.frame(t = +3, rh = 0, h = 0),
+  col = color,
+  zlim = c(z_min, z_max),
+  theta = 55,
+  phi = 10,
+  border = "grey15",
+  lwd = 0.5
+)
 ```
 
-
-
-
 # Weather, model outputs and the disease
+
 ```{r, echo = TRUE,out.width = '100%' }
-myimages<-list.files("./data/op_2007_16/graph/yearly_plots", pattern = ".png", full.names = TRUE)
+myimages <-
+  list.files(
+    "./data/op_2007_16/graph/yearly_plots",
+    pattern = ".png",
+    full.names = TRUE
+  )
 include_graphics(myimages)
 ```
 
