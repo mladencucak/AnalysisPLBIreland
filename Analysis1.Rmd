@@ -33,7 +33,9 @@ list.of.packages <-
     "egg",
     "rsm",
     "GGally",
-    "R.utils"
+    "R.utils",
+    "rcompanion",
+    "mgsub"
   )
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -529,7 +531,20 @@ PlotROC( ROC_data[["88_12_9_90"]])
 
 ```
 
-```{r fig.align='center', out.width = '80%',out.height = '80%'}
+```{r include=FALSE}
+p1 <- PlotROC( ROC_data[["90_10_12_rain"]])
+p2 <- PlotROC( ROC_data[["88_10_10_90"]])
+p3 <- PlotROC( ROC_data[["87_13_12_90"]])
+p4 <- PlotROC( ROC_data[["88_12_9_90"]])
+
+png(filename = paste("./data/op_2007_16/results/ROC_plots.png"), width = 800, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
+  egg::ggarrange(p1,p2,p3,p4,
+                 ncol = 2)
+  dev.off()
+```
+
+
+```{r fig.align='center', out.width = '80%',out.height = '100%', warning=FALSE}
 ls_roc <- list( ROC_data[["90_10_12_rain"]], 
                   ROC_data[["88_10_10_90"]], 
                   ROC_data[["87_13_12_90"]],
@@ -595,10 +610,10 @@ t_data <-
   spread(key = lw_rh, value = auc) %>% 
   mutate(difference = rain - rain_rh)
 ggplot(t_data, aes(x = difference)) +
-  geom_histogram(binwidth = 0.001)+
   geom_density(fill = "royalblue", 
                alpha = 0.5, 
                color = NA) + 
+  geom_histogram(binwidth = 0.001)+
   geom_point(aes(y = 0),
              alpha = 0.5)+
   theme_article()
@@ -631,19 +646,22 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs forwith rain as single predictor are removed from further analysis.
 
 ```{r}
-data %>% 
+plot <- data %>% 
   mutate(Leaf_Wetness=factor(ifelse(lw_rh=="rain_rh", "rain and rh", "only rain"))) %>% 
   ggplot( aes(x = factor(lw_rh),y= auc, group = Leaf_Wetness))+
   geom_boxplot(aes(colour = Leaf_Wetness), width=0.4)+ 
-  # geom_label(aes_string(x=1.5, y=height, label=paste("p =",w.test$p.value)), label.size =0.02 )+
-scale_color_discrete(name = "Leaf Wetness", 
+  scale_color_discrete(name = "Leaf Wetness", 
                      labels = c("Rain>0.01", "Rain>0.01&RH>90%"))+
   scale_x_discrete( breaks = c(0,90), labels = c("rain", "rh and rain"))+
   xlab("Infection period switch")+
-  ylab("AUC")+
+  ylab("AUROC")+
   theme_article()+
   coord_equal(10/1)
+#save the the plot
+plot+ggsave("./data/op_2007_16/results/LWswithc.png", width = 11, height = 11, units = "cm")
+plot
 ```
+
 
 ```{r}
 #Remove the data containg only rain as estimator
@@ -665,7 +683,7 @@ Increasing temperature threshold had positive, while reducing rh and duration of
 
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.  
 ```{r fig.align='center',fig.show = "hold"}
-data[order(data$hours),] %>% 
+p1 <- data[order(data$hours),] %>% 
   ggplot(., aes(factor(hours), auc))+
   geom_boxplot(width= 0.4)+
   geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
@@ -675,7 +693,7 @@ data[order(data$hours),] %>%
   ylab("AUROC")+
   theme_article()
 
-ggplot(data, aes(factor(rh_thresh), auc))+
+p2 <- ggplot(data, aes(factor(rh_thresh), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
   ggtitle("RH thresholds for sporulation and infection")+
@@ -684,7 +702,7 @@ ggplot(data, aes(factor(rh_thresh), auc))+
   xlab("RH threshold (%)")+
   theme_article()
 
-ggplot(data, aes(factor(temp_thres), auc))+
+p3 <-  ggplot(data, aes(factor(temp_thres), auc))+
   geom_boxplot(width= 0.4)+
     geom_jitter(position = position_jitter(width = 0.2), colour= "black", alpha = 0.6,size = 0.7)+
   ggtitle("Temperature thresholds for sporulation and infection")+
@@ -692,16 +710,21 @@ ggplot(data, aes(factor(temp_thres), auc))+
   xlab("Temperature threshold (°C)")+
   ylab("AUROC")+
   theme_article()
+
+png(filename = paste("./data/op_2007_16/results/init_vis.png"),
+    width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
+egg::ggarrange(p1,p2,p3, ncol = 1)
+dev.off()
 ```
 
 
 
 ### Model fitting 
-
+Thresholds evaluated in this study. 
 ```{r}
 lapply(data[,1:3], function(x) sort(unique(x)))
 ```
-Create coded data set. Nine levels of each variable are used. 
+Create coded data set. Seven levels of each variable are used. 
 
 ```{r}
 cd_data <- coded.data(data, t ~  (temp_thres - 10),
@@ -712,17 +735,70 @@ head(cd_data) %>% kable()
 
 ```
 
-Fit a cubic model.
+Model fitting.
 ```{r}
-rsm_fit <-  lm(auc ~ poly( rh, h, t, degree = 3), data = cd_data)
+
+rpoly_1_fit <-  lm(auc ~ poly(rh, h, t, degree = 1), data = cd_data)
+rpoly_2_fit <-  lm(auc ~ poly(rh, h, t, degree = 2), data = cd_data)
+rpoly_3_fit <-  lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
+rpoly_4_fit <-  lm(auc ~ poly(rh, h, t, degree = 4), data = cd_data)
+
+mod_ls <- list(rpoly_1_fit, rpoly_2_fit, rpoly_3_fit, rpoly_4_fit)
+mod_ls <- lapply(mod_ls, function(x) x$studres <- rstudent(x))
+
+compareLM(rpoly_1_fit,rpoly_2_fit,rpoly_3_fit,rpoly_4_fit)[[2]] %>% gt() 
+
+anova(rpoly_1_fit, rpoly_2_fit, rpoly_3_fit, rpoly_4_fit)
+
+# Selected model
+rsm_fit <-  rpoly_3_fit
 rsm_fit$studres <- rstudent(rsm_fit)
 anova(rsm_fit)
 ```
 
-Evaluate model fit with diagnostic plot.
-```{r}
+Evaluate model fit with diagnostic plots.
+```{r out.width = '50%',fig.show = "hold"}
 plot(rsm_fit$studres, main="Residuals vs Order of data")
 abline(h = 0, col = "red")
+hist(resid(rsm_fit)) #distriburion of residuals is approximately  normal
+```
+
+Extract the model formula. the code has been borrowd from [this stackoverflow thread]([I'm an inline-style link](https://www.google.com))
+```{r}
+processPolyNames = function(coef){
+  members = strsplit(mgsub::mgsub(coef,c("poly\\(",", degre.*"),c("","")),", ")[[1]]
+  degree = as.numeric(strsplit(strsplit(coef,")")[[1]][2],"\\.")[[1]])
+  coef_out = ""
+  for(d in seq_along(degree)){
+    if(degree[d] == 0) next
+    if(degree[d] == 1){
+      if(coef_out == ""){
+        coef_out = members[d]
+      } else {
+        coef_out = paste0(coef_out,"*",members[d])
+      }
+    } else {
+      if(coef_out == ""){
+        coef_out = paste0(members[d],"^",degree[d])
+      } else {
+        coef_out = paste0(coef_out,"*",members[d],"^",degree[d])
+      }
+    }
+  }
+  return(coef_out)
+}
+
+coefs = summary(rsm_fit)$coef[,1]
+prettyNames = lapply(names(coefs)[-1],processPolyNames)
+prettyModel = ""
+for(i in seq_along(coefs)){
+  if(i == 1){
+    prettyModel = paste0(prettyModel,round(coefs[i],7))
+  } else {
+    prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0,"+",""),round(coefs[i],5),"*",prettyNames[[i-1]])
+  }
+}
+cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames,prettyModel)
 ```
 
 Visualise fitted response surface. 
