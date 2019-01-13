@@ -26,7 +26,9 @@ list.of.packages <-
     "egg",
     "rsm",
     "GGally",
-    "R.utils"
+    "R.utils",
+    "rcompanion",
+    "mgsub"
   )
 
 new.packages <-
@@ -506,8 +508,8 @@ This function was applied to output of each variation of the model with varying 
 # this chunk not evaluated
 #select max warning threshold
 warning_thresholds <- 1:18
-
-cores <- ifelse(detectCores() > 1, detectCores()-1, 1) #Detect the number of cores and set it to total minus 1 to avoid overload
+#Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
+cores <- ifelse(detectCores() > 1, detectCores()-1, 1) 
 cl <- makeCluster(cores)
 clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
 clusterEvalQ(cl, library("tidyverse"))
@@ -563,7 +565,7 @@ AUROC_data <- bind_rows(AUROC_data)
 
 Empirical ROC curve was created for each variation of the model.  
 
-```{r plotROC, message=FALSE, warning=FALSE,out.width = '50%',fig.show = "hold"}
+```{r plotROC, message=FALSE, warning=FALSE,out.width = '80%', out.height= '80%'}
 PlotROC <- function(df) {
   df <- df[rev(df$cut_point), ]
   #append rows for plotting
@@ -593,7 +595,7 @@ PlotROC <- function(df) {
     scale_x_continuous(limits = c(0, 1),
                        expand = c(0, 0),
                        name = "1- Specificity") +
-    ggtitle(paste(df[1, 1])) +
+    ggtitle(paste("Model parameters =", str_replace_all(df[1, 1],"_", ";"))) +
     annotate(
       "text",
       x = 0.75,
@@ -609,65 +611,8 @@ PlotROC <- function(df) {
     )
 }
 PlotROC(ROC_data[["90_10_12_rain"]])
-PlotROC(ROC_data[["88_10_10_90"]])
-PlotROC(ROC_data[["87_13_12_90"]])
-PlotROC(ROC_data[["88_12_9_90"]])
 ```
 
-```{r plot-ROC-figures, fig.align='center', out.width = '80%',out.height = '80%'}
-ls_roc <- list( ROC_data[["90_10_12_rain"]], 
-                ROC_data[["88_10_10_90"]], 
-                ROC_data[["87_13_12_90"]],
-                ROC_data[["88_12_9_90"]])
-ls_roc <- lapply(ls_roc, function(x) {
-  df <- x[rev(x$cut_point),]
-  #append rows for plotting
-  x <- rep(NA, ncol(df))
-  df <- rbind(x, df)
-  df[nrow(df) + 1,] <- NA
-  df$model <- unique(df$model[!is.na(df$model)])
-  df[1,c("sens","one_min_spec")] <- 0
-  df[nrow(df),c("sens","one_min_spec")] <- 1
-  return(df)
-})
-df <- bind_rows(ls_roc)
-
-rename(df, Model = model) %>%
-  ggplot(aes(
-    one_min_spec,
-    sens,
-    group = Model,
-    color = Model,
-    label = cut_point
-  )) +
-  # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
-  geom_point() +
-  geom_text_repel(size = 2) +
-  geom_path(colour = "gray") +
-  geom_line() +
-  scale_y_continuous(limits = c(0, 1),
-                     expand = c(0, 0),
-                     name = "Sensitivity") +
-  scale_x_continuous(limits = c(0, 1),
-                     expand = c(0, 0),
-                     name = "1- Specificity") +
-  theme_minimal() +
-  theme(
-    text = element_text(size = 14),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_rect(
-      linetype = "dashed",
-      size = 0.1,
-      fill = "NA",
-      colour = "black"
-    ),
-    legend.position = c(.95, .15),
-    legend.justification = c("right", "bottom"),
-    # legend.box.just = "right",
-    legend.margin = margin(6, 6, 6, 6)
-  )
-```
 
 Prepare the data for further analysis and check the resulting data frame.
 
@@ -740,6 +685,7 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs with rain as single predictor are removed from further analysis.
 
 ```{r remove-single-rain}
+plot <- 
 data %>%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == "rain_rh", "rain and rh", "only rain"
@@ -756,9 +702,11 @@ data %>%
   scale_x_discrete(breaks = c(0, 90),
                    labels = c("rain", "rh and rain")) +
   xlab("Infection period switch") +
-  ylab("AUC") +
+  ylab("AUROC") +
   theme_article() +
   coord_equal(10 / 1)
+plot+ggsave("./data/op_2007_16/results/LWswithc.png", width = 11, height = 11, units = "cm")
+plot
 ```
 
 ```{r}
@@ -769,9 +717,9 @@ data$lw_rh <- NULL
 
 ## T, RH and Sporulation duration
 
-### Visualisation
+### Initial exploration
 
-Scatter plot matrix shows some relationships between y and other variables
+Scatter plot matrix shows some relationships between y and other variables.
 
 ```{r fig.align='center'}
 GGally::ggpairs(data,
@@ -784,7 +732,8 @@ Increasing temperature threshold had positive, while reducing rh and duration of
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.
 
 ```{r fig.align='center',fig.show = "hold"}
-data[order(data$hours), ] %>%
+p1 <-  
+  data[order(data$hours), ] %>%
   ggplot(., aes(factor(hours), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
@@ -802,7 +751,8 @@ data[order(data$hours), ] %>%
   ylab("AUROC") +
   theme_article()
 
-ggplot(data, aes(factor(rh_thresh), auc)) +
+p2 <- 
+  ggplot(data, aes(factor(rh_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -819,7 +769,8 @@ ggplot(data, aes(factor(rh_thresh), auc)) +
   xlab("RH threshold (%)") +
   theme_article()
 
-ggplot(data, aes(factor(temp_thresh), auc)) +
+p3 <-  
+  ggplot(data, aes(factor(temp_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -838,6 +789,11 @@ ggplot(data, aes(factor(temp_thresh), auc)) +
   xlab("Temperature threshold (°C)") +
   ylab("AUROC") +
   theme_article()
+
+png(filename = paste("./data/op_2007_16/results/init_vis.png"),
+    width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
+egg::ggarrange(p1,p2,p3, ncol = 1)
+dev.off(); rm(p1,p2,p3)
 ```
 
 
@@ -847,7 +803,7 @@ ggplot(data, aes(factor(temp_thresh), auc)) +
 lapply(data[, 1:3], function(x)
   sort(unique(x)))
 ```
-Create coded data set. Nine levels of each variable are used. 
+Create coded data set. Seven levels of each variable are used. 
 
 ```{r}
 cd_data <- coded.data(data, t ~  (temp_thresh - 10),
@@ -857,159 +813,186 @@ str(cd_data)
 head(cd_data) %>% kable()
 ```
 
-Fit a cubic model.
+Fit models of first to fourth order, and evaluate fits.
+
 ```{r}
-rsm_fit <- lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
-rsm_fit$studres <- rstudent(rsm_fit)
-anova(rsm_fit)
+poly_1_fit <-  lm(auc ~ poly(rh, h, t, degree = 1), data = cd_data)
+poly_2_fit <-  lm(auc ~ poly(rh, h, t, degree = 2), data = cd_data)
+poly_3_fit <-  lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
+poly_4_fit <-  lm(auc ~ poly(rh, h, t, degree = 4), data = cd_data)
+
+compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
+  add_column( Order = 1:4, .before = 1) %>% 
+  gt() 
 ```
 
-Evaluate model fit with diagnostic plot.
+Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted $R^{2}$, while the distriburion of residuals is still fulfilling the assumption of normality. Model of $4^{th}$ order seems to provide very little gain in terms of fit Adj. $R^{2}$ comparing to $3^{rd}$ order, and most importantly is not overfitting indicated by Shapiro test for mode of $4^{th}$ order. Information crterions are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for sole purpose interpretation of the data, and will not be utilised any further. 
 
-```{r}
-plot(rsm_fit$studres, main = "Residuals vs Order of Data")
+```{r include=FALSE}
+rm(poly_1_fit,poly_2_fit,poly_4_fit)
+```
+
+Evaluate model fit with diagnostic plot. 
+
+```{r out.width = '50%',fig.show = "hold"}
+poly_3_fit$studres <- rstudent(poly_3_fit)
+plot(poly_3_fit$studres, main="Residuals vs Order of data")
 abline(h = 0, col = "red")
+hist(resid(poly_3_fit)) #distriburion of residuals should be approximately  normal
 ```
 
-Visualise fitted response surface. Note that AUROC Z values are multiplied by 10,
-scaled 0 - 1.0, for graphing purposes only.
+Assumptions of normapity of residuals are fulfilled. 
+Extract the model formula. The code has been borrowed from [this StackOverflow thread](https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel)
+
+```{r}
+processPolyNames = function(coef){
+  members = strsplit(mgsub::mgsub(coef,c("poly\\(",", degre.*"),c("","")),", ")[[1]]
+  degree = as.numeric(strsplit(strsplit(coef,")")[[1]][2],"\\.")[[1]])
+  coef_out = ""
+  for(d in seq_along(degree)){
+    if(degree[d] == 0) next
+    if(degree[d] == 1){
+      if(coef_out == ""){
+        coef_out = members[d]
+      } else {
+        coef_out = paste0(coef_out,"*",members[d])
+      }
+    } else {
+      if(coef_out == ""){
+        coef_out = paste0(members[d],"^",degree[d])
+      } else {
+        coef_out = paste0(coef_out,"*",members[d],"^",degree[d])
+      }
+    }
+  }
+  return(coef_out)
+}
+
+coefs = summary(poly_3_fit)$coef[,1]
+prettyNames = lapply(names(coefs)[-1],processPolyNames)
+prettyModel = ""
+for(i in seq_along(coefs)){
+  if(i == 1){
+    prettyModel = paste0(prettyModel,round(coefs[i],7))
+  } else {
+    prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0,"+",""),round(coefs[i],5),"*",prettyNames[[i-1]])
+  }
+}
+
+cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames,prettyModel)
+```
+
+Visualise fitted response surface. 
 
 ```{r persp, fig.show = "hold", warning=FALSE, message=FALSE}
-z_min <- min(data$auc) - c(min(data$auc) * 0.02) * 10
-z_max <- max(data$auc) + c(max(data$auc) * 0.02) * 10
+z_min <- min(data$auc) - c(min(data$auc) * 0.02) 
+z_max <- max(data$auc) + c(max(data$auc) * 0.02) 
 
 # use a viridis palette for usability
 library(viridis)
 color <- plasma(256)
 
-par(mar = c(5, 2, 0.5, 0.5),
+par(mar = c(4, 0, 0, 0),
     mfrow = c(3, 3),
     cex = 0.4)
 
-persp(
-  rsm_fit,
-  ~ h + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = -3, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
+par_cut <- data.frame(t = c(rep(0,6),-3, 0, +3),
+                      rh = c(rep(0,3),-3, 0, +3,rep(0,3)),
+                      h = c(-3, 0, +3,rep(0,6)))
 
-persp(
-  rsm_fit,
-  ~ h + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = 0, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
+plot_ls <- list()
 
-persp(
-  rsm_fit,
-  ~ h + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = +3, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ rh + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = 0, h = -3),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ rh + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = 0, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ rh + t,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = 0, h = +3),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ h + rh,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = -3, rh = 0, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ h + rh,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = 0, rh = 0, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
-
-persp(
-  rsm_fit,
-  ~ h + rh,
-  zlab = "\n\n\nAUROC",
-  at = data.frame(t = +3, rh = 0, h = 0),
-  col = color,
-  zlim = c(z_min, z_max),
-  theta = 55,
-  phi = 10,
-  border = "grey15",
-  lwd = 0.5
-)
+for(i in seq(nrow(par_cut))){
+    persp(
+    poly_3_fit,
+    ~ h + t,
+    zlab = "\n\n\n\nAUROC",
+    at = data.frame(par_cut[i,]),
+    col = color,
+    zlim = c(z_min, z_max),
+    theta = 55,
+    phi = 10,
+    border = "grey15",
+    lwd = 0.5,
+    main = "par_cut[i,]"
+  )
+}
 ```
+
+```{r out.width = '50%',fig.show = "hold"}
+PlotROC(ROC_data[["90_10_12_rain"]])
+PlotROC(ROC_data[["88_10_10_90"]])
+PlotROC(ROC_data[["87_13_12_90"]])
+PlotROC(ROC_data[["88_12_9_90"]])
+```
+
+
+
+```{r plot-ROC-figures, fig.align='center', out.width = '80%',out.height = '80%', warning=FALSE}
+ls_roc <- list( ROC_data[["90_10_12_rain"]], 
+                ROC_data[["88_10_10_90"]], 
+                ROC_data[["87_13_12_90"]],
+                ROC_data[["88_12_9_90"]])
+ls_roc <- lapply(ls_roc, function(x) {
+  df <- x[rev(x$cut_point),]
+  #append rows for plotting
+  x <- rep(NA, ncol(df))
+  df <- rbind(x, df)
+  df[nrow(df) + 1,] <- NA
+  df$model <- unique(df$model[!is.na(df$model)])
+  df[1,c("sens","one_min_spec")] <- 0
+  df[nrow(df),c("sens","one_min_spec")] <- 1
+  return(df)
+})
+df <- bind_rows(ls_roc)
+
+rename(df, Model = model) %>%
+  ggplot(aes(
+    one_min_spec,
+    sens,
+    group = Model,
+    color = Model,
+    label = cut_point
+  )) +
+  # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
+  geom_point() +
+  geom_text_repel(size = 2) +
+  geom_path(colour = "gray") +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = "Sensitivity") +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = "1- Specificity") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(
+      linetype = "dashed",
+      size = 0.1,
+      fill = "NA",
+      colour = "black"
+    ),
+    legend.position = c(.95, .15),
+    legend.justification = c("right", "bottom"),
+    # legend.box.just = "right",
+    legend.margin = margin(6, 6, 6, 6)
+  )+
+  ggtitle("ROC for selected models")
+```
+
+
+
 
 # Weather, model outputs and the disease
 
-```{r, echo = TRUE,out.width = '100%' }
+```{r echo = TRUE,out.width = '100%' }
 myimages <-
   list.files(
-    "./data/op_2007_16/graph/yearly_plots",
+    "../data/op_2007_16/graph/yearly_plots",
     pattern = ".png",
     full.names = TRUE
   )
