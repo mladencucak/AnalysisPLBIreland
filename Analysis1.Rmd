@@ -4,6 +4,12 @@
 
 ## Libraries
 
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+```
+
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -616,7 +622,7 @@ PlotROC(ROC_data[["90_10_12_rain"]])
 
 Prepare the data for further analysis and check the resulting data frame.
 
-```{r}
+```{r parameters}
 parameters <- colnames(parameters[, names(parameters) != "model"])
 AUROC_data <-
   separate(AUROC_data, model, into =  parameters, sep = "_")
@@ -684,7 +690,8 @@ w.test
 Wilcoxon signed rank test showed that median AUROC is greater when using both rain >0.1 mm and RH>90% instead only rain >0.1 mm and as leaf wetness indicators with p `r {format.pval(w.test$p.value, eps = .001)}`.
 Model outputs with rain as single predictor are removed from further analysis.
 
-```{r remove-single-rain}
+```{r plot_lw_estim}
+plot <- 
 data %>%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == "rain_rh", "rain and rh", "only rain"
@@ -701,12 +708,14 @@ data %>%
   scale_x_discrete(breaks = c(0, 90),
                    labels = c("rain", "rh and rain")) +
   xlab("Infection period switch") +
-  ylab("AUC") +
+  ylab("AUROC") +
   theme_article() +
   coord_equal(10 / 1)
+plot+ggsave("./data/op_2007_16/results/LWswithc.png", width = 11, height = 11, units = "cm")
+plot
 ```
 
-```{r}
+```{r remove-single-rain}
 #Remove the data containg only rain as estimator
 data <- subset(data, lw_rh == "rain_rh")
 data$lw_rh <- NULL
@@ -714,11 +723,11 @@ data$lw_rh <- NULL
 
 ## T, RH and Sporulation duration
 
-### Visualisation
+### Initial exploration
 
-Scatter plot matrix shows some relationships between y and other variables
+Scatter plot matrix shows some relationships between y and other variables.
 
-```{r fig.align='center'}
+```{r interactions, fig.align='center'}
 GGally::ggpairs(data,
                 lower = list(continuous = "points"),
                 upper = list(continuous = "cor"))
@@ -728,8 +737,9 @@ Increasing temperature threshold had positive, while reducing rh and duration of
 
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.
 
-```{r fig.align='center',fig.show = "hold"}
-data[order(data$hours), ] %>%
+```{r desc_stat, fig.align='center',fig.show = "hold"}
+p1 <-  
+  data[order(data$hours), ] %>%
   ggplot(., aes(factor(hours), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
@@ -747,7 +757,8 @@ data[order(data$hours), ] %>%
   ylab("AUROC") +
   theme_article()
 
-ggplot(data, aes(factor(rh_thresh), auc)) +
+p2 <- 
+  ggplot(data, aes(factor(rh_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -764,7 +775,8 @@ ggplot(data, aes(factor(rh_thresh), auc)) +
   xlab("RH threshold (%)") +
   theme_article()
 
-ggplot(data, aes(factor(temp_thresh), auc)) +
+p3 <-  
+  ggplot(data, aes(factor(temp_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -783,18 +795,23 @@ ggplot(data, aes(factor(temp_thresh), auc)) +
   xlab("Temperature threshold (°C)") +
   ylab("AUROC") +
   theme_article()
+
+png(filename = paste("./data/op_2007_16/results/init_vis.png"),
+    width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
+egg::ggarrange(p1,p2,p3, ncol = 1)
+dev.off(); rm(p1,p2,p3)
 ```
 
 
 ### Model fitting 
 
-```{r}
+```{r mod_fit_data}
 lapply(data[, 1:3], function(x)
   sort(unique(x)))
 ```
-Create coded data set. Nine levels of each variable are used. 
+Create coded data set. Seven levels of each variable are used. 
 
-```{r}
+```{r code_data}
 cd_data <- coded.data(data, t ~  (temp_thresh - 10),
                       rh ~ (rh_thresh - 90),
                       h ~ (hours - 12))
@@ -804,30 +821,37 @@ head(cd_data) %>% kable()
 
 Fit models of first to fourth order, and evaluate fits.
 
-```{r}
+```{r model_fit}
 poly_1_fit <-  lm(auc ~ poly(rh, h, t, degree = 1), data = cd_data)
 poly_2_fit <-  lm(auc ~ poly(rh, h, t, degree = 2), data = cd_data)
 poly_3_fit <-  lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
 poly_4_fit <-  lm(auc ~ poly(rh, h, t, degree = 4), data = cd_data)
-
 
 compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
   add_column( Order = 1:4, .before = 1) %>% 
   gt() 
 ```
 
+Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R^2^, while the distriburion of residuals is still fulfilling the assumption of normality. Model of 4^th^ order seems to provide very little gain in terms of fit Adj. R^2^ comparing to 3^rd^ order, and most importantly is not overfitting indicated by Shapiro test for mode of 4^th^ order. Information crterions are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for sole purpose interpretation of the data, and will not be utilised any further. 
+
+```{r include=FALSE}
+rm(poly_1_fit,poly_2_fit,poly_4_fit)
+```
+
 Evaluate model fit with diagnostic plot. 
 
-```{r out.width = '50%',fig.show = "hold"}
+```{r diag_plot,out.width = '50%',fig.show = "hold"}
 poly_3_fit$studres <- rstudent(poly_3_fit)
 plot(poly_3_fit$studres, main="Residuals vs Order of data")
 abline(h = 0, col = "red")
 hist(resid(poly_3_fit)) #distriburion of residuals should be approximately  normal
 ```
 
-Extract the model formula. the code has been borrowd from [this StackOverflow thread](https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel)
+Assumptions of normapity of residuals are fulfilled. 
 
-```{r}
+Extract the model formula. The code has been borrowed from [this StackOverflow thread](https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel)
+
+```{r equation}
 processPolyNames = function(coef){
   members = strsplit(mgsub::mgsub(coef,c("poly\\(",", degre.*"),c("","")),", ")[[1]]
   degree = as.numeric(strsplit(strsplit(coef,")")[[1]][2],"\\.")[[1]])
@@ -862,47 +886,66 @@ for(i in seq_along(coefs)){
   }
 }
 
-prettyModel;rm(processPolyNames,coefs,prettyNames,prettyModel)
+cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames,prettyModel)
+
 ```
 
-Visualise fitted response surface. Note that AUROC Z values are multiplied by 10,
-scaled 0 - 1.0, for graphing purposes only.
+### Surface plot of model fits 
 
-```{r persp, fig.show = "hold", warning=FALSE, message=FALSE}
-z_min <- min(data$auc) - c(min(data$auc) * 0.02) 
-z_max <- max(data$auc) + c(max(data$auc) * 0.02) 
+Visualise fitted response surface. 
+
+```{r persp, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
+z_min <- min(data$auc) - c(min(data$auc) * 0.02)
+z_max <- max(data$auc) + c(max(data$auc) * 0.02)
 
 # use a viridis palette for usability
 library(viridis)
 color <- plasma(256)
 
-par(mar = c(5, 2, 0.5, 0.5),
+par(mar = c(1.5, 4.5, 3.5, 1.5),
     mfrow = c(3, 3),
-    cex = 0.4)
+    cex = 0.5)
 
-par_cut <- data.frame(t = c(rep(0,6),-3, 0, +3),
-                      rh = c(rep(0,3),-3, 0, +3,rep(0,3)),
-                      h = c(-3, 0, +3,rep(0,6)))
+par_cut <- data.frame(
+  t = c(rep(0, 6), -3, 0,+3),
+  rh = c(rep(0, 3), -3, 0,+3, rep(0, 3)),
+  h = c(-3, 0,+3, rep(0, 6))
+)
 
 plot_ls <- list()
 
-for(i in seq(nrow(par_cut))){
-    persp(
-    poly_3_fit,
-    ~ h + t,
-    zlab = "\n\n\n\nAUROC",
-    at = data.frame(par_cut[i,]),
+for (i in seq(nrow(par_cut))) {
+  persp(poly_3_fit,
+        if (i <= 3) {
+          ~ rh + t
+        } else if (i %in% 4:6) {
+          ~ h + t
+        } else if (i >= 7) {
+          ~ h + rh
+        }
+        ,
+        at = data.frame(par_cut[i,]),
+    zlab = "\nAUROC",
     col = color,
     zlim = c(z_min, z_max),
-    theta = 55,
-    phi = 10,
+    theta = 60,
+    phi = 15,
     border = "grey15",
-    lwd = 0.5
+    lwd = 0.5,
+    cex.main = 2,
+    cex.axis = 1.06,
+    cex.lab = 1.9,
+    main = paste0("\n",letters[i],") ", "Response at ", 
+                  "t = ", par_cut[i,1] + 10, "; ", 
+                  "rh = ", par_cut[i,2] + 90, "; ", 
+                  "h = ", par_cut[i,3] +10)
   )
 }
 ```
 
-```{r out.width = '50%',fig.show = "hold"}
+### Further investigation
+
+```{r further_analysis, out.width = '50%',fig.show = "hold", warning=FALSE}
 PlotROC(ROC_data[["90_10_12_rain"]])
 PlotROC(ROC_data[["88_10_10_90"]])
 PlotROC(ROC_data[["87_13_12_90"]])
