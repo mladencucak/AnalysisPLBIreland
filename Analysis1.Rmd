@@ -35,7 +35,8 @@ list.of.packages <-
     "R.utils",
     "rcompanion",
     "mgsub",
-    "here"
+    "here",
+    "stringr"
   )
 
 new.packages <-
@@ -572,7 +573,7 @@ AUROC_data <- bind_rows(AUROC_data)
 Empirical ROC curve was created for each variation of the model.  
 
 ```{r plotROC, message=FALSE, warning=FALSE,out.width = '80%', out.height= '80%'}
-PlotROC <- function(df) {
+PlotROC <- function(df, numbering = NULL) {
   df <- df[rev(df$cut_point), ]
   #append rows for plotting
   x <- rep(NA, ncol(df))
@@ -582,8 +583,37 @@ PlotROC <- function(df) {
   df[1, c("sens", "one_min_spec")] <- 0
   df[nrow(df), c("sens", "one_min_spec")] <- 1
   
-  AUROC_lab <-
-    paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+  #find AUROC value for selected model
+  if("model"%in% names(AUROC_data)){
+    AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+  } else { #some changes in next chnk of code made this necessary, col model will be split and removed
+    if(str_split(unique(df$model), "_")[[1]][4] == "90"){
+       mod_var <- str_split(unique(df$model), "_")
+       mod_var[[1]][4] <- "rain_rh"
+       implode <- function(..., sep='') {paste(..., collapse=sep)}
+       mod_var <-  implode(mod_var[[1]],sep="_")   
+    }
+    auc_val <- 
+    unite(AUROC_data, col = model,  colnames(AUROC_data[,1:4]), sep = "_") %>% 
+      filter(model == mod_var) %>% 
+      select(auc)
+    AUROC_lab <- paste("AUROC =", round(auc_val, 3))
+  }
+  
+  #Print title without or with lettering (for later analysis)
+  if("model"%in% names(AUROC_data)){
+   title <- paste("Model parameters =", str_replace_all(df[1, 1],"_", ";"))
+  } else{
+      pars <- str_split(df[1,1], "_")
+    title <- 
+      paste0( letters[numbering], ") ",
+        "ROC for ", 
+       "Tt = ", pars[[1]][[2]],"°C;",
+       "RHt = ", pars[[1]][1], "%; ",
+        "\n",
+       "SDt = ", pars[[1]][3], " hours; and LW = rain and RH>90%.")
+    }
+  
   
   ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
     geom_abline(
@@ -601,11 +631,11 @@ PlotROC <- function(df) {
     scale_x_continuous(limits = c(0, 1),
                        expand = c(0, 0),
                        name = "1- Specificity") +
-    ggtitle(paste("Model parameters =", str_replace_all(df[1, 1],"_", ";"))) +
+    ggtitle(title) +
     annotate(
       "text",
       x = 0.75,
-      y = 0.25,
+      y = 0.15,
       label = AUROC_lab,
       size = 8
     ) +
@@ -618,7 +648,6 @@ PlotROC <- function(df) {
 }
 PlotROC(ROC_data[["90_10_12_rain"]])
 ```
-
 
 Prepare the data for further analysis and check the resulting data frame.
 
@@ -736,7 +765,7 @@ Increasing temperature threshold had positive, while reducing rh and duration of
 
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.
 
-```{r desc_stat, fig.align='center',fig.show = "hold"}
+```{r desc_stat, fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
 p1 <-  
   data[order(data$hours), ] %>%
   ggplot(., aes(factor(hours), auc)) +
@@ -798,7 +827,9 @@ p3 <-
 png(filename = here("data", "op_2007_16","results","init_vis.png"),
     width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
 egg::ggarrange(p1,p2,p3, ncol = 1)
-dev.off(); rm(p1,p2,p3)
+dev.off()
+p1;p2;p3
+
 ```
 
 
@@ -811,9 +842,9 @@ lapply(data[, 1:3], function(x)
 Create coded data set. Seven levels of each variable are used. 
 
 ```{r code_data}
-cd_data <- coded.data(data, t ~  (temp_thresh - 10),
-                      rh ~ (rh_thresh - 90),
-                      h ~ (hours - 12))
+cd_data <- coded.data(data, Tt ~  (temp_thresh - 10),
+                      RHt ~ (rh_thresh - 90),
+                      SDt ~ (hours - 12))
 str(cd_data)
 head(cd_data) %>% kable()
 ```
@@ -821,17 +852,28 @@ head(cd_data) %>% kable()
 Fit models of first to fourth order, and evaluate fits.
 
 ```{r model_fit}
-poly_1_fit <-  lm(auc ~ poly(rh, h, t, degree = 1), data = cd_data)
-poly_2_fit <-  lm(auc ~ poly(rh, h, t, degree = 2), data = cd_data)
-poly_3_fit <-  lm(auc ~ poly(rh, h, t, degree = 3), data = cd_data)
-poly_4_fit <-  lm(auc ~ poly(rh, h, t, degree = 4), data = cd_data)
+poly_1_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
+poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
+poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
+poly_4_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
 compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
   add_column( Order = 1:4, .before = 1) %>% 
   gt() 
 ```
 
-Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R^2^, while the distriburion of residuals is still fulfilling the assumption of normality. Model of 4^th^ order seems to provide very little gain in terms of fit Adj. R^2^ comparing to 3^rd^ order, and most importantly is not overfitting indicated by Shapiro test for mode of 4^th^ order. Information crterions are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for sole purpose interpretation of the data, and will not be utilised any further. 
+Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R^2^, while the distriburion of residuals is still fulfilling the assumption of normality. Model of 4^th^ order seems to provide very little gain in terms of fit Adj. R^2^ comparing to 3^rd^ order, and most importantly is not overfitting indicated by Wilks-Shapiro test for model of 4^th^ order. Information crterions are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data. 
+
+
+
+```{r summary_table2, warning=FALSE }
+
+library(pander)
+panderOptions('round', 2)
+panderOptions('keep.trailing.zeros', TRUE)
+pander(poly_3_fit,add.significance.stars = T)
+```
+
 
 ```{r include=FALSE}
 rm(poly_1_fit,poly_2_fit,poly_4_fit)
@@ -879,15 +921,16 @@ prettyNames = lapply(names(coefs)[-1],processPolyNames)
 prettyModel = ""
 for(i in seq_along(coefs)){
   if(i == 1){
-    prettyModel = paste0(prettyModel,round(coefs[i],7))
+    prettyModel = paste0(prettyModel,round(coefs[i],2))
   } else {
-    prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0,"+",""),round(coefs[i],5),"*",prettyNames[[i-1]])
+    prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0," + "," "),round(coefs[i],2),"*",prettyNames[[i-1]])
   }
 }
-
-cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames,prettyModel)
+prettyModel <-  gsub("-", "- ", prettyModel)
+cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames)
 
 ```
+
 
 ### Surface plot of model fits 
 
@@ -899,16 +942,16 @@ z_max <- max(data$auc) + c(max(data$auc) * 0.02)
 
 # use a viridis palette for usability
 library(viridis)
-color <- plasma(256)
+color_var <- plasma(256)
 
 par(mar = c(1.5, 4.5, 3.5, 1.5),
     mfrow = c(3, 3),
     cex = 0.5)
 
 par_cut <- data.frame(
-  t = c(rep(0, 6), -3, 0,+3),
-  rh = c(rep(0, 3), -3, 0,+3, rep(0, 3)),
-  h = c(-3, 0,+3, rep(0, 6))
+  Tt = c(rep(0, 6), -3, 0,+3),
+  RHt = c(rep(0, 3), -3, 0,+3, rep(0, 3)),
+  SDt = c(-3, 0,+3, rep(0, 6))
 )
 
 plot_ls <- list()
@@ -916,50 +959,96 @@ plot_ls <- list()
 for (i in seq(nrow(par_cut))) {
   persp(poly_3_fit,
         if (i <= 3) {
-          ~ rh + t
+          ~ RHt + Tt
         } else if (i %in% 4:6) {
-          ~ h + t
+          ~ SDt + Tt
         } else if (i >= 7) {
-          ~ h + rh
+          ~ SDt + RHt
         }
         ,
         at = data.frame(par_cut[i,]),
     zlab = "\nAUROC",
-    col = color,
+    xlab = if (i <= 3) {
+          c("RHt (%)","Tt (°C)")
+        } else if (i %in% 4:6) {
+          c("SDt (hours)", "Tt (°C)")
+        } else if (i >= 7) {
+          c("SDt (hours)", "RHt (%)")
+        },
+    col = color_var,
     zlim = c(z_min, z_max),
-    theta = 40,
-    phi = 15,
+    theta = 37,
+    phi = 10,
     border = "grey15",
     lwd = 0.5,
-    cex.main = 2,
+    cex.main = 1.8,
     cex.axis = 1.06,
-    cex.lab = 1.9,
+    cex.lab = 1.8,
     main = paste0("\n",letters[i],") ", "Response at ", 
-                  "t = ", par_cut[i,1] + 10, "; ", 
-                  "rh = ", par_cut[i,2] + 90, "; ", 
-                  "h = ", par_cut[i,3] +10)
+                  "Tt = ", par_cut[i,1] + 10,"°C;",
+                   "\n",
+                  "RHt = ", par_cut[i,2] + 90, "%; ",
+                  "SDt = ", par_cut[i,3] +12, " hours."
+                  )
   )
 }
 ```
 
-Plots show relationship between variation in parameters of two variables with third variable fixed at three levels and response as AUROC. 
+Plots show relationship between variation in parameters of two variables with third variable fixed at three levels and response as AUROC. 3D surface plots indicate that reduction teperature and relative humidity threshold improves accuracy of the model; while teperature threshold should be increased to acheve same effect. 
+
+Another way to present this data is with countour plots. We will plot contour plots corresponding to the above 3D surfaces 
+
+```{r countour, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=5, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
+
+par(
+  mar = c(3, 4, 4, 2),
+    mfrow = c(3, 1),
+    cex.main = 1.2,
+    cex.axis = 1.06,
+    cex.lab = 1.1)
+# c(5, 4, 4, 2)
+
+contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = -3 ))
+# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0))
+# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
+
+contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = -3, SDt = 0 ))
+# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
+# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 3, SDt = 0 ))
+
+# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = -3, RHt = 0, SDt = 0 ))
+# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
+contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 3, RHt = 0, SDt = 0 ))
+
+```
+
 
 ### Further investigation
 
-Based on the sensitivity analysis followig model parametrisations were compared to the original parameters of Itish ruels and further analised: 
+Based on the sensitivity analysis followig model parametrisations were compared to the original parameters of Irish Rules and further analised: 
 
-```{r}
-parameters %>% 
-  filter(model %in% c("90_10_12_rain","88_10_10_r+rh","87_13_12_r+rh","88_12_9_r+rh" )) %>% 
-  select(-"model") %>% 
-  gt()
+```{r table_of_models}
+# parameters[parameters[["model"]] %in% c("90_10_12_rain",
+#                                    "88_10_10_r+rh",
+#                                    "87_13_12_r+rh",
+#                                    "88_12_9_r+rh" 
+#                                    ),] %>% 
+#   select(-model) %>% 
+#   gt()
 ```
 
-```{r further_analysis, out.width = '50%',fig.show = "hold", warning=FALSE}
+```{r further_analysis, fig.show = "hold",fig.width=5, fig.height=5, warning=FALSE, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
+mod_list <-  list(ROC_data[["90_10_12_rain"]],
+                  ROC_data[["88_10_10_90"]],
+                  ROC_data[["87_13_12_90"]],
+                  ROC_data[["88_12_9_90"]])
+
 PlotROC(ROC_data[["90_10_12_rain"]])
 PlotROC(ROC_data[["88_10_10_90"]])
 PlotROC(ROC_data[["87_13_12_90"]])
 PlotROC(ROC_data[["88_12_9_90"]])
+
+map2(mod_list, c(1:length(mod_list)), PlotROC)
 ```
 
 
@@ -1023,6 +1112,9 @@ rename(df, Model = model) %>%
 IR have failed to indicate any risk in 2  and the warning threshold of 12 hour was reached in only 4 years out of 10. 
 
 
+### Fungicide treatments
+Theoretical investigation of number of treatments recomended by selected models was run
+
 # Weather, model outputs and the disease
 
 ```{r echo = TRUE,out.width = '100%' }
@@ -1038,4 +1130,3 @@ Packages used
 ```{r }
 sessionInfo()
 ```
-
