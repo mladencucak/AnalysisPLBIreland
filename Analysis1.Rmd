@@ -36,7 +36,8 @@ list.of.packages <-
     "rcompanion",
     "mgsub",
     "here",
-    "stringr"
+    "stringr",
+    "pander"
   )
 
 new.packages <-
@@ -144,13 +145,20 @@ dates_cut <-
   read_csv(
     here("data", "op_2007_16", "plantingdates.csv"),
     col_types = cols(
-      disease_observed_sus = col_date(format = "%d/%m/%Y"),
+      disease_observed = col_date(format = "%d/%m/%Y"),
       last_assessment = col_date(format = "%d/%m/%Y")
     )
   )
 dates_cut$planting_date <-
   as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
 dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
+#st warnning period to 14 days before disease onset
+dates_cut <- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
+                        .before = "disease_observed")
+
+dates_cut <- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = "disease_onset" )
+rownames(dates_cut) <- NULL
+
 dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 ```
 
@@ -173,7 +181,7 @@ IrishRulesModel <- function(weather,
     rh_thresh <- 90
     temp_thresh <- 10
     hours <- 12   #sum of hours before EBH accumulation
-  } else{
+  } else {
     #pass a vector of parameters
     rh_thresh <- as.numeric(param[2])
     temp_thresh <- as.numeric(param[3])
@@ -182,7 +190,9 @@ IrishRulesModel <- function(weather,
       param[5]           #if is NA then only rain data will be used
   }
   
-  
+  #threshold for estimation of leaf wetness using relative humidity
+  lw_rhum_threshold <- 90
+    
   weather[["rain"]] -> rain
   if ("rhum" %in% names(weather)) {
     weather[["rhum"]] -> rh
@@ -237,11 +247,11 @@ IrishRulesModel <- function(weather,
   } else{
     for (j in 1:length(idx)) {
       #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-      if (if (is.na(lw_rhum)) {
-        #if thee is no input for rhum threshold
+      if (if (lw_rhum=="rain") {
+        #if only rain
         (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1)           #just see rain sum
       } else{
-        any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] >= lw_rhum)) |
+        any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] >= lw_rhum_threshold)) |
             #take both as possible switches
             (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1))
       })
@@ -314,7 +324,7 @@ params$lw_rh <- "rain"
 
 #Repeat all of the analysis considering rh >= 90% and rain as an estimator of leaf wetness
 params2 <- params
-params2$lw_rh <- as.character("r+rh")
+params2$lw_rh <- as.character("rainrh")
 
 parameters <- bind_rows(params, params2)
 rm(params, params2)
@@ -334,8 +344,8 @@ The model has been run with each set of parameters, and columns with model outpu
 
 ```{r run-model, eval=FALSE}
 # This chunk is not run
-for(i in 1:nrow(par)) {
-  loop_var <- apply(par[i, ], 1, function(x) {
+for(i in 1:nrow(parameters)) {
+  loop_var <- apply(parameters[i, ], 1, function(x) {
     #run the model with different parameters
     k <-
       lapply(split(OP, factor(OP$year)), function(chunk)
@@ -344,14 +354,14 @@ for(i in 1:nrow(par)) {
   })
   OP[, ncol(OP) + 1] <-  as.numeric(loop_var)
   rm(loop_var)
-  names(OP)[ncol(OP)] <- paste0(par[i, 1])
-  print(paste(i, "of", nrow(par)))
+  names(OP)[ncol(OP)] <- paste0(parameters[i, 1])
+  print(paste(i, "of", nrow(parameters)))
 }
 
 
 nn <- paste0(names(OP[, 26:length(names(OP))]), "_ebh", "")
 setnames(OP, old = c(names(OP[, 26:length(names(OP))])), new = nn)
-rm(i, nn)
+rm( nn)
 ```
 
 Instead, just load the output from a prior model run to save time.
@@ -509,18 +519,18 @@ SensParametersCalc <-
   }
 ```
 
-This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it takes around 40 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.
+This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it reduces the run time to 4 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.
 
 ```{r apply-sense-spec-calc, eval=FALSE}
 # this chunk not evaluated
 #select max warning threshold
 warning_thresholds <- 1:18
+begin <- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
 cores <- ifelse(detectCores() > 1, detectCores()-1, 1) 
 cl <- makeCluster(cores)
 clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
 clusterEvalQ(cl, library("tidyverse"))
-system.time(
   ROC <- pbapply::pblapply(warning_thresholds, function(x)
   {
     xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
@@ -528,7 +538,7 @@ system.time(
   },
   cl = cl
   )
-)
+begin- Sys.time()
 stopCluster(cl)
 ```
 
@@ -542,10 +552,11 @@ Sort the outputs for each model variation.
 ```{r sort-ROC, fig.align='center'}
 ROC_data <-
   as.data.frame(data.table::rbindlist(ROC))
-rm(ROC) #Outputs stored for each warning threshold/cutoffs
+rownames(ROC_data) <- NULL
+# rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data <-
   base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
-ROC_data[[1]] %>% gt()
+ROC_data[[1]] %>% pander()
 ```
 
 ## ROC
@@ -589,15 +600,20 @@ PlotROC <- function(df, numbering = NULL) {
   } else { #some changes in next chnk of code made this necessary, col model will be split and removed
     if(str_split(unique(df$model), "_")[[1]][4] == "90"){
        mod_var <- str_split(unique(df$model), "_")
-       mod_var[[1]][4] <- "rain_rh"
+       mod_var[[1]][4] <- "rainrh"
        implode <- function(..., sep='') {paste(..., collapse=sep)}
        mod_var <-  implode(mod_var[[1]],sep="_")   
-    }
+    }else{
+    mod_var <- str_split(unique(df$model), "_")
+    implode <- function(..., sep='') {paste(..., collapse=sep)}
+    mod_var <-  implode(mod_var[[1]],sep="_") 
+  }
     auc_val <- 
     unite(AUROC_data, col = model,  colnames(AUROC_data[,1:4]), sep = "_") %>% 
       filter(model == mod_var) %>% 
       select(auc)
     AUROC_lab <- paste("AUROC =", round(auc_val, 3))
+    
   }
   
   #Print title without or with lettering (for later analysis)
@@ -652,10 +668,10 @@ PlotROC(ROC_data[["90_10_12_rain"]])
 Prepare the data for further analysis and check the resulting data frame.
 
 ```{r parameters}
-parameters <- colnames(parameters[, names(parameters) != "model"])
+params <- colnames(parameters[, names(parameters) != "model"])
 AUROC_data <-
-  separate(AUROC_data, model, into =  parameters, sep = "_")
-AUROC_data[AUROC_data$lw_rh == "90", "lw_rh"] <- "rain_rh"
+  separate(AUROC_data, model, into =  params, sep = "_")
+# AUROC_data[AUROC_data$lw_rh == "r+rh", "lw_rh"] <- "rainrh"
 AUROC_data[, 1:3] <-
   lapply(AUROC_data[, 1:3], as.numeric)
 data <- data.frame(AUROC_data)
@@ -675,7 +691,7 @@ t_data <-
   group_by(rh_thresh, temp_thresh, hours) %>%
   unite(var, rh_thresh, temp_thresh, hours) %>%
   spread(key = lw_rh, value = auc) %>%
-  mutate(difference = rain - rain_rh)
+  mutate(difference = rain - rainrh)
 ggplot(t_data, aes(x = difference)) +
   geom_histogram(binwidth = 0.001) +
   geom_density(fill = "royalblue",
@@ -707,7 +723,7 @@ Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estima
 w.test <- with(t_data,
                wilcox.test(
                  rain,
-                 rain_rh,
+                 rainrh,
                  paired = TRUE,
                  exact = F,
                  alternative = "less"
@@ -722,7 +738,7 @@ Model outputs with rain as single predictor are removed from further analysis.
 plot <- 
 data %>%
   mutate(Leaf_Wetness = factor(ifelse(
-    lw_rh == "rain_rh", "rain and rh", "only rain"
+    lw_rh == "rainrh", "rain and rh", "only rain"
   ))) %>%
   ggplot(aes(
     x = factor(lw_rh),
@@ -745,7 +761,7 @@ plot+ggsave(here("data", "op_2007_16","results","LWswithc.png"), width = 11, hei
 
 ```{r remove-single-rain}
 #Remove the data containg only rain as estimator
-data <- subset(data, lw_rh == "rain_rh")
+data <- subset(data, lw_rh == "rainrh")
 data$lw_rh <- NULL
 ```
 
@@ -907,9 +923,9 @@ processPolyNames = function(coef){
       }
     } else {
       if(coef_out == ""){
-        coef_out = paste0(members[d],"^",degree[d])
+        coef_out = paste0(members[d],"^",degree[d],"^")
       } else {
-        coef_out = paste0(coef_out,"*",members[d],"^",degree[d])
+        coef_out = paste0(coef_out,"*",members[d],"^",degree[d],"^")
       }
     }
   }
@@ -926,11 +942,15 @@ for(i in seq_along(coefs)){
     prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0," + "," "),round(coefs[i],2),"*",prettyNames[[i-1]])
   }
 }
-prettyModel <-  gsub("-", "- ", prettyModel)
-cat(paste("AUROC =",prettyModel));rm(processPolyNames,coefs,prettyNames)
+prettyModel <-  paste("AUROC =", gsub("-", "- ", prettyModel))
+cat(prettyModel);rm(processPolyNames,coefs,prettyNames)
 
 ```
+`r format(prettyModel)`
 
+```{r rm_formula,include=FALSE}
+rm(prettyModel)
+```
 
 ### Surface plot of model fits 
 
@@ -1027,37 +1047,31 @@ contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 3, RHt = 0, SD
 
 Based on the sensitivity analysis followig model parametrisations were compared to the original parameters of Irish Rules and further analised: 
 
-```{r table_of_models}
-# parameters[parameters[["model"]] %in% c("90_10_12_rain",
-#                                    "88_10_10_r+rh",
-#                                    "87_13_12_r+rh",
-#                                    "88_12_9_r+rh" 
-#                                    ),] %>% 
-#   select(-model) %>% 
-#   gt()
-```
+```{r further_analysis, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=5, fig.height=5, fig.path='figures/', dev=c('png', 'pdf')}
+# 
+# par(
+#     mfrow = c(1, 4)
+#   )
 
-```{r further_analysis, fig.show = "hold",fig.width=5, fig.height=5, warning=FALSE, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
 mod_list <-  list(ROC_data[["90_10_12_rain"]],
-                  ROC_data[["88_10_10_90"]],
-                  ROC_data[["87_13_12_90"]],
-                  ROC_data[["88_12_9_90"]])
+                  ROC_data[["88_10_10_rainrh"]],
+                  ROC_data[["87_13_12_rainrh"]],
+                  ROC_data[["88_12_9_rainrh"]])
 
-PlotROC(ROC_data[["90_10_12_rain"]])
-PlotROC(ROC_data[["88_10_10_90"]])
-PlotROC(ROC_data[["87_13_12_90"]])
-PlotROC(ROC_data[["88_12_9_90"]])
-
-map2(mod_list, c(1:length(mod_list)), PlotROC)
+pl <- map2(mod_list, c(1:length(mod_list)), PlotROC)
+pl[[1]]
+pl[[2]]
+pl[[3]]
+pl[[4]]
 ```
 
 
 
 ```{r plot-ROC-figures, fig.align='center', fig.width=7, fig.height=7, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
 ls_roc <- list( ROC_data[["90_10_12_rain"]], 
-                ROC_data[["88_10_10_90"]], 
-                ROC_data[["87_13_12_90"]],
-                ROC_data[["88_12_9_90"]])
+                ROC_data[["88_10_10_rainrh"]], 
+                ROC_data[["87_13_12_rainrh"]],
+                ROC_data[["88_12_9_rainrh"]])
 ls_roc <- lapply(ls_roc, function(x) {
   df <- x[rev(x$cut_point),]
   #append rows for plotting
