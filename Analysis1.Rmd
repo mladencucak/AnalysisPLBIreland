@@ -538,7 +538,7 @@ clusterEvalQ(cl, library("tidyverse"))
   },
   cl = cl
   )
-begin- Sys.time()
+begin- Sys.time() #check the duration of the process in the console
 stopCluster(cl)
 ```
 
@@ -586,80 +586,92 @@ Empirical ROC curve was created for each variation of the model.
 ```{r plotROC, message=FALSE, warning=FALSE,out.width = '80%', out.height= '80%', fig.align="center"}
 PlotROC <- function(df, numbering = NULL) {
   df <- df[rev(df$cut_point), ]
-  #append rows for plotting
-  x <- rep(NA, ncol(df))
-  df <- rbind(x, df)
-  df[nrow(df) + 1, ] <- NA
-  df$model <- unique(df$model[!is.na(df$model)])
-  df[1, c("sens", "one_min_spec")] <- 0
-  df[nrow(df), c("sens", "one_min_spec")] <- 1
-  
-  #find AUROC value for selected model
-  if("model"%in% names(AUROC_data)){
-    AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
-  } else { #some changes in next chnk of code made this necessary, col model will be split and removed
-    if(str_split(unique(df$model), "_")[[1]][4] == "rainrh"){
-       mod_var <- str_split(unique(df$model), "_")
-       mod_var[[1]][4] <- "rainrh"
-       implode <- function(..., sep='') {paste(..., collapse=sep)}
-       mod_var <-  implode(mod_var[[1]],sep="_")   
-    }else{
+#append rows for plotting
+x <- rep(NA, ncol(df))
+df <- rbind(x, df)
+df[nrow(df) + 1, ] <- NA
+df$model <- unique(df$model[!is.na(df$model)])
+df[1, c("sens", "one_min_spec")] <- 0
+df[nrow(df), c("sens", "one_min_spec")] <- 1
+
+#Condence labels for a single cutoff point
+ df <- 
+  df %>% 
+  group_by(one_min_spec, sens, model) %>% 
+  summarise(cut_point = ifelse(all(is.na(cut_point)),
+                               "",
+                               range(cut_point, na.rm = TRUE) %>%
+                                 unique() %>%
+                                 paste(collapse = "-"))) %>%
+  ungroup()
+
+
+#find AUROC value for selected model
+if("model"%in% names(AUROC_data)){
+  AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+} else { #some changes in next chnk of code made this necessary, col model will be split and removed
+  if(str_split(unique(df$model), "_")[[1]][4] == "rainrh"){
+    mod_var <- str_split(unique(df$model), "_")
+    mod_var[[1]][4] <- "rainrh"
+    implode <- function(..., sep='') {paste(..., collapse=sep)}
+    mod_var <-  implode(mod_var[[1]],sep="_")   
+  }else{
     mod_var <- str_split(unique(df$model), "_")
     implode <- function(..., sep='') {paste(..., collapse=sep)}
     mod_var <-  implode(mod_var[[1]],sep="_") 
   }
-    auc_val <- 
+  auc_val <- 
     unite(AUROC_data, col = model,  colnames(AUROC_data[,1:4]), sep = "_") %>% 
-      filter(model == mod_var) %>% 
-      select(auc)
-    AUROC_lab <- paste("AUROC =", round(auc_val, 3))
-    
-  }
+    filter(model == mod_var) %>% 
+    select(auc)
+  AUROC_lab <- paste("AUROC =", round(auc_val, 3))
   
-  #Print title without or with lettering (for later analysis)
-  pars <- str_split(df[1,1], "_")
-    title <- 
-      paste0( ifelse(is.null(numbering),"",  paste0(letters[numbering],") ")), 
-              "ROC for ", 
-              "Tt = ", pars[[1]][[2]],"°C; ",
-              "RHt = ", pars[[1]][1], "%; ",
-              "SDt = ", pars[[1]][3], 
-              "\n",
-              " hours; and LW = rain and RH>90%.")
-  
-  
-  ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
-    geom_abline(
-      intercept = 0,
-      slope = 1,
-      color = "black",
-      linetype = "dashed"
-    ) +
-    geom_path(colour = "gray") +
-    geom_point(colour = "black") +
-    geom_text_repel(size = 4) +
-    scale_y_continuous(limits = c(0, 1),
-                       expand = c(0, 0),
-                       breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
-                       name = "Sensitivity") +
-    scale_x_continuous(limits = c(0, 1),
-                       expand = c(0, 0),
-                       breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
-                       name = "1- Specificity") +
-    ggtitle(title) +
-    annotate(
-      "text",
-      x = 0.7,
-      y = 0.15,
-      label = AUROC_lab,
-      size = 5
-    ) +
-    theme_bw() +
-    theme(
-      text = element_text(size = 10.5),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank()
-    )
+}
+
+#Print title without or with lettering (for later analysis)
+pars <- str_split(df[1,"model"], "_")
+title <- 
+  paste0( ifelse(is.null(numbering),"",  paste0(letters[numbering],") ")), 
+          "ROC for ", 
+          "Tt = ", pars[[1]][[2]],"°C; ",
+          "RHt = ", pars[[1]][1], "%; ",
+          "SDt = ", pars[[1]][3], 
+          "\n",
+          " hours; and LW = rain and RH>90%.")
+
+
+ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    color = "black",
+    linetype = "dashed"
+  ) +
+  geom_path(colour = "gray") +
+  geom_point(colour = "black") +
+  geom_text_repel(size = 4) +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     name = "Sensitivity") +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     name = "1- Specificity") +
+  ggtitle(title) +
+  annotate(
+    "text",
+    x = 0.7,
+    y = 0.15,
+    label = AUROC_lab,
+    size = 5
+  ) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 10.5),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 }
 PlotROC(ROC_data[["90_10_12_rain"]])
 ```
@@ -1073,11 +1085,8 @@ cowplot::plot_grid(pl[[1]],
 
 
 ```{r plot-ROC-figures, fig.align='center', fig.width=7, fig.height=7, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
-ls_roc <- list( ROC_data[["90_10_12_rain"]], 
-                ROC_data[["88_10_10_rainrh"]], 
-                ROC_data[["87_13_12_rainrh"]],
-                ROC_data[["88_12_9_rainrh"]])
-ls_roc <- lapply(ls_roc, function(x) {
+
+ls_roc <- lapply(mod_list, function(x) {
   df <- x[rev(x$cut_point),]
   #append rows for plotting
   x <- rep(NA, ncol(df))
@@ -1100,7 +1109,7 @@ rename(df, Model = model) %>%
   )) +
   # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
   geom_point() +
-  geom_text_repel(size = 2) +
+  # geom_text_repel(size = 2) +
   geom_path(colour = "gray") +
   geom_line() +
   scale_y_continuous(limits = c(0, 1),
