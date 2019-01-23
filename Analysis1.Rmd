@@ -594,7 +594,7 @@ df$model <- unique(df$model[!is.na(df$model)])
 df[1, c("sens", "one_min_spec")] <- 0
 df[nrow(df), c("sens", "one_min_spec")] <- 1
 
-#Condence labels for a single cutoff point
+#Condense labels for a single cutoff point
  df <- 
   df %>% 
   group_by(one_min_spec, sens, model) %>% 
@@ -1086,7 +1086,7 @@ cowplot::plot_grid(pl[[1]],
 
 ```{r plot-ROC-figures, fig.align='center', fig.width=7, fig.height=7, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
 
-ls_roc <- lapply(mod_list, function(x) {
+ls_roc <- lapply(mod_list[4:6], function(x) {
   df <- x[rev(x$cut_point),]
   #append rows for plotting
   x <- rep(NA, ncol(df))
@@ -1095,6 +1095,16 @@ ls_roc <- lapply(mod_list, function(x) {
   df$model <- unique(df$model[!is.na(df$model)])
   df[1,c("sens","one_min_spec")] <- 0
   df[nrow(df),c("sens","one_min_spec")] <- 1
+  #Condense labels for a single cutoff point
+ df <- 
+  df %>% 
+  group_by(one_min_spec, sens, model) %>% 
+  summarise(cut_point = ifelse(all(is.na(cut_point)),
+                               "",
+                               range(cut_point, na.rm = TRUE) %>%
+                                 unique() %>%
+                                 paste(collapse = "-"))) %>%
+  ungroup()
   return(df)
 })
 df <- bind_rows(ls_roc)
@@ -1109,7 +1119,7 @@ rename(df, Model = model) %>%
   )) +
   # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
   geom_point() +
-  # geom_text_repel(size = 2) +
+  geom_text_repel(size = 2) +
   geom_path(colour = "gray") +
   geom_line() +
   scale_y_continuous(limits = c(0, 1),
@@ -1140,19 +1150,7 @@ rename(df, Model = model) %>%
 IR have failed to indicate any risk in 2  and the warning threshold of 12 hour was reached in only 4 years out of 10. 
 
 
-### Fungicide treatments
-Theoretical investigation of number of treatments recomended by selected models was run
 
-# Weather, model outputs and the disease
-
-```{r echo = TRUE,out.width = '100%' }
-myimages <-
-  list.files(here("data", "op_2007_16", "graph", "yearly_plots"),
-    pattern = ".png",
-    full.names = TRUE
-  )
-include_graphics(myimages)
-```
 
 Packages used
 ```{r }
