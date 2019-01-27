@@ -1,6 +1,6 @@
 % About
 
-The goal of this research is to evaluate potato late blight forecasting model and its application in Republic of Ireland. 
+This repository is part of results of my PhD project. Here I present first evaluation of the potato late blight forecasting model used in Republic of Ireland, called Irish Rules. 
 
 The funding for this project comes from DAFM (Deparment of Agriculture, Food and Marine). 
 

@@ -312,7 +312,7 @@ The set of the most important variables of Irish rules model is evaluated. The E
 #read in parameters
 parameters <-
   read_excel(here("data", "op_2007_16", "par.xlsx"), sheet = "par")
-parameters %>% gt()
+parameters %>% kable() %>% kableExtra::kable_styling(latex_options = "striped",full_width = FALSE)
 ```
 
 
@@ -759,7 +759,7 @@ data %>%
   geom_boxplot(aes(colour = Leaf_Wetness), width = 0.4) +
   # geom_label(aes_string(x=1.5, y=height, label=paste("p =",w.test$p.value)), label.size =0.02 )+
   scale_color_discrete(name = "Leaf Wetness",
-                       labels = c("Rain>0.01", "Rain>0.01&RH>90%")) +
+                       labels = c("Rain>0.01", "Rain>0.01 & RH>=90%")) +
   scale_x_discrete(breaks = c(0, 90),
                    labels = c("rain", "rh and rain")) +
   xlab("Infection period switch") +
