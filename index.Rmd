@@ -24,7 +24,7 @@ University of Southern Queensland:
 Please cite this research compendium as:
 
 
-> Cucak, M., Sparks, A., Fealy, R., Lambkin, K., and Kildea, S. Analysis of potato late blight forecasting in Ireland. 
+> Cucak, M., Sparks, A., Fealy, R., Lambkin, K., and Kildea, S. Evaluation of the Irish Rules, a potato late blight forecasting used in Ireland. 
 
 ## Licences
 
