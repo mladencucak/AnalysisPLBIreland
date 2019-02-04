@@ -24,13 +24,13 @@ University of Southern Queensland:
 Please cite this research compendium as:
 
 
-> Cucak, M., Sparks, A., Fealy, R., Lambkin, K., and Kildea, S. Analysis of potato late blight forecasting in Ireland. Online at https://doi.org/xxx/xxx
+> Cucak, M., Sparks, A., Fealy, R., Lambkin, K., and Kildea, S. Analysis of potato late blight forecasting in Ireland. 
 
 ## Licences
 
 Data: [CC-0](https://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
 Manuscript: [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)  
-Code: [MIT](https://opensource.org/licenses/MIT) year: 2017, copyright holder: Emerson Del Ponte
+Code: [MIT](https://opensource.org/licenses/MIT) year: 2019, copyright holder: Mladen Cucak
 
 ## Contributions
 
