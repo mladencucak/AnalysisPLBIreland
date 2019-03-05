@@ -1,4 +1,6 @@
-# Introduction 
+% Evaluation of Irish Rules model
+
+# Parameter evaluation
 
 ## Libraries
 
@@ -53,11 +55,6 @@ if (any(as.numeric(packages_load) == 0)) {
 }
 rm(list.of.packages, new.packages, packages_load)
 ```
-
-## Reproducibility
-
-
-# Parameter evaluation
 
 ## Leaf wetness estimation
 
