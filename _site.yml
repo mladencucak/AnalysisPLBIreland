@@ -22,18 +22,16 @@ navbar:
   - text: About
     icon: fa fa-home
     href: index.html
-  - text: Model Comparison
+  - text: Data
     icon: fa fa-table
-    href: Analysis1.html
-  - text: Model Evaluation
+    href: data.html
+  - text: Analysis
     icon: fa fa-table
-    href: Analysis1.html
-  - text: Codes
-    icon: fa fa-file-code-o
-    href: code.html
-  - text: Manuscript
-    icon: fa fa-file-text-o
-    href: manuscript.html
+    href: Analysis.html
+  - text: Results
+    icon: fa fa-table
+    href: Results.html
+ 
   right:
   - text: source
     icon: fa-github-square

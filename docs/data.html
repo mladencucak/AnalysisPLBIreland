@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title></title>
+
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-binding-2.0.2/leaflet.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PLB DSS Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa fa fa-home"></span>
+     
+    About
+  </a>
+</li>
+<li>
+  <a href="data.html">
+    <span class="fa fa fa fa-table"></span>
+     
+    Data
+  </a>
+</li>
+<li>
+  <a href="Analysis.html">
+    <span class="fa fa fa fa-table"></span>
+     
+    Analysis
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mladencucak/AnalysisPLBIreland">
+    <span class="fa fa-github-square"></span>
+     
+    source
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<div id="libraries" class="section level2">
+<h2>Libraries</h2>
+<p>Packages needed for the data preparatin are loaded. If the libraries do not exist locally, they will be downloaded.</p>
+<pre class="r"><code>list.of.packages &lt;-
+  c(
+    &quot;tidyverse&quot;,
+    &quot;readxl&quot;,
+    &quot;data.table&quot;,
+    &quot;knitr&quot;,
+    &quot;zoo&quot;,
+    &quot;imputeTS&quot;,
+    &quot;ggthemes&quot;,
+    &quot;rcompanion&quot;,
+    &quot;mgsub&quot;,
+    &quot;R.utils&quot;,
+    &quot;here&quot;,
+    &quot;stringr&quot;,
+    &quot;pander&quot;,
+    &quot;leaflet&quot;,
+    &quot;ggridges&quot;,
+    &quot;lubridate&quot;,
+    &quot;RColorBrewer&quot;
+  )
+
+new.packages &lt;-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
+
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages)
+
+if (&quot;gt&quot; %in% installed.packages() == FALSE)
+  remotes::install_github(&quot;rstudio/gt&quot;)
+
+list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
+packages_load &lt;-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
+} else {
+  print(&quot;All packages were successfully loaded.&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
+<pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
+</div>
+<div id="reproducibility" class="section level2">
+<h2>Reproducibility</h2>
+<p>Outputs of computational exhaustive procedures have been stored with the data and can be loaded directly.</p>
+</div>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<div id="bio-data" class="section level2">
+<h2>Bio data</h2>
+<div id="location" class="section level3">
+<h3>Location</h3>
+<p>Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.</p>
+<pre class="r"><code>greenLeafIcon &lt;- makeIcon(
+  iconUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-green.png&quot;,
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94,
+  shadowUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-shadow.png&quot;,
+  shadowWidth = 50, shadowHeight = 64,
+  shadowAnchorX = 4, shadowAnchorY = 62
+)
+
+leaflet() %&gt;%
+  addTiles(group = &quot;OSM (default)&quot;) %&gt;%
+  setView(-8,53.5,6)%&gt;%
+  addMarkers(lng = -6.9121167, lat = 52.8560667,
+             label = &quot;Oak Park&quot;,
+             # color = &quot;green&quot;,
+             icon=greenLeafIcon
+              # radius = 5
+  )</code></pre>
+<div id="htmlwidget-7febf3358d262f944153" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7febf3358d262f944153">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<p>Planting date and first observation of the disease are loaded. Emergence takes up to 3 weeks under Irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.</p>
+<pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
+dates_cut &lt;-
+  read_csv(
+    here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;plantingdates.csv&quot;),
+    col_types = cols(
+      disease_observed = col_date(format = &quot;%d/%m/%Y&quot;),
+      last_assessment = col_date(format = &quot;%d/%m/%Y&quot;)
+    )
+  )
+dates_cut$planting_date &lt;-
+  as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
+dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
+#st warnning period to 14 days before disease onset
+dates_cut &lt;- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
+                        .before = &quot;disease_observed&quot;)
+
+dates_cut &lt;- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = &quot;disease_onset&quot; )
+rownames(dates_cut) &lt;- NULL
+
+dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["date"],"align":["right"]},{"label":["Emergence"],"name":[3],"type":["date"],"align":["right"]},{"label":["Warning"],"name":[4],"type":["date"],"align":["right"]},{"label":["Disease onset"],"name":[5],"type":["date"],"align":["right"]},{"label":["Disease observed"],"name":[6],"type":["date"],"align":["right"]},{"label":["Last assessment"],"name":[7],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"2007-04-03","3":"2007-04-24","4":"2007-06-16","5":"2007-06-26","6":"2007-06-30","7":"2007-08-23"},{"1":"2008","2":"2008-04-07","3":"2008-04-28","4":"2008-06-18","5":"2008-06-28","6":"2008-07-02","7":"2008-08-13"},{"1":"2009","2":"2009-04-21","3":"2009-05-12","4":"2009-06-22","5":"2009-07-02","6":"2009-07-06","7":"2009-08-08"},{"1":"2010","2":"2010-05-04","3":"2010-05-25","4":"2010-07-05","5":"2010-07-15","6":"2010-07-19","7":"2010-08-30"},{"1":"2011","2":"2011-05-06","3":"2011-05-27","4":"2011-07-14","5":"2011-07-24","6":"2011-07-28","7":"2011-08-25"},{"1":"2012","2":"2012-05-28","3":"2012-06-18","4":"2012-06-29","5":"2012-07-09","6":"2012-07-13","7":"2012-08-28"},{"1":"2013","2":"2013-06-03","3":"2013-06-24","4":"2013-08-09","5":"2013-08-19","6":"2013-08-23","7":"2013-09-20"},{"1":"2014","2":"2014-05-23","3":"2014-06-13","4":"2014-07-18","5":"2014-07-28","6":"2014-08-01","7":"2014-09-11"},{"1":"2015","2":"2015-05-22","3":"2015-06-12","4":"2015-07-17","5":"2015-07-27","6":"2015-07-31","7":"2015-09-18"},{"1":"2016","2":"2016-05-31","3":"2016-06-21","4":"2016-07-08","5":"2016-07-18","6":"2016-07-22","7":"2016-09-16"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div id="weather-data" class="section level2">
+<h2>Weather Data</h2>
+<p>Historical weather data from Met Éireann synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years.</p>
+<pre class="r"><code>#Weather data, parameters and cut off dates
+load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;OP_2007-2016.RData&quot;))
+
+OP[1:5, 1:20] %&gt;% gt()</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#mxyfodepgi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#mxyfodepgi .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#mxyfodepgi .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mxyfodepgi .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mxyfodepgi .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#mxyfodepgi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#mxyfodepgi .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#mxyfodepgi .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#mxyfodepgi .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#mxyfodepgi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#mxyfodepgi .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#mxyfodepgi .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#mxyfodepgi .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#mxyfodepgi .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#mxyfodepgi .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#mxyfodepgi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#mxyfodepgi .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#mxyfodepgi .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#mxyfodepgi .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#mxyfodepgi .gt_center {
+  text-align: center;
+}
+
+#mxyfodepgi .gt_left {
+  text-align: left;
+}
+
+#mxyfodepgi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mxyfodepgi .gt_font_normal {
+  font-weight: normal;
+}
+
+#mxyfodepgi .gt_font_bold {
+  font-weight: bold;
+}
+
+#mxyfodepgi .gt_font_italic {
+  font-style: italic;
+}
+
+#mxyfodepgi .gt_super {
+  font-size: 65%;
+}
+
+#mxyfodepgi .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="mxyfodepgi" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
+<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>short_date</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>year</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>month</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>day</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rain</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rain</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_temp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wetb</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wetb</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>dewpt</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>vappr</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rhum</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rhum</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>msl</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wdsp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wdsp</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wddir</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wddir</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 00:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.2</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.8</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.1</td>
+<td class='gt_row gt_right'>3.0</td>
+<td class='gt_row gt_right'>7.6</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>87</td>
+<td class='gt_row gt_right'>1006.9</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>11</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>250</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>2007-01-01 01:00:00</td>
+<td class='gt_row gt_left gt_striped'>2007-01-01</td>
+<td class='gt_row gt_right gt_striped'>2007</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>0.0</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>5.4</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>4.4</td>
+<td class='gt_row gt_right gt_striped'>3.0</td>
+<td class='gt_row gt_right gt_striped'>7.6</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>84</td>
+<td class='gt_row gt_right gt_striped'>1007.6</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>7</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>240</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 02:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.0</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>5.8</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.7</td>
+<td class='gt_row gt_right'>3.2</td>
+<td class='gt_row gt_right'>7.7</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>83</td>
+<td class='gt_row gt_right'>1008.4</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>6</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>250</td>
+</tr>
+<tr>
+<td class='gt_row gt_left gt_striped'>2007-01-01 03:00:00</td>
+<td class='gt_row gt_left gt_striped'>2007-01-01</td>
+<td class='gt_row gt_right gt_striped'>2007</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>0.1</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>5.2</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>4.3</td>
+<td class='gt_row gt_right gt_striped'>2.8</td>
+<td class='gt_row gt_right gt_striped'>7.5</td>
+<td class='gt_row gt_right gt_striped'>0</td>
+<td class='gt_row gt_right gt_striped'>84</td>
+<td class='gt_row gt_right gt_striped'>1009.7</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>15</td>
+<td class='gt_row gt_right gt_striped'>2</td>
+<td class='gt_row gt_right gt_striped'>260</td>
+</tr>
+<tr>
+<td class='gt_row gt_left'>2007-01-01 04:00:00</td>
+<td class='gt_row gt_left'>2007-01-01</td>
+<td class='gt_row gt_right'>2007</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.0</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>5.6</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>4.2</td>
+<td class='gt_row gt_right'>2.3</td>
+<td class='gt_row gt_right'>7.2</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>79</td>
+<td class='gt_row gt_right'>1010.9</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>15</td>
+<td class='gt_row gt_right'>2</td>
+<td class='gt_row gt_right'>260</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div>
+<p>Additional variables needed for the analysis.</p>
+<pre class="r"><code>colnames(OP)[which(names(OP) == &quot;year&quot;)] &lt;- &quot;year_var&quot;
+OP &lt;-
+  add_column(OP, week_var = data.table::week(OP$date), .before = &quot;i_rain&quot;)
+OP &lt;-
+  add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&quot;)</code></pre>
+<p>Subset the data to exclude the months of the year which we do not need for the analysis.</p>
+<pre class="r"><code>OP &lt;- subset(OP, month &gt; 3 &amp; month &lt; 10)</code></pre>
+<p>Remove the variables we don’t need for the analysis, to make some speed gains.</p>
+<p>Get a summary of missing values for the variables of interest.</p>
+<pre class="r"><code>OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Missing value imputation with qbic spline function works very well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case.</p>
+<pre class="r"><code>infil_gap &lt;- 8 #Maximum length of the infill gap
+OP$temp &lt;-
+  round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap), 1)
+OP$rhum &lt;-
+  round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap), 0)
+OP$rhum  &lt;- sapply(OP$rhum, function(x)
+  ifelse(x &gt; 100, x &lt;- 100, x))
+#Check if the imputation worked
+OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there are only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88 % and temperature of 8 C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.</p>
+<pre class="r"><code>OP[is.na(OP$rain), ]$rain &lt;-
+  with(OP[is.na(OP$rain), ], ifelse(rhum &lt; 88 | temp &lt; 8, 0, rain))
+OP %&gt;% group_by(year_var)  %&gt;%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"0","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>There are missing values and it is safe to proceed with the analysis.<br />
+Save the output for the analysis.</p>
+<pre class="r"><code>save(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;OP_2007-2016_infilled.RData&quot;))</code></pre>
+<pre><code>## Warning in base::save(..., envir = envir): nothing specified to be save()d</code></pre>
+</div>
+<div id="weather-summaries" class="section level2">
+<h2>Weather summaries</h2>
+<p>Do some weather data quality checks.</p>
+<pre class="r"><code># Check if there are dupicated rows
+OP[duplicated(OP),  ]</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["short_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["year_var"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["month"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["day"],"name":[5],"type":["int"],"align":["right"]},{"label":["week_var"],"name":[6],"type":["int"],"align":["right"]},{"label":["doy"],"name":[7],"type":["int"],"align":["right"]},{"label":["i_rain"],"name":[8],"type":["int"],"align":["right"]},{"label":["rain"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["i_temp"],"name":[10],"type":["int"],"align":["right"]},{"label":["temp"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["i_wetb"],"name":[12],"type":["int"],"align":["right"]},{"label":["wetb"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["dewpt"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["i_rhum"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["rhum"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["msl"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["i_wdsp"],"name":[19],"type":["int"],"align":["right"]},{"label":["wdsp"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["i_wddir"],"name":[21],"type":["int"],"align":["right"]},{"label":["wddir"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["stno"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[24],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[25],"type":["dbl"],"align":["right"]}],"data":[],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># rh has to be within 0 and 100:
+OP[which(OP$rh &lt; 0 | OP$rh &gt; 100), ]</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["short_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["year_var"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["month"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["day"],"name":[5],"type":["int"],"align":["right"]},{"label":["week_var"],"name":[6],"type":["int"],"align":["right"]},{"label":["doy"],"name":[7],"type":["int"],"align":["right"]},{"label":["i_rain"],"name":[8],"type":["int"],"align":["right"]},{"label":["rain"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["i_temp"],"name":[10],"type":["int"],"align":["right"]},{"label":["temp"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["i_wetb"],"name":[12],"type":["int"],"align":["right"]},{"label":["wetb"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["dewpt"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["i_rhum"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["rhum"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["msl"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["i_wdsp"],"name":[19],"type":["int"],"align":["right"]},{"label":["wdsp"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["i_wddir"],"name":[21],"type":["int"],"align":["right"]},{"label":["wddir"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["stno"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[24],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[25],"type":["dbl"],"align":["right"]}],"data":[],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># temp greater than 30 is possibly an outlier:
+OP[which(OP$temp &gt; 30), ]</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["short_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["year_var"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["month"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["day"],"name":[5],"type":["int"],"align":["right"]},{"label":["week_var"],"name":[6],"type":["int"],"align":["right"]},{"label":["doy"],"name":[7],"type":["int"],"align":["right"]},{"label":["i_rain"],"name":[8],"type":["int"],"align":["right"]},{"label":["rain"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["i_temp"],"name":[10],"type":["int"],"align":["right"]},{"label":["temp"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["i_wetb"],"name":[12],"type":["int"],"align":["right"]},{"label":["wetb"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["dewpt"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["i_rhum"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["rhum"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["msl"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["i_wdsp"],"name":[19],"type":["int"],"align":["right"]},{"label":["wdsp"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["i_wddir"],"name":[21],"type":["int"],"align":["right"]},{"label":["wddir"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["stno"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[24],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[25],"type":["dbl"],"align":["right"]}],"data":[],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Histogram of variables used in the analysis</p>
+<pre class="r"><code>hist(OP$temp,col = &quot;peachpuff&quot;, main = &quot;Histogram of Temperatures&quot;,prob = TRUE) # prob = TRUE to show densities instead of frequencies
+lines(density(OP$temp), lwd = 2, col = &quot;chocolate3&quot;)
+abline(v = mean(OP$temp),col = &quot;royalblue&quot;, lwd = 2)
+abline(v = median(OP$temp),col = &quot;red&quot;, lwd = 2)
+legend(x = &quot;topright&quot;, # location of legend within plot area
+       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;),
+       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;),
+       lwd = c(2, 2, 2))
+
+hist(OP$rhum,col = &quot;lightblue&quot;, main = &quot;Histogram of Temperatures&quot;,prob = TRUE) 
+lines(density(OP$rhum), lwd = 2, col = &quot;chocolate3&quot;)
+abline(v = mean(OP$rhum),col = &quot;royalblue&quot;, lwd = 2)
+abline(v = median(OP$rhum),col = &quot;red&quot;, lwd = 2)
+legend(x = &quot;topleft&quot;, 
+       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;),
+       col = c(&quot;lightblue&quot;, &quot;royalblue&quot;, &quot;red&quot;),
+       lwd = c(2, 2, 2))
+hist(OP$rain)</code></pre>
+<p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>  OP %&gt;%
+    filter(month %in% c(4:10)) %&gt;%
+    group_by(year_var) %&gt;%
+    summarize(temp = round(mean(temp),1),
+              rain = sum(rain),
+              rhum = round(mean(rhum),1)
+              ) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">year_var</th>
+<th align="right">temp</th>
+<th align="right">rain</th>
+<th align="right">rhum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2007</td>
+<td align="right">13.2</td>
+<td align="right">432.3</td>
+<td align="right">80.2</td>
+</tr>
+<tr class="even">
+<td align="right">2008</td>
+<td align="right">12.8</td>
+<td align="right">516.0</td>
+<td align="right">79.9</td>
+</tr>
+<tr class="odd">
+<td align="right">2009</td>
+<td align="right">12.9</td>
+<td align="right">531.5</td>
+<td align="right">83.0</td>
+</tr>
+<tr class="even">
+<td align="right">2010</td>
+<td align="right">13.1</td>
+<td align="right">365.9</td>
+<td align="right">79.4</td>
+</tr>
+<tr class="odd">
+<td align="right">2011</td>
+<td align="right">12.8</td>
+<td align="right">312.7</td>
+<td align="right">81.1</td>
+</tr>
+<tr class="even">
+<td align="right">2012</td>
+<td align="right">12.3</td>
+<td align="right">510.9</td>
+<td align="right">81.5</td>
+</tr>
+<tr class="odd">
+<td align="right">2013</td>
+<td align="right">13.3</td>
+<td align="right">259.8</td>
+<td align="right">76.9</td>
+</tr>
+<tr class="even">
+<td align="right">2014</td>
+<td align="right">13.6</td>
+<td align="right">358.0</td>
+<td align="right">80.1</td>
+</tr>
+<tr class="odd">
+<td align="right">2015</td>
+<td align="right">12.3</td>
+<td align="right">335.4</td>
+<td align="right">78.4</td>
+</tr>
+<tr class="even">
+<td align="right">2016</td>
+<td align="right">13.5</td>
+<td align="right">360.6</td>
+<td align="right">81.9</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>OP$month_abb &lt;- month(OP$month, label = T) 
+
+ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+    name = &quot;Temp. (°C)&quot;
+  )+
+  ggtitle( &quot;Temperatures at Oak Park&quot;)+
+  xlab(&quot;Temperature (°C)&quot;)+
+  ylab(&quot;Month&quot;)+
+  theme_tufte()+
+  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
+<pre><code>## Picking joint bandwidth of 0.512</code></pre>
+<pre class="r"><code>ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+    name = &quot;RH (%)&quot;
+  )+
+  scale_x_continuous(expand = c(0.1, 0)) +
+  ggtitle( &quot;Relative Humidity at Oak Park&quot;)+
+  xlab(&quot;Relative Humidity (%)&quot;)+
+  ylab(&quot;Month&quot;)+
+  theme_tufte()+
+  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
+<pre><code>## Picking joint bandwidth of 2.11</code></pre>
+<pre class="r"><code>#Rain plot
+OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;% 
+  summarize(temp = round(mean(temp),1),
+            rain = sum(rain),
+            wdsp = mean(wdsp),
+            rhum = round(mean(rhum),1)
+            
+  ) %&gt;% 
+    mutate( month_abb = month(month, label = T)) %&gt;% 
+ggplot(aes(month_abb,rain,fill = factor(year_var)))+
+  geom_bar( position=&quot;dodge&quot;, stat=&quot;identity&quot;, width = 0.7)+
+  scale_fill_manual(values = colorRampPalette(brewer.pal(10, &quot;Blues&quot;))(10))+
+  theme_minimal()</code></pre>
+<pre><code>## Warning in brewer.pal(10, &quot;Blues&quot;): n too large, allowed maximum for palette Blues is 9
+## Returning the palette you asked for with that many colors</code></pre>
+<p><img src="images/gens_ridges-1.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-2.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-3.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>OP %&gt;%
+    filter(month %in% c(4:10)) %&gt;%
+    group_by(year_var, month, short_date) %&gt;% 
+    summarize(temp = round(mean(temp),1),
+              rain = sum(rain),
+              wdsp = mean(wdsp),
+              rhum = round(mean(rhum),1)
+              
+    ) %&gt;% rename(date = short_date) %&gt;% 
+  ggplot() +
+    geom_line(aes(
+      x = date,
+      y = rhum,
+      color = &quot;Relative humidity (%)&quot;,
+      fill = &quot;Relative humidity (%)&quot;
+    ),
+    size = 0.1) +
+    geom_line(aes(
+      x = date,
+      y = temp,
+      colour = &quot;Temperature (˚C)&quot;,
+      fill = &quot;Temperature (˚C)&quot;
+    ),
+    size = 0.1) +
+    geom_col(
+      aes(date,
+          rain,
+          colour = &quot;Precipitation (mm/h)&quot;,
+          fill = &quot;Precipitation (mm/h)&quot;),
+      size = 1 ,
+      inherit.aes = TRUE,
+      width = 0.05
+    ) +
+    geom_hline(aes(yintercept = 88,
+                   linetype = &quot;88 % RH&quot;),
+               colour = &quot;#ff7f00&quot;,
+               size = 0.5) +
+    geom_hline(aes(yintercept = 10,
+                   linetype = &quot;10 ˚C&quot;),
+               colour = &quot;#e31a1c&quot;,
+               size = 0.5) +
+    labs(x = &quot;&quot;, y = &quot;T (˚C), PR (mm), RH (%) and Wind (m/s)&quot;) +
+    scale_colour_manual(
+      &quot;Weather&quot;,
+      values = c(
+        &quot;Relative humidity (%)&quot; = &quot;blue&quot;,
+        &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
+        &quot;Precipitation (mm/h)&quot; = &quot;#a6cee3&quot;
+      )
+    ) +
+    scale_fill_manual(
+      &quot;Weather&quot;,
+      values = c(
+        &quot;Relative humidity (%)&quot; =  &quot;blue&quot;,
+        &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
+        &quot;Precipitation (mm/h)&quot; = &quot;#a6cee3&quot;
+      )
+    ) +
+    scale_linetype_manual(name = &quot;Limits&quot;,
+                          values = c(1, 2, 3)) +
+    theme(
+      plot.title = element_text(size = 22),
+      text = element_text(family = &quot;Garamond&quot;),
+      axis.title.x = element_blank()
+    ) +
+    facet_wrap(. ~ year_var, scales = &quot;free_x&quot;, ncol = 1) +
+    ggtitle(&quot;Hourly weather data for Oak Park&quot;) +
+    theme_minimal()+
+   theme(axis.title.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        legend.position=&quot;top&quot;)</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: fill
+
+## Warning: Ignoring unknown aesthetics: fill</code></pre>
+<p><img src="images/wth_daily-1.png" width="1056" /></p>
+</div>
+</div>
+
+
+
+Copyright 2018 Mladen Čučak
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

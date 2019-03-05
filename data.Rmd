@@ -1,51 +1,357 @@
-% Data 
+# Introduction 
 
-## Raw data 
+## Libraries
 
-The data were obtained from xx and were organized in xx excel/csv files. The example file is in the wide format where each day of assessment is in a different column, etc.
-
-## Data wrangling
-
-The original files were modified as following. The names of the variables were changed to.. The original wide format was retained and will be transformed using the dplyr functions, etc.
-
-## Glimpse 
-
-```{r message=FALSE, warning=FALSE}
-library(tidyverse)
-data <- read_delim("data/data.csv", delim = ";")
-glimpse(data)
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
 ```
 
-## Description of variables
+Packages needed for the data preparatin are loaded. If the libraries do not exist locally, they will be downloaded.
 
-- Variable1: 
-  - Description 
-  - Type: character
-  - Unit
+```{r setup, message=FALSE, warning=FALSE}
+list.of.packages <-
+  c(
+    "tidyverse",
+    "readxl",
+    "data.table",
+    "knitr",
+    "zoo",
+    "imputeTS",
+    "ggthemes",
+    "rcompanion",
+    "mgsub",
+    "R.utils",
+    "here",
+    "stringr",
+    "pander",
+    "leaflet",
+    "ggridges",
+    "lubridate",
+    "RColorBrewer"
+  )
 
-- Variable2: 
-  - Description 
-  - Type: integer
-  - Unit
+new.packages <-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 
-- Variable3: 
-  - Description 
-  - Type: double
-  - Unit:
-  
-## Quick view 
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages)
 
+if ("gt" %in% installed.packages() == FALSE)
+  remotes::install_github("rstudio/gt")
+
+list.of.packages <- c(list.of.packages, "gt")
+packages_load <-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+} else {
+  print("All packages were successfully loaded.")
+}
+rm(list.of.packages, new.packages, packages_load)
+```
+
+## Reproducibility
+Outputs of computational exhaustive procedures have been stored with the data and can be loaded directly.  
+
+# Data  
+
+## Bio data
+
+### Location
+Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.
 ```{r}
-data
+greenLeafIcon <- makeIcon(
+  iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94,
+  shadowUrl = "http://leafletjs.com/examples/custom-icons/leaf-shadow.png",
+  shadowWidth = 50, shadowHeight = 64,
+  shadowAnchorX = 4, shadowAnchorY = 62
+)
+
+leaflet() %>%
+  addTiles(group = "OSM (default)") %>%
+  setView(-8,53.5,6)%>%
+  addMarkers(lng = -6.9121167, lat = 52.8560667,
+             label = "Oak Park",
+             # color = "green",
+             icon=greenLeafIcon
+              # radius = 5
+  )
+
+```
+
+Planting date and first observation of the disease are loaded. 
+
+```{r epidemic-initiation, fig.align='center'}
+#Get subsets of data for period before the epidemics were initiated
+dates_cut <-
+  read_csv(
+    here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
+    col_types = cols(
+      disease_observed = col_date(format = "%d/%m/%Y"),
+      last_assessment = col_date(format = "%d/%m/%Y")
+    )
+  )
+
+dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
+```
+
+Save processed bio data. 
+
+## Weather Data
+Historical weather data from Met Éireann  synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
+
+```{r weather-data, message=FALSE, warning=FALSE,fig.align='center'}
+#Weather data, parameters and cut off dates
+load(file = here::here("data", "op_2007_16", "raw", "OP_2007-2016.RData"))
+
+OP[1:5, 1:20] %>% gt()
+```
+
+Additional variables needed for the analysis.
+```{r add-vars-OP}
+colnames(OP)[which(names(OP) == "year")] <- "year_var"
+OP <-
+  add_column(OP, week_var = data.table::week(OP$date), .before = "i_rain")
+OP <-
+  add_column(OP, doy = data.table::yday(OP$date), .before = "i_rain")
+```
+Subset the data to exclude the months of the year which we do not need for the analysis. 
+```{r subset-OP}
+OP <- subset(OP, month > 3 & month < 10)
+```
+Remove the variables we don't need for the analysis, to make some speed gains. 
+
+Get a summary of missing values for the variables of interest. 
+```{r summarise-missing-OP}
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
 ```
 
 
-## Download 
+Missing value imputation with qbic spline function works very well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case. 
 
-The data are deposited in xx public repositories where they can be downloaded. Check on each data repository the policies regarding data use and citation.
+```{r impute-missing, message=FALSE, warning=FALSE}
+infil_gap <- 8 #Maximum length of the infill gap
+OP$temp <-
+  round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap), 1)
+OP$rhum <-
+  round(na.spline(OP$rhum, na.rm = FALSE, maxgap = infil_gap), 0)
+OP$rhum  <- sapply(OP$rhum, function(x)
+  ifelse(x > 100, x <- 100, x))
+#Check if the imputation worked
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
+```
 
-<img src = "https://osf.io/static/img/circle_logo.png" width = "25">
-[](DOI 10.17605/OSF.IO/7D3CH) 
+Rain is somewhat harder to impute but there are ways around this problem, especially when there are only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88&nbsp;% and temperature of 8&nbsp;C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.
+
+```{r imput-rain}
+OP[is.na(OP$rain), ]$rain <-
+  with(OP[is.na(OP$rain), ], ifelse(rhum < 88 | temp < 8, 0, rain))
+OP %>% group_by(year_var)  %>%
+  summarize(
+    NA_rain = sum(is.na(rain)),
+    NA_temp = sum(is.na(temp)),
+    NA_rhum = sum(is.na(rhum))
+  )
+```
+There are missing values and it is safe to proceed with the analysis.   
+Save the output for the analysis.  
+```{r save_data}
+save(OP, file = here::here("data", "op_2007_16",  "OP_2007-2016_infilled.RData"))
+
+```
+
+## Weather summaries
+
+Do some weather data quality checks.
+```{r checks}
+# Check if there are dupicated rows
+OP[duplicated(OP),  ]
+# rh has to be within 0 and 100:
+OP[which(OP$rh < 0 | OP$rh > 100), ]
+# temp greater than 30 is possibly an outlier:
+OP[which(OP$temp > 30), ]
+```  
+
+Histogram of variables used in the analysis
+```{r wth_histograms,fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
+hist(OP$temp,col = "peachpuff", main = "Histogram of Temperatures",prob = TRUE) # prob = TRUE to show densities instead of frequencies
+lines(density(OP$temp), lwd = 2, col = "chocolate3")
+abline(v = mean(OP$temp),col = "royalblue", lwd = 2)
+abline(v = median(OP$temp),col = "red", lwd = 2)
+legend(x = "topright", # location of legend within plot area
+       c("Density plot", "Mean", "Median"),
+       col = c("chocolate3", "royalblue", "red"),
+       lwd = c(2, 2, 2))
+
+hist(OP$rhum,col = "lightblue", main = "Histogram of Temperatures",prob = TRUE) 
+lines(density(OP$rhum), lwd = 2, col = "chocolate3")
+abline(v = mean(OP$rhum),col = "royalblue", lwd = 2)
+abline(v = median(OP$rhum),col = "red", lwd = 2)
+legend(x = "topleft", 
+       c("Density plot", "Mean", "Median"),
+       col = c("lightblue", "royalblue", "red"),
+       lwd = c(2, 2, 2))
+hist(OP$rain)
+```
+
+
+```{r wth_summary}
+
+  OP %>%
+    filter(month %in% c(4:10)) %>%
+    group_by(year_var) %>%
+    summarize(temp = round(mean(temp),1),
+              rain = sum(rain),
+              rhum = round(mean(rhum),1)
+              ) %>% kable()
+
+```
 
 
 
+
+```{r gens_ridges, fig.align='center', fig.show = "hold",fig.width=6, fig.height=6}
+OP$month_abb <- month(OP$month, label = T) 
+
+ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
+    name = "Temp. (°C)"
+  )+
+  ggtitle( "Temperatures at Oak Park")+
+  xlab("Temperature (°C)")+
+  ylab("Month")+
+  theme_tufte()+
+  theme_ridges(font_size = 13, grid = TRUE)
+
+ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
+    name = "RH (%)"
+  )+
+  scale_x_continuous(expand = c(0.1, 0)) +
+  ggtitle( "Relative Humidity at Oak Park")+
+  xlab("Relative Humidity (%)")+
+  ylab("Month")+
+  theme_tufte()+
+  theme_ridges(font_size = 13, grid = TRUE)
+
+#Rain plot
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month, short_date) %>% 
+  summarize(temp = round(mean(temp),1),
+            rain = sum(rain),
+            wdsp = mean(wdsp),
+            rhum = round(mean(rhum),1)
+            
+  ) %>% 
+    mutate( month_abb = month(month, label = T)) %>% 
+ggplot(aes(month_abb,rain,fill = factor(year_var)))+
+  geom_bar( position="dodge", stat="identity", width = 0.7)+
+  scale_fill_manual(values = colorRampPalette(brewer.pal(10, "Blues"))(10))+
+  theme_minimal()
+
+```
+```{r wth_daily, fig.height=13, fig.width=11}
+OP %>%
+    filter(month %in% c(4:10)) %>%
+    group_by(year_var, month, short_date) %>% 
+    summarize(temp = round(mean(temp),1),
+              rain = sum(rain),
+              wdsp = mean(wdsp),
+              rhum = round(mean(rhum),1)
+              
+    ) %>% rename(date = short_date) %>% 
+  ggplot() +
+    geom_line(aes(
+      x = date,
+      y = rhum,
+      color = "Relative humidity (%)",
+      fill = "Relative humidity (%)"
+    ),
+    size = 0.1) +
+    geom_line(aes(
+      x = date,
+      y = temp,
+      colour = "Temperature (˚C)",
+      fill = "Temperature (˚C)"
+    ),
+    size = 0.1) +
+    geom_col(
+      aes(date,
+          rain,
+          colour = "Precipitation (mm/h)",
+          fill = "Precipitation (mm/h)"),
+      size = 1 ,
+      inherit.aes = TRUE,
+      width = 0.05
+    ) +
+    geom_hline(aes(yintercept = 88,
+                   linetype = "88 % RH"),
+               colour = "#ff7f00",
+               size = 0.5) +
+    geom_hline(aes(yintercept = 10,
+                   linetype = "10 ˚C"),
+               colour = "#e31a1c",
+               size = 0.5) +
+    labs(x = "", y = "T (˚C), PR (mm), RH (%) and Wind (m/s)") +
+    scale_colour_manual(
+      "Weather",
+      values = c(
+        "Relative humidity (%)" = "blue",
+        "Temperature (˚C)" = "#fb9a99",
+        "Precipitation (mm/h)" = "#a6cee3"
+      )
+    ) +
+    scale_fill_manual(
+      "Weather",
+      values = c(
+        "Relative humidity (%)" =  "blue",
+        "Temperature (˚C)" = "#fb9a99",
+        "Precipitation (mm/h)" = "#a6cee3"
+      )
+    ) +
+    scale_linetype_manual(name = "Limits",
+                          values = c(1, 2, 3)) +
+    theme(
+      plot.title = element_text(size = 22),
+      text = element_text(family = "Garamond"),
+      axis.title.x = element_blank()
+    ) +
+    facet_wrap(. ~ year_var, scales = "free_x", ncol = 1) +
+    ggtitle("Hourly weather data for Oak Park") +
+    theme_minimal()+
+   theme(axis.title.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        legend.position="top")
+
+
+```
