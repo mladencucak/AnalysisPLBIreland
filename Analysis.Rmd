@@ -1,6 +1,6 @@
 % Evaluation of Irish Rules model
 
-# Introduction 
+# Analysis 
 
 ## Libraries
 

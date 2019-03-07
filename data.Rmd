@@ -96,8 +96,7 @@ dates_cut <-
   read_csv(
     here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
     col_types = cols(
-      disease_observed = col_date(format = "%d/%m/%Y"),
-      last_assessment = col_date(format = "%d/%m/%Y")
+      disease_observed = col_date(format = "%d/%m/%Y")
     )
   )
 
