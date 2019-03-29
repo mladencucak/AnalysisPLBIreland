@@ -73,7 +73,7 @@ Historical weather data from Met Éireann  synoptic weather station at Oak Park 
 
 ```{r weather-data, message=FALSE, warning=FALSE,fig.align='center'}
 #Weather data, parameters and cut off dates
-load(file = here("data", "op_2007_16", "OP_2007-2016.RData"))
+load(file = here::here("data", "op_2007_16", "OP_2007-2016.RData"))
 
 OP[1:5, 1:20] %>% gt()
 ```
@@ -143,7 +143,7 @@ Planting date and first observation of the disease are loaded. Emergence takes u
 #Get subsets of data for period before the epidemics were initiated
 dates_cut <-
   read_csv(
-    here("data", "op_2007_16", "plantingdates.csv"),
+    here::here("data", "op_2007_16", "plantingdates.csv"),
     col_types = cols(
       disease_observed = col_date(format = "%d/%m/%Y"),
       last_assessment = col_date(format = "%d/%m/%Y")
@@ -367,7 +367,7 @@ rm( nn)
 Instead, just load the output from a prior model run to save time.
 
 ```{r load-model-run, fig.align='center'}
-load(file = here("data", "op_2007_16", "OP_for_analysis.RData"))
+load(file = here::here("data", "op_2007_16", "OP_for_analysis.RData"))
 # Sample of outputs
 head(OP[, c(1, 7, 9, 15, 24:30)], 5)
 ```
@@ -545,7 +545,7 @@ stopCluster(cl)
 Rather, the results of calculations from a prior run can be directly loaded.
 
 ```{r load-ROC}
-load(file = here("data", "op_2007_16","results","ROC_output.Rdata"))
+load(file = here::here("data", "op_2007_16","results","ROC_output.Rdata"))
 ```
 
 Sort the outputs for each model variation.
@@ -851,7 +851,7 @@ p3 <-
   ylab("AUROC") +
   theme_article()
 
-png(filename = here("data", "op_2007_16","results","init_vis.png"),
+png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
     width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()
