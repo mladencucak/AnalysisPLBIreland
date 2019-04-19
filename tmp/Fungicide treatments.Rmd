@@ -1,0 +1,297 @@
+% Treatment frequency evaluation
+ 
+
+# Libraries
+
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+```
+
+Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
+
+```{r setup, message=FALSE, warning=FALSE}
+list.of.packages <-
+  c(
+    "tidyverse",
+    "readxl",
+    "data.table",
+    "lubridate",
+    "knitr",
+    "padr",
+    "devtools",
+    "pracma",
+    "remotes",
+    "parallel",
+    "pbapply",
+    "ggrepel",
+    "ggthemes",
+    "egg",
+    "rsm",
+    "GGally",
+    "R.utils",
+    "rcompanion",
+    "mgsub",
+    "here",
+    "stringr",
+    "pander"
+  )
+
+new.packages <-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
+
+#Download packages that are not already present
+if (length(new.packages))
+  install.packages(new.packages)
+
+if ("gt" %in% installed.packages() == FALSE)
+  remotes::install_github("rstudio/gt")
+
+list.of.packages <- c(list.of.packages, "gt")
+packages_load <-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+} else {
+  print("All packages were successfully loaded.")
+}
+rm(list.of.packages, new.packages, packages_load)
+```
+
+# Preparing the data
+
+Soil temperature data.
+```{r soiltemps , warning=FALSE}
+soildf<- read_csv(here::here("tmp", "agridata_375.csv"),col_types = cols(X1 = col_skip(), X10 = col_skip()), 
+    skip = 7)
+soildf$date = as.Date(soildf$date,format="%d-%b-%Y",  tz = "UTC")
+soildf <- separate(soildf, "date", c("year_var", "month", "day"), sep = "-", remove = F )
+soildf$doy <-  yday(soildf$date)
+soildf[,2:5] <- lapply(soildf[,2:5], as.numeric)
+soildf <- soildf[with(soildf, month>3 | month==3&day >17),]
+```
+  
+We assume that the planting starts day after the daily average soil temperature becomes higher than 8&deg;C for three consecutive days. This is common practice in Ireland, recomended by Teagasc.  
+  
+```{r }
+dfls <- base::split(soildf, soildf$year_var)
+dates_cut <- 
+lapply(dfls, function(x) {
+  criteria <- as.numeric(x$soil>8)
+  #cumulative sum days matching the criteria
+  criteria_sum <- stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+  pl_date <- x[match(3, criteria_sum)+1, "date"]
+  data.frame( "year" = unique(year(x$date)),
+              date = pl_date[1,1])
+  
+}
+) %>% bind_rows() %>% 
+rename( "plant_date"  = date)
+rm(soildf, dfls)
+```
+  
+The data for 2007 is missing so we shall use the mean date from other years. 
+  
+```{r missingyear_soiltemp, warning=FALSE}
+
+dates_cut$plant_doy <-yday(dates_cut$plant_date)
+dates_cut <- 
+bind_rows(
+  list(
+    dates_cut,
+    data.frame(
+      year = 2007,
+      plant_date = as.Date(strptime(paste("2007", mean(dates_cut$plant_doy, na.rm = T )), format="%Y %j")),
+      plant_doy = mean(dates_cut$plant_doy)
+    )
+  )
+)
+```
+  
+We will assume that the emergence takes 3 and additional minimum of 2 weeks for the emergence. 
+  
+```{r}
+meet_in_rows <- 5*7
+dates_cut$prot_start <- with(dates_cut, plant_doy + meet_in_rows)
+dates_cut$prot_start <- paste(dates_cut$year, dates_cut$prot_start, sep = "-") %>% strptime(format="%Y-%j") %>% as.Date()
+
+```
+   
+For the purposes of this study we will assume that the growing season lasts 120 days.  
+  
+```{r}
+duration_of_season <- 120
+dates_cut$season_end <- with(dates_cut, plant_doy + duration_of_season)
+dates_cut$season_end <- paste(dates_cut$year, dates_cut$season_end, sep = "-") %>% strptime(format="%Y-%j") %>% as.Date()
+```
+
+
+Load the Weather data with model poutputs. 
+
+```{r}
+load(file = here::here("data", "op_2007_16", "OP_for_analysis.RData"))
+
+years <-  unique(OP$year_var)
+
+df <- filter(OP, month>=2 & month <=9 );rm(OP)
+df <-
+  df[, c("date",
+              "year_var",
+              "short_date",
+              "week_var",
+              "doy",
+              "rain",
+              "temp",
+              "rhum",
+              "90_10_12_rain_ebh",
+              "88_12_10_rainrh_ebh",
+              "88_10_10_rainrh_ebh")]  #Keep only needed columns for faster code execution
+```
+Calculate the number of calendar treatments. 
+```{r}
+    
+calendar_five <- round( c(120-5*7)/5,0)
+calendar_seven <- round( c(120-5*7)/7,0)
+
+```
+
+We are asuming that a fungicide treatment is activated everytime the warning threshold is reached. Cumulative sum of recomanded treatments is calculated per season.  
+  
+```{r treatment-calc}
+ControlFreqFun <-
+  function(y,
+           weather_data,
+           dates_cut,
+           prot_duration = NULL) {
+    #Set the warning threshold and run the rest of the script
+    warning_threshold <- y
+    #Weather and model output data
+    fun_df <- weather_data
+
+    #A function to subset the data for the period of interest in each year
+    test.overlap = function(vals, start_date, end_date) {
+      rowSums(mapply(function(a, b)
+        between(vals, a, b),
+        start_date, end_date)) > 0
+    }
+    
+    #Subset the of the data for the duration of 'protection' period for each year
+    trt_df <-
+      fun_df  %>%
+      filter(test.overlap(short_date, 
+                          dates_cut$prot_start, 
+                          dates_cut$season_end)
+             ) %>%
+      select(
+        ends_with("year_var"),
+        ends_with("week_var"),
+        ends_with("doy"),
+        ends_with("_ebh")
+      ) %>%
+      group_by(year_var) %>%
+      #if there was an accumulation from previous day, it would triger a warning
+      #Check all of the first five rows because of possible break of 5 hours
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(
+                  ifelse(row_number() <= 5 & . >= warning_threshold,
+                         warning_threshold, .)
+                )) %>%
+      #all five values all changed so we have to delete 4 of them and leave only 1
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(
+                  row_number() <= 4 & . == warning_threshold, 0, .
+                ))) %>%
+      # Change values coresponding to the warning threshold to 1 for calculating the sum
+      mutate_at(., .vars = colnames(.[grep("ebh", colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %>%
+      group_by(year_var, week_var, doy) %>%
+      summarise_at(., .vars = colnames(.[grep("ebh", colnames(.))]), .funs = sum)
+    
+    #Calculate number of treatmetns per year
+    sum_df <- 
+    trt_df %>% 
+    group_by(year_var) %>% 
+    summarise_at(colnames(trt_df[, grep("ebh", colnames(trt_df))]), .funs = sum) 
+    
+    sum_df$warning_thres <-  warning_threshold
+    
+    return(sum_df)
+  }
+```
+
+This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel pcontrol_evalessing support because it reduces the run time to 4 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.
+
+```{r apply-sense-spec-calc}
+# this chunk not evaluated
+#select max warning threshold
+warning_thresholds <- 1:18
+begin <- Sys.time()
+#Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
+cores <- ifelse(detectCores() > 1, detectCores()-1, 1) 
+cl <- makeCluster(cores)
+clusterExport(cl, c("df", "dates_cut", "ControlFreqFun"))
+
+clusterEvalQ(cl, library("tidyverse"))
+  control_eval <- pbapply::pblapply(warning_thresholds, function(x)
+  {
+    xx <- ControlFreqFun(x,df, dates_cut, prot_duration = 7)
+    return(xx)
+  },
+  cl = cl
+  )
+begin- Sys.time() #check the duration of the pcontrol_evaless in the console
+stopCluster(cl)
+```
+
+Melt the data frame.
+```{r}
+control_eval_long <- 
+control_eval %>% 
+  bind_rows() %>% 
+  reshape2::melt(
+    id.vars = c("year_var", "warning_thres"),
+    variable.name = "programme",
+    value.name = "no_of_treatments"
+  )
+control_eval_long %>% head() %>% pander()
+```
+
+```{r}
+
+```
+
+
+```{r plot_controls_year,fig.height=20 }
+ggplot(control_eval_long, aes(factor(warning_thres), no_of_treatments)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = "black",
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  geom_line(aes(warning_thres, 12),colour = "#FAAB18")+
+  geom_label(aes(14,13, label= "5-day freq."), 
+             colour = "#FAAB18", fill = NA, label.size = NA, family = "Helvetica", size = 3) +
+  geom_line(aes(warning_thres, 17),colour = "#1380A1")+
+  geom_label(aes(14,18, label= "7-day freq."), 
+             colour = "#1380A1", fill = NA, label.size = NA, family = "Helvetica", size = 3) +
+  geom_smooth(method = "loess",
+              se = T,
+              color = "red",
+              aes(group = 1)) +
+  facet_wrap(year_var~programme, ncol = 3)+
+  ggtitle("Cost effectiveness of model versions") +
+  theme(strip.text.y = element_blank())+
+  xlab("Warning thresholds (EBH)") +
+  ylab("Number of treatments") +
+  theme_article()
+```
+
+Packages used
+```{r }
+sessionInfo()
+```
