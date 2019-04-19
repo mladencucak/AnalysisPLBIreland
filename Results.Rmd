@@ -30,7 +30,8 @@ list.of.packages <-
     "pander",
     "egg",
     "rsm",
-    "ggrepel"
+    "ggrepel",
+    "cowplot"
   )
 
 new.packages <-
@@ -246,6 +247,9 @@ head(cd_data) %>% kable()
 Fit models of first to fourth order, and evaluate fits.
 
 ```{r model_fit}
+te_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
+
+
 poly_1_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
 poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
@@ -444,13 +448,13 @@ mod_list <-  list(
                   ROC_data[["88_10_10_rainrh"]])
 
 pl <- map2(mod_list, c(1:length(mod_list)), PlotROC)
-cowplot::plot_grid(pl[[1]], 
-                   pl[[2]], 
-                   pl[[3]],
-                   pl[[4]], 
-                   pl[[5]], 
-                   pl[[6]], 
-                   ncol=3)
+plot_grid(pl[[1]], 
+          pl[[2]],
+          pl[[3]],
+          pl[[4]],
+          pl[[5]], 
+          pl[[6]],
+          ncol=3)
 ```
 
 

@@ -277,6 +277,7 @@ for(i in 1:nrow(parameters)) {
         IrishRulesModel(chunk, x)) #get the list of outputs
     unlist(k) -> k  #make it a vector
   })
+  #attach each output of each model version to the data
   OP[, ncol(OP) + 1] <-  as.numeric(loop_var)
   rm(loop_var)
   names(OP)[ncol(OP)] <- paste0(parameters[i, 1])
@@ -355,8 +356,6 @@ SensParametersCalc <-
       ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
     
     TreatmentWindow <- function(x, prot_duration) {
-      # don't leave commented code. Use or remove
-      # x <- fptn_df[["93_10_12_rain_ebh"]]
       y <-
         vector(mode = "numeric", length = length(x) + prot_duration)
       for (i in seq_along(x)) {
@@ -410,8 +409,6 @@ SensParametersCalc <-
       summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %>%
       mutate_at(., #some years have two warnings during the warning period
                 .vars = colnames(.[grep("ebh", colnames(.))]), funs(ifelse(. >= 1 , 1, 0)))
-    
-    # tpfn_df[,1:4]
     
     TP <-
       summarise_all(tpfn_df[, colnames(tpfn_df[, grep("ebh", colnames(tpfn_df))])], .funs = sum)
@@ -619,7 +616,6 @@ Prepare the data for further analysis and check the resulting data frame.
 params <- colnames(parameters[, names(parameters) != "model"])
 AUROC_data <-
   separate(AUROC_data, model, into =  params, sep = "_")
-# AUROC_data[AUROC_data$lw_rh == "r+rh", "lw_rh"] <- "rainrh"
 AUROC_data[, 1:3] <-
   lapply(AUROC_data[, 1:3], as.numeric)
 data <- data.frame(AUROC_data)
