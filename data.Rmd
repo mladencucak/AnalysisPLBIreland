@@ -190,26 +190,52 @@ OP[which(OP$rh < 0 | OP$rh > 100), ]
 OP[which(OP$temp > 30), ]
 ```  
 
-Histogram of variables used in the analysis
+Histogram of variables used in the analysis.577wks
 ```{r wth_histograms,fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
 hist(OP$temp,col = "peachpuff", main = "Histogram of Temperatures",prob = TRUE) # prob = TRUE to show densities instead of frequencies
 lines(density(OP$temp), lwd = 2, col = "chocolate3")
 abline(v = mean(OP$temp),col = "royalblue", lwd = 2)
 abline(v = median(OP$temp),col = "red", lwd = 2)
-legend(x = "topright", # location of legend within plot area
-       c("Density plot", "Mean", "Median"),
-       col = c("chocolate3", "royalblue", "red"),
+abline(v=quantile(OP$temp,0.25),col="darkgreen",lty=2)
+abline(v=quantile(OP$temp,0.75),col="green",lty=2)
+
+legend(x = "topleft", 
+       bty = "n",
+       c("Density plot", "Mean", "Median","Lower Quantile", "Upper Quantile"),
+       col = c("chocolate3", "royalblue", "red", "darkgreen","green"),
        lwd = c(2, 2, 2))
 
 hist(OP$rhum,col = "lightblue", main = "Histogram of Temperatures",prob = TRUE) 
 lines(density(OP$rhum), lwd = 2, col = "chocolate3")
 abline(v = mean(OP$rhum),col = "royalblue", lwd = 2)
+abline(v=quantile(OP$rhum,0.25),col="darkgreen",lty=2)
+abline(v=quantile(OP$rhum,0.75),col="green",lty=2)
 abline(v = median(OP$rhum),col = "red", lwd = 2)
 legend(x = "topleft", 
-       c("Density plot", "Mean", "Median"),
-       col = c("lightblue", "royalblue", "red"),
+       bty = "n",
+       c("Density plot", "Mean", "Median","Lower Quantile", "Upper Quantile"),
+       col = c("lightblue", "royalblue", "red", "darkgreen","green"),
        lwd = c(2, 2, 2))
 hist(OP$rain)
+```
+
+
+```{r wth_summary_all}
+OP_rain <- 
+  OP %>%
+    filter(month %in% c(4:10)) %>%
+    group_by(year_var) %>%
+    summarize(rain = sum(rain)) %>% 
+   ungroup() %>% 
+    summarize(rain = mean(rain)) 
+ OP %>%
+    filter(month %in% c(4:10)) %>%
+    summarize(temp = round(mean(temp),1),
+              rhum = round(mean(rhum),1)
+              ) %>% 
+   bind_cols(., OP_rain) %>% 
+  kable(caption = "10 Year Averages Weather at Oak Park")
+
 ```
 
 
@@ -225,6 +251,38 @@ hist(OP$rain)
 
 ```
 
+```{r}
+#Calculate average minimum daily temeperatures per month
+OP_rain <- 
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month) %>% 
+  summarize(rain = sum(rain)) %>% 
+    mutate( month_abb = month(month, label = T)) %>% 
+  group_by(month) %>% 
+  summarize(rain = round(mean(rain), 1))
+
+#Calculate average minimum daily temeperatures per month
+OP_min_temp <- 
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month, short_date) %>% 
+  summarize(min_temp = round(min(temp),1)) %>% 
+    mutate( month_abb = month(month, label = T)) %>% 
+  group_by(month) %>% 
+  summarize(min_temp = round(mean(min_temp), 1)) %>% 
+  left_join(., OP_rain, "month")
+
+OP_months <- 
+  OP %>%
+    filter(month %in% c(4:10)) %>%
+    group_by( month) %>%
+    summarize(temp = round(mean(temp),1),
+              rhum = round(mean(rhum),1)
+              ) %>% 
+  left_join(., OP_min_temp, "month")
+OP_months%>% kable(caption = "Monthly Averages")
+```
 
 
 
@@ -245,6 +303,39 @@ ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
   theme_tufte()+
   theme_ridges(font_size = 13, grid = TRUE)
 
+#Average temperatures plot
+OP_temp <- 
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month, short_date) %>% 
+  summarize(temp = round(mean(temp),1)) %>% 
+    mutate( month_abb = month(month, label = T))  
+ggplot(OP_temp,aes(month_abb,temp))+
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
+  geom_boxplot( width = 0.3)+
+ annotate("text",x = 1:6, y = 24, 
+          label=as.character(round(OP_months$temp,2)) )+
+  ggtitle("Average Daily Temperatures Per Month at Oak Park")+
+  ylab("Temperature (°C)")+
+  xlab("Month")+
+  theme_minimal()
+
+#Minimum temperatures plot
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month, short_date) %>% 
+  summarize(min_temp = round(min(temp),1)) %>% 
+    mutate( month_abb = month(month, label = T)) %>% 
+ggplot(aes(month_abb,min_temp))+
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
+  geom_boxplot( width = 0.3)+
+  annotate("text",x = 1:6, y = 24, 
+          label=as.character(round(OP_months$min_temp,2)) )+
+  ggtitle("Minimum Daily Temperatures Per Month at Oak Park")+
+  ylab("Temperature (°C)")+
+  xlab("Month")+
+  theme_minimal()
+
 ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
   geom_density_ridges_gradient(
     aes(fill = ..x..), scale = 2, size = 0.2
@@ -264,20 +355,19 @@ ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
 OP %>%
   filter(month %in% c(4:10)) %>%
   group_by(year_var, month, short_date) %>% 
-  summarize(temp = round(mean(temp),1),
-            rain = sum(rain),
-            wdsp = mean(wdsp),
-            rhum = round(mean(rhum),1)
-            
+  summarize(rain = sum(rain)
   ) %>% 
     mutate( month_abb = month(month, label = T)) %>% 
 ggplot(aes(month_abb,rain,fill = factor(year_var)))+
   geom_bar( position="dodge", stat="identity", width = 0.7)+
   scale_fill_manual(values = colorRampPalette(brewer.pal(10, "Blues"))(10))+
+  annotate("text",x = 1:6, y = 24, 
+          label=as.character(OP_months$rain))+
   theme_minimal()
 
+
 ```
-```{r wth_daily, fig.height=13, fig.width=11}
+```{r wth_daily, fig.height=18, fig.width=11}
 OP %>%
     filter(month %in% c(4:10)) %>%
     group_by(year_var, month, short_date) %>% 
@@ -305,8 +395,8 @@ OP %>%
     geom_col(
       aes(date,
           rain,
-          colour = "Precipitation (mm/h)",
-          fill = "Precipitation (mm/h)"),
+          colour = "Precipitation (mm/day)",
+          fill = "Precipitation (mm/day)"),
       size = 1 ,
       inherit.aes = TRUE,
       width = 0.05
@@ -314,18 +404,18 @@ OP %>%
     geom_hline(aes(yintercept = 88,
                    linetype = "88 % RH"),
                colour = "#ff7f00",
-               size = 0.5) +
+               size = 0.3) +
     geom_hline(aes(yintercept = 10,
                    linetype = "10 ˚C"),
                colour = "#e31a1c",
-               size = 0.5) +
+               size = 0.3) +
     labs(x = "", y = "T (˚C), PR (mm), RH (%) and Wind (m/s)") +
     scale_colour_manual(
       "Weather",
       values = c(
         "Relative humidity (%)" = "blue",
         "Temperature (˚C)" = "#fb9a99",
-        "Precipitation (mm/h)" = "#a6cee3"
+        "Precipitation (mm/day)" = "#a6cee3"
       )
     ) +
     scale_fill_manual(
@@ -333,7 +423,7 @@ OP %>%
       values = c(
         "Relative humidity (%)" =  "blue",
         "Temperature (˚C)" = "#fb9a99",
-        "Precipitation (mm/h)" = "#a6cee3"
+        "Precipitation (mm/day)" = "#a6cee3"
       )
     ) +
     scale_linetype_manual(name = "Limits",

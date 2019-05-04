@@ -1,9 +1,5 @@
----
-title: "sds"
-author: "Mladen Cucak "
-date: "April 19, 2019"
-output: word_document
----
+% Model Usefulness
+
 # Libraries
 
 ```{r opts, echo = FALSE}
@@ -63,7 +59,8 @@ if (any(as.numeric(packages_load) == 0)) {
 }
 rm(list.of.packages, new.packages, packages_load)
 ```
-
+#The Rationale  
+The cop risk predicion model is usefull only if it provides provides same level of prottection as the standard practice, while reducing neccessary costs and labour. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting. Two alternative model paramtarisations are proposed, it is neccessary to evaluate if there is a  need for 
 # Cut-off dates
 
 Soil temperature data.
@@ -74,12 +71,12 @@ soildf$date = as.Date(soildf$date,format="%d-%b-%Y",  tz = "UTC")
 soildf <- separate(soildf, "date", c("year_var", "month", "day"), sep = "-", remove = F )
 soildf$doy <-  yday(soildf$date)
 soildf[,2:5] <- lapply(soildf[,2:5], as.numeric)
-soildf <- soildf[with(soildf, month>3 | month==3&day >17),]
 ```
   
-We assume that the planting starts day after the daily average soil temperature becomes higher than 8&deg;C for three consecutive days. This is common practice in Ireland, recomended by Teagasc.  
+We assume that the planting starts day after the daily average soil temperature becomes higher than 8&deg;C for three consecutive days in the beginning of April. This is common practice in Ireland, recommended by Teagasc.  
   
 ```{r }
+soildf <- soildf[with(soildf, month >= 4),]
 dfls <- base::split(soildf, soildf$year_var)
 dates_cut <- 
 lapply(dfls, function(x) {
@@ -114,7 +111,7 @@ bind_rows(
 )
 ```
   
-We will assume that the emergence takes 3 and additional minimum of 2 weeks for the emergence. 
+We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows. 
   
 ```{r}
 meet_in_rows <- 5*7
@@ -123,10 +120,10 @@ dates_cut$prot_start <- paste(dates_cut$year, dates_cut$prot_start, sep = "-") %
 
 ```
    
-For the purposes of this study we will assume that the growing season lasts 120 days.  
+For the purposes of this study we will assume that the growing season lasts 120 days. However, the pesticide protection lasts for at least another three weeks to allow the tuber growth.   
   
 ```{r}
-duration_of_season <- 120
+duration_of_season <- 120 + 21 
 dates_cut$season_end <- with(dates_cut, plant_doy + duration_of_season)
 dates_cut$season_end <- paste(dates_cut$year, dates_cut$season_end, sep = "-") %>% strptime(format="%Y-%j") %>% as.Date()
 dates_cut %>% kable()
@@ -161,14 +158,14 @@ df <-  dplyr::rename(df,
 
 ```
 # Treatment frequency: Model vs. Calendar 
-Calculate the number of calendar treatments, assuming they would start 5 weeks and end 120 days after the planting 
+Calculate the number of calendar treatments, assuming they would start 5 weeks and end `r duration_of_season` days after the planting 
 ```{r}
-(calendar_five <- round( c(120-5*7)/5,0))
-(calendar_seven <- round( c(120-5*7)/7,0))
+(calendar_five <- round( c(duration_of_season-5*7)/5,0))
+(calendar_seven <- round( c(duration_of_season-5*7)/7,0))
 
 ```
 
-We are asuming that a fungicide treatment is activated everytime the warning threshold is reached. Cumulative sum of recomanded treatments is calculated per season.  
+We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Cumulative sum of recommended treatments is calculated per season.  
   
 ```{r treatment-calc}
 
@@ -183,6 +180,13 @@ ControlFreqFun <-
     #Weather and model output data
     fun_df <- weather_data
     
+    #Each warning would cause treatment that will keep the plants protected for a period of time
+    min_prot_dur <-
+      ifelse(is.null(min_prot_dur), 5, min_prot_dur)#If not defined default value is 5 days
+    max_prot_dur <-
+      ifelse(is.null(max_prot_dur), 10, max_prot_dur)#If not defined default value is 10 days
+    
+    
     #A function to subset the data for the period of interest in each year
     test.overlap = function(vals, start_date, end_date) {
       rowSums(mapply(function(a, b)
@@ -191,13 +195,14 @@ ControlFreqFun <-
     }
     
     #Subset the of the data for the duration of 'protection' period for each year
-    trt_df <-
+     trt_df <-
       fun_df  %>%
       filter(test.overlap(short_date, 
                           dates_cut$prot_start, 
-                          dates_cut$season_end)
+                          dates_cut$season_end + max_prot_dur #Additional days for risk estimation and timing of treatments
+                          )
       ) %>%
-      select(
+      dplyr::select(
         ends_with("year_var"),
         ends_with("week_var"),
         ends_with("doy"),
@@ -221,31 +226,57 @@ ControlFreqFun <-
                 funs(ifelse(. == warning_threshold, 1, 0))) %>%
       group_by(year_var, week_var, doy) %>%
       summarise_at(., .vars = colnames(.[grep("ir", colnames(.))]), .funs = sum)
+     
     
-    
+     #####################################################################
+     #Calculate the number of treatments with with minimum protection duration of 5 days
+     TreatmentWindowOne <- function(model_output, min_prot_dur ,max_prot_dur ) {
+       # model_output <- trt_df_one[[1]]$ir
+       
+       y <- model_output
+       
+       for (i in seq_along( 1: c(length(y) - max_prot_dur))) {
+         
+         #Following treatment will be implemented on day 5 if there is 1 in the next five days
+         if (y[i] == 1 & sum(y[c(i+1):c(i+min_prot_dur)])>0 ) {
+           y[i+min_prot_dur] <- 1
+           y[c(i+1):c(i+ c(min_prot_dur-1))] <- 0
+         }
+       }
+       #Add zeros for the duration of added period
+       y[c(length(y) - max_prot_dur) : length(y)] <- 0
+       y
+     }
+     
+     #Apply function on yearly subsets
+     trt_df_one <- 
+       split(trt_df, trt_df$year_var)
+     
+     for (year in seq_along(trt_df_one)) {
+       x <- trt_df_one[[year]]
+       trt_df_one[[year]] <- 
+         
+         lapply(x[grep("ir", colnames(x))], function(x)
+           TreatmentWindowOne(x, min_prot_dur ,max_prot_dur)) %>%
+         bind_cols()
+     }
+     
+     trt_df_one <-  bind_rows(trt_df_one)
+     trt_df_one <-  bind_cols(trt_df["year_var"],trt_df_one )
+     
     #####################################################################
     #Calculate the number of treatments with 5-10 day sliding treatment interval
-    
-    
-    
-    
-    TreatmentWindow <- function(model_output, min_prot_dur = NULL,max_prot_dur = NULL) {
-      #Each warning would cause treatment that will keep the plants protected for a period of time
-      min_prot_dur <-
-        ifelse(is.null(min_prot_dur), 5, min_prot_dur)#If not defined default value is 5 days
-      max_prot_dur <-
-        ifelse(is.null(max_prot_dur), 10, max_prot_dur)#If not defined default value is 10 days
+    TreatmentWindow <- function(model_output, min_prot_dur ,max_prot_dur ) {
       
-      # model_output <-  trt_df$ir
-      z <- model_output
-      x <- c(z, seq(1,max_prot_dur, 1))
+      
+      x <- model_output
       #attach vector, 10 days of 0
       y <- vector(mode = "numeric", length = length(x) )
       # find the first treatment
       y[which(x == 1)[1]] <- 1
       
       
-      for (i in seq_along(y)) {
+      for (i in seq_along( 1: c(length(y) - max_prot_dur))) {
         
         #Following treatment will be implemented on day 5 if there is 1 in the next five days
         if (y[i] == 1 & sum(x[c(i+1):c(i+5)])>0 ) {y[i+5] <- 1}
@@ -257,9 +288,11 @@ ControlFreqFun <-
         #If warning threshold was not reached at all or 10th day, then spray on 10th day 
         if (y[i] == 1 & sum(x[c(i+1):c(i+9)])==0 ) {y[i+10] <- 1}
         #if there was no treatment 
-        if(i== length(z)) break
+        if(i== c(length(y) - max_prot_dur)) break
       }
-      y[1:length(z)] 
+      #Add zeros for the duration of added period
+      y[c(length(y) - max_prot_dur) : length(y)] <- 0
+      y
     }
     
     trt_df_window <- 
@@ -269,21 +302,20 @@ ControlFreqFun <-
     for (year in seq_along(trt_df_window)) {
       x <- trt_df_window[[year]]
       trt_df_window[[year]] <- 
-      
-      lapply(x[grep("ir", colnames(x))], function(x)
-        TreatmentWindow(x, min_prot_dur,max_prot_dur)) %>%
+        
+        lapply(x[grep("ir", colnames(x))], function(x)
+          TreatmentWindow(x, min_prot_dur,max_prot_dur)) %>%
         bind_cols() %>% 
         rename_all(., .funs = funs(paste0("w_", .)))
     }
     
     trt_df_window <-  bind_rows(trt_df_window)
-    #Triger a treatment window
 
     
-            
-    trt_df <- bind_cols(trt_df, trt_df_window)
-
-            
+    #Combine the data for both scenarios
+    trt_df <- bind_cols(trt_df_one, trt_df_window)
+    
+    
     
     #Calculate number of treatmetns per year
     sum_df <- 
@@ -297,7 +329,6 @@ ControlFreqFun <-
     
     return(sum_df)
   }
-
 
 ```
 
@@ -345,68 +376,93 @@ control_eval_long %>% head() %>% pander()
   
 
 ```{r plot_models, warning=F, fig.align="center", fig.dim= c(11,7)}
-ggplot(control_eval_long, aes(factor(warning_thres), no_of_treatments)) +
+
+control_eval_long %>% 
+# control_eval_long%>% 
+  mutate(programme = ifelse(programme== "ir", "Default IR", 
+                            ifelse(programme== "ir_opt", "Optimised IR",
+                                   ifelse(programme == "ir_low_risk", "Low Risk IR",
+                                          ifelse(programme== "w_ir", "Default IR 5-10d",
+                                                 ifelse(programme== "w_ir_opt", "Optimised IR 5-10d",
+                                                        ifelse(programme == "w_ir_low_risk", "Low Risk IR 5-10d",""))))))) %>% 
+mutate(programme = factor(programme
+                          # , levels = ("Default IR","Optimised IR", "Low Risk IR","Default IR 5-10d","Optimised IR 5-10d","Low Risk IR 5-10d")
+                          )) %>% 
+ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   geom_vline(xintercept=seq(1,9,1), size = 0.2, color = "gray", linetype="dotted")+
   geom_vline(xintercept=seq(3,9,3), size = 0.2, color = "gray", linetype="solid")+
-  geom_boxplot(width = 0.4, show.legend=FALSE) +
+  # geom_boxplot(width = 0.4, show.legend=FALSE) +
   geom_jitter(aes(color = factor(year_var)),
-    position = position_jitter(width = 0.2),
-    # colour = "black",
-    alpha = 0.6,
-    size = 0.7
+              position = position_jitter(width = 0.1),
+              # colour = "black",
+              alpha = 0.6,
+              size = 1
   ) +
   geom_line(aes(warning_thres, 12),colour = gray.colors(2)[1])+
-  geom_label(aes(14,13, label= "5-day freq."), 
+  geom_label(aes(14,calendar_seven+0.8 , label= "7-day freq."), 
              colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 3) +
   geom_line(aes(warning_thres, 17),colour = gray.colors(2)[1])+
-  geom_label(aes(14,18, label= "7-day freq."), 
+  geom_label(aes(14,calendar_five+0.8, label= "5-day freq."), 
              colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 3) +
   geom_smooth(method = "loess",
-              se = T,
+              se = FALSE,
               color = gray.colors(2)[1],
               aes(group = 1)) +
-  facet_wrap(~programme, ncol = 3)+
+  facet_wrap(~programme, ncol = 3) +
   ggtitle("Cost effectiveness of model versions") +
-
+  
   xlab("Warning thresholds (EBH)") +
   ylab("Number of treatments") +
-  scale_x_discrete(breaks=seq(0, 18, 3))+
-  theme_article()+
-  theme()
+  scale_x_discrete(breaks=seq(0, 18, 3)) +
+  theme_article()
 ```
   
-  The figure shows how do the decision thresholds of  the three model versions differ from the calendar spray programmes. The dots represent the number of treatments according to coresponding warning threshold, where each dot represents one year. If the fitted smothed line is above the estimated calendar frequency line, the model recomands more treatments than the usual standard calendar programme.  
+  The figure shows how do the decision thresholds of  the three model versions differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents one year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.  
+  
+
 There is variation in the data and it would be interesting to see if there is an effect of year. 
 
 ```{r plot_years, warning=F, fig.align="center", fig.dim= c(11,9)}
-ggplot(control_eval_long, aes(factor(warning_thres), no_of_treatments, group =programme, colour =programme)) +
+control_eval_long %>% 
+# control_eval_long%>% 
+  mutate(programme = ifelse(programme== "ir", "Default IR", 
+                            ifelse(programme== "ir_opt", "Optimised IR",
+                                   ifelse(programme == "ir_low_risk", "Low Risk IR",
+                                          ifelse(programme== "w_ir", "Default IR 5-10d",
+                                                 ifelse(programme== "w_ir_opt", "Optimised IR 5-10d",
+                                                        ifelse(programme == "w_ir_low_risk", "Low Risk IR 5-10d",""))))))) %>% 
+mutate(programme = factor(programme
+                          # , levels = ("Default IR","Optimised IR", "Low Risk IR","Default IR 5-10d","Optimised IR 5-10d","Low Risk IR 5-10d")
+                          )) %>% 
+ggplot(., aes(factor(warning_thres), no_of_treatments, group =programme, colour =programme)) +
   geom_vline(xintercept=seq(1,9,1), size = 0.2, color = "gray", linetype="dotted")+
   geom_vline(xintercept=seq(3,9,3), size = 0.2, color = "gray", linetype="solid")+
 
   geom_line(aes())+
   geom_line(aes(warning_thres, 12),colour = gray.colors(2)[1])+
-  geom_label(aes(14,13, label= "5-day freq."), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 4) +
+  geom_label(aes(14,calendar_seven+0.8 , label= "7-day freq."), 
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 3) +
   geom_line(aes(warning_thres, 17),colour = gray.colors(2)[1])+
-  geom_label(aes(14,18, label= "7-day freq."), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 4) +
+  geom_label(aes(14,calendar_five+0.8, label= "5-day freq."), 
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = "Helvetica", size = 3) +
   facet_wrap(~year_var, ncol = 5)+
-  ggtitle("Cost effectiveness of model versions") +
+  ggtitle("Treatment Frequency as a Factor the Decision Threshold") +
   theme(strip.text.y = element_blank())+
   xlab("Warning thresholds (EBH)") +
   ylab("Number of treatments") +
   theme_article() + 
   geom_vline(xintercept=c(2,3,4), size = 0.5, color = "gray", linetype="dotted")+
   scale_x_discrete(breaks=seq(0, 18, 3))+
+  scale_y_continuous(breaks=seq(0, 30, 5))+
   scale_colour_manual( "Model",values = c("#a6cee3", "#1f78b4", "#7570b3","orange", "red", "yellow" ))+
   theme(legend.position="top",
         text = element_text( size = 11))
 ```
   
-It is evident that setting a trheshold to even a minimum accumulation of risk, in other words a single effective blight hour, is trigerring less treatments in certain years. 
+It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years. 
   
 #Dose reduction based on warning outputs  
-Producers often lack the trust environmental risk predicon . 
+
 Calculate the dose reductions based on the 
 
 ```{r}
