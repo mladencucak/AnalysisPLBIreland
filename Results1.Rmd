@@ -245,7 +245,7 @@ str(cd_data)
 head(cd_data) %>% kable()
 ```
 
-We may use non-parametric local regression (loess) to obtain predicted values for the 4-dimensnional response surface, using <tt>{RHt}, <tt>{SDt}, and <tt>{Tt}, and all 3- and 2-way interations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, <tt>{A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255--268}).
+We may use non-parametric local regression (loess) to obtain predicted values for the 4-dimensnional response surface, using RHt, SDt, and Tt, and all 3- and 2-way interations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255--268).
 
 ```{r loess}
 lo_fit1 <- loess(auc ~ RHt * SDt * Tt, data = cd_data)

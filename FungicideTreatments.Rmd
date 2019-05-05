@@ -1,7 +1,5 @@
 % Evaluation of Irish Rules model
 
-# Parameter evaluation
-
 # Libraries
 
 ```{r opts, echo = FALSE}
@@ -65,10 +63,10 @@ rm(list.of.packages, new.packages, packages_load)
 #The Rationale  
 The cop risk prediction model is useful only if it provides provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.   
 Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. 
-The perormance is evaluated in two ways, as a reduction of: 
+The performance is evaluated in two ways, as a reduction of: 
 1. Number of treatments:
   + With minimum window of 5 days between treatments 
-  + With mimium of 5 and maximum of 10 days between treatments
+  + With minimum of 5 and maximum of 10 days between treatments
 2. Dose reduction based on 7 day calendar treatment  
 
 # Cut-off Dates

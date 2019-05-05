@@ -413,14 +413,14 @@ div.tocify {
   </a>
 </li>
 <li>
-  <a href="Results.html">
+  <a href="Results1.html">
     <span class="fa fa fa fa-table"></span>
      
     Results
   </a>
 </li>
 <li>
-  <a href="Fungicide_treatments.Rmd">
+  <a href="FungicideTreatments.html">
     <span class="fa fa fa fa-table"></span>
      
     Usefulness
@@ -449,9 +449,6 @@ div.tocify {
 </div>
 
 
-<div id="parameter-evaluation" class="section level1">
-<h1>Parameter evaluation</h1>
-</div>
 <div id="libraries" class="section level1">
 <h1>Libraries</h1>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -508,7 +505,7 @@ if (any(as.numeric(packages_load) == 0)) {
 <div id="the-rationale" class="section level1">
 <h1>The Rationale</h1>
 <p>The cop risk prediction model is useful only if it provides provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.<br />
-Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. The perormance is evaluated in two ways, as a reduction of: 1. Number of treatments: + With minimum window of 5 days between treatments + With mimium of 5 and maximum of 10 days between treatments 2. Dose reduction based on 7 day calendar treatment</p>
+Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. The performance is evaluated in two ways, as a reduction of: 1. Number of treatments: + With minimum window of 5 days between treatments + With minimum of 5 and maximum of 10 days between treatments 2. Dose reduction based on 7 day calendar treatment</p>
 </div>
 <div id="cut-off-dates" class="section level1">
 <h1>Cut-off Dates</h1>
@@ -873,7 +870,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
   cl = cl
   )
 begin- Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -6.135601 secs</code></pre>
+<pre><code>## Time difference of -5.407548 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;- 
