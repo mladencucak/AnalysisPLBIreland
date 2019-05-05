@@ -504,7 +504,7 @@ if (any(as.numeric(packages_load) == 0)) {
 </div>
 <div id="the-rationale" class="section level1">
 <h1>The Rationale</h1>
-<p>The cop risk prediction model is useful only if it provides provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.<br />
+<p>The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.<br />
 Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. The performance is evaluated in two ways, as a reduction of: 1. Number of treatments: + With minimum window of 5 days between treatments + With minimum of 5 and maximum of 10 days between treatments 2. Dose reduction based on 7 day calendar treatment</p>
 </div>
 <div id="cut-off-dates" class="section level1">
@@ -870,7 +870,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
   cl = cl
   )
 begin- Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -5.407548 secs</code></pre>
+<pre><code>## Time difference of -5.147242 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;- 
@@ -938,20 +938,29 @@ control_eval_long %&gt;% head() %&gt;% pander()</code></pre>
 </table>
 <pre class="r"><code>control_eval_long %&gt;% 
 # control_eval_long%&gt;% 
-  mutate(programme = ifelse(programme== &quot;ir&quot;, &quot;Default IR&quot;, 
-                            ifelse(programme== &quot;ir_opt&quot;, &quot;Optimised IR&quot;,
-                                   ifelse(programme == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;,
-                                          ifelse(programme== &quot;w_ir&quot;, &quot;Default IR 5-10d&quot;,
-                                                 ifelse(programme== &quot;w_ir_opt&quot;, &quot;Optimised IR 5-10d&quot;,
-                                                        ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;Low Risk IR 5-10d&quot;,&quot;&quot;))))))) %&gt;% 
-mutate(programme = factor(programme
-                          # , levels = (&quot;Default IR&quot;,&quot;Optimised IR&quot;, &quot;Low Risk IR&quot;,&quot;Default IR 5-10d&quot;,&quot;Optimised IR 5-10d&quot;,&quot;Low Risk IR 5-10d&quot;)
-                          )) %&gt;% 
-ggplot(., aes(factor(warning_thres), no_of_treatments)) +
+  mutate(programme = ifelse(programme== &quot;ir&quot;, &quot;a) Default IR&quot;, 
+                            ifelse(programme== &quot;ir_opt&quot;, &quot;b) Optimised IR&quot;,
+                                   ifelse(programme == &quot;ir_low_risk&quot;, &quot;c) Low Risk IR&quot;,
+                                          ifelse(programme== &quot;w_ir&quot;, &quot;d) Default IR 5-10d&quot;,
+                                                 ifelse(programme== &quot;w_ir_opt&quot;, &quot;e) Optimised IR 5-10d&quot;,
+                                                        ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;f) Low Risk IR 5-10d&quot;,&quot;&quot;))))))) %&gt;% 
+  mutate(programme = factor(
+    programme,
+    levels = c(
+    &quot;a) Default IR&quot;,
+    &quot;b) Optimised IR&quot;,
+    &quot;c) Low Risk IR&quot;,
+    &quot;d) Default IR 5-10d&quot;,
+    &quot;e) Optimised IR 5-10d&quot;,
+    &quot;f) Low Risk IR 5-10d&quot;
+    )
+    )) %&gt;%
+  mutate(Years = factor(year_var)) %&gt;% 
+    ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   geom_vline(xintercept=seq(1,9,1), size = 0.2, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
   geom_vline(xintercept=seq(3,9,3), size = 0.2, color = &quot;gray&quot;, linetype=&quot;solid&quot;)+
   # geom_boxplot(width = 0.4, show.legend=FALSE) +
-  geom_jitter(aes(color = factor(year_var)),
+  geom_jitter(aes(color = Years),
               position = position_jitter(width = 0.1),
               # colour = &quot;black&quot;,
               alpha = 0.6,
@@ -959,10 +968,10 @@ ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   ) +
   geom_line(aes(warning_thres, calendar_seven),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_seven+0.8 , label= &quot;7-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = &quot;Helvetica&quot;, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
   geom_line(aes(warning_thres, calendar_five),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_five+0.8, label= &quot;5-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = &quot;Helvetica&quot;, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
   geom_smooth(method = &quot;loess&quot;,
               se = FALSE,
               color = gray.colors(2)[1],
@@ -973,6 +982,7 @@ ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   xlab(&quot;Warning thresholds (EBH)&quot;) +
   ylab(&quot;Number of treatments&quot;) +
   scale_x_discrete(breaks=seq(0, 18, 3)) +
+  theme(legend.position = &quot;top&quot;)+
   theme_article()</code></pre>
 <p><img src="images/plot_models-1.png" width="1056" style="display: block; margin: auto;" /></p>
 <p>The figure shows how do the decision thresholds of the three model versions differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents one year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.</p>
@@ -985,9 +995,18 @@ ggplot(., aes(factor(warning_thres), no_of_treatments)) +
                                           ifelse(programme== &quot;w_ir&quot;, &quot;Default IR 5-10d&quot;,
                                                  ifelse(programme== &quot;w_ir_opt&quot;, &quot;Optimised IR 5-10d&quot;,
                                                         ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;Low Risk IR 5-10d&quot;,&quot;&quot;))))))) %&gt;% 
-mutate(programme = factor(programme
-                          # , levels = (&quot;Default IR&quot;,&quot;Optimised IR&quot;, &quot;Low Risk IR&quot;,&quot;Default IR 5-10d&quot;,&quot;Optimised IR 5-10d&quot;,&quot;Low Risk IR 5-10d&quot;)
-                          )) %&gt;% 
+  mutate(programme = factor(
+    programme,
+    levels = c(
+    &quot;Default IR&quot;,
+    &quot;Optimised IR&quot;,
+    &quot;Low Risk IR&quot;,
+    &quot;Default IR 5-10d&quot;,
+    &quot;Optimised IR 5-10d&quot;,
+    &quot;Low Risk IR 5-10d&quot;
+    )
+    )) %&gt;%
+  mutate(Years = factor(year_var)) %&gt;% 
 ggplot(., aes(factor(warning_thres), no_of_treatments, group =programme, colour =programme)) +
   geom_vline(xintercept=seq(1,9,1), size = 0.2, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
   geom_vline(xintercept=seq(3,9,3), size = 0.2, color = &quot;gray&quot;, linetype=&quot;solid&quot;)+
@@ -995,11 +1014,11 @@ ggplot(., aes(factor(warning_thres), no_of_treatments, group =programme, colour 
   geom_line(aes())+
   geom_line(aes(warning_thres, 12),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_seven+0.8 , label= &quot;7-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = &quot;Helvetica&quot;, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
   geom_line(aes(warning_thres, 17),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_five+0.8, label= &quot;5-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, family = &quot;Helvetica&quot;, size = 3) +
-  facet_wrap(~year_var, ncol = 5)+
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
+  facet_wrap(~Years, ncol = 5)+
   ggtitle(&quot;Treatment Frequency as a Factor the Decision Threshold&quot;) +
   theme(strip.text.y = element_blank())+
   xlab(&quot;Warning thresholds (EBH)&quot;) +
