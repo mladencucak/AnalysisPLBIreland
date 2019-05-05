@@ -427,6 +427,13 @@ div.tocify {
     Results
   </a>
 </li>
+<li>
+  <a href="Fungicide_treatments.Rmd">
+    <span class="fa fa fa fa-table"></span>
+     
+    Usefulness
+  </a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -529,8 +536,8 @@ leaflet() %&gt;%
              icon=greenLeafIcon
               # radius = 5
   )</code></pre>
-<div id="htmlwidget-5d23e158da9ebfd2d95d" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5d23e158da9ebfd2d95d">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-cba607bbd7d60fd5ed46" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cba607bbd7d60fd5ed46">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
 <p>Planting date and first observation of the disease are loaded.</p>
 <pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
 dates_cut &lt;-
@@ -561,7 +568,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#jdwjwqtvwj .gt_table {
+#uqatvvbvyh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -580,13 +587,13 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#jdwjwqtvwj .gt_heading {
+#uqatvvbvyh .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#jdwjwqtvwj .gt_title {
+#uqatvvbvyh .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -597,7 +604,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#jdwjwqtvwj .gt_subtitle {
+#uqatvvbvyh .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -608,7 +615,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#jdwjwqtvwj .gt_bottom_border {
+#uqatvvbvyh .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -617,7 +624,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#jdwjwqtvwj .gt_column_spanner {
+#uqatvvbvyh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -625,7 +632,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#jdwjwqtvwj .gt_col_heading {
+#uqatvvbvyh .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -638,11 +645,11 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#jdwjwqtvwj .gt_sep_right {
+#uqatvvbvyh .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#jdwjwqtvwj .gt_group_heading {
+#uqatvvbvyh .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -666,7 +673,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#jdwjwqtvwj .gt_empty_group_heading {
+#uqatvvbvyh .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -690,29 +697,29 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#jdwjwqtvwj .gt_striped {
+#uqatvvbvyh .gt_striped {
   background-color: #f2f2f2;
 }
 
-#jdwjwqtvwj .gt_row {
+#uqatvvbvyh .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#jdwjwqtvwj .gt_stub {
+#uqatvvbvyh .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#jdwjwqtvwj .gt_stub.gt_row {
+#uqatvvbvyh .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#jdwjwqtvwj .gt_summary_row {
+#uqatvvbvyh .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -721,13 +728,13 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#jdwjwqtvwj .gt_first_summary_row {
+#uqatvvbvyh .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#jdwjwqtvwj .gt_table_body {
+#uqatvvbvyh .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -742,55 +749,55 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#jdwjwqtvwj .gt_footnote {
+#uqatvvbvyh .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#jdwjwqtvwj .gt_sourcenote {
+#uqatvvbvyh .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#jdwjwqtvwj .gt_center {
+#uqatvvbvyh .gt_center {
   text-align: center;
 }
 
-#jdwjwqtvwj .gt_left {
+#uqatvvbvyh .gt_left {
   text-align: left;
 }
 
-#jdwjwqtvwj .gt_right {
+#uqatvvbvyh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jdwjwqtvwj .gt_font_normal {
+#uqatvvbvyh .gt_font_normal {
   font-weight: normal;
 }
 
-#jdwjwqtvwj .gt_font_bold {
+#uqatvvbvyh .gt_font_bold {
   font-weight: bold;
 }
 
-#jdwjwqtvwj .gt_font_italic {
+#uqatvvbvyh .gt_font_italic {
   font-style: italic;
 }
 
-#jdwjwqtvwj .gt_super {
+#uqatvvbvyh .gt_super {
   font-size: 65%;
 }
 
-#jdwjwqtvwj .gt_footnote_glyph {
+#uqatvvbvyh .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="jdwjwqtvwj" style="overflow-x:auto;"><!--gt table start-->
+<div id="uqatvvbvyh" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
@@ -1035,7 +1042,7 @@ abline(v = median(OP$rhum),col = &quot;red&quot;, lwd = 2)
 legend(x = &quot;topleft&quot;, 
        bty = &quot;n&quot;,
        c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;,&quot;Lower Quantile&quot;, &quot;Upper Quantile&quot;),
-       col = c(&quot;lightblue&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
+       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
        lwd = c(2, 2, 2))
 hist(OP$rain)</code></pre>
 <p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /></p>

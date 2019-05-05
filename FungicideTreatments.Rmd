@@ -1,4 +1,6 @@
-% Model Usefulness
+% Evaluation of Irish Rules model
+
+# Parameter evaluation
 
 # Libraries
 

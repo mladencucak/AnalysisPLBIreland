@@ -30,7 +30,10 @@ navbar:
     href: Analysis.html
   - text: Results
     icon: fa fa-table
-    href: Results.html
+    href: Results1.html
+  - text: Usefulness
+    icon: fa fa-table
+    href: FungicideTreatments.html
  
   right:
   - text: source
