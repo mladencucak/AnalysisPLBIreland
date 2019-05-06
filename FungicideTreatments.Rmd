@@ -417,10 +417,10 @@ control_eval_long %>%
   ) +
   geom_line(aes(warning_thres, calendar_seven),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_seven+0.8 , label= "7-day freq."), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
   geom_line(aes(warning_thres, calendar_five),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_five+0.8, label= "5-day freq."), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
   geom_smooth(method = "loess",
               se = FALSE,
               color = gray.colors(2)[1],

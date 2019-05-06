@@ -286,7 +286,7 @@ abline(h = 0, col = "red")
 hist(resid(poly_3_fit)) #distriburion of residuals should be approximately  normal
 ```
 
-Assumptions of normapity of residuals are fulfilled. 
+Assumptions of normality of residuals are fulfilled. 
 
 Extract the model formula. The code has been borrowed from [this StackOverflow thread](https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel)
 

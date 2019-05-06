@@ -668,7 +668,7 @@ df &lt;-  dplyr::rename(df,
 <pre><code>## [1] 21</code></pre>
 <pre class="r"><code>(calendar_seven &lt;- round( c(duration_of_season-5*7)/7,0))</code></pre>
 <pre><code>## [1] 15</code></pre>
-<p>We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Cumulative sum of recommended treatments is calculated per season.</p>
+<p>We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Minimum period until the next treatment is 5 days. Cumulative sum of recommended treatments is calculated per season.</p>
 <pre class="r"><code>ControlFreqFun &lt;-
   function(y,
            weather_data,
@@ -870,7 +870,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
   cl = cl
   )
 begin- Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -5.147242 secs</code></pre>
+<pre><code>## Time difference of -5.327751 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;- 
@@ -968,10 +968,10 @@ control_eval_long %&gt;% head() %&gt;% pander()</code></pre>
   ) +
   geom_line(aes(warning_thres, calendar_seven),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_seven+0.8 , label= &quot;7-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
   geom_line(aes(warning_thres, calendar_five),colour = gray.colors(2)[1])+
   geom_label(aes(14,calendar_five+0.8, label= &quot;5-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
+             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
   geom_smooth(method = &quot;loess&quot;,
               se = FALSE,
               color = gray.colors(2)[1],
@@ -985,7 +985,7 @@ control_eval_long %&gt;% head() %&gt;% pander()</code></pre>
   theme(legend.position = &quot;top&quot;)+
   theme_article()</code></pre>
 <p><img src="images/plot_models-1.png" width="1056" style="display: block; margin: auto;" /></p>
-<p>The figure shows how do the decision thresholds of the three model versions differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents one year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.</p>
+<p>The figure shows how does the frequency of recommended treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.</p>
 <p>There is variation in the data and it would be interesting to see if there is an effect of year.</p>
 <pre class="r"><code>control_eval_long %&gt;% 
 # control_eval_long%&gt;% 
