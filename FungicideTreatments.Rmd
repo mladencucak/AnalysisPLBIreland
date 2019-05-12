@@ -60,7 +60,7 @@ if (any(as.numeric(packages_load) == 0)) {
 }
 rm(list.of.packages, new.packages, packages_load)
 ```
-#The Rationale  
+# The Rationale  
 The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.   
 Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. 
 The performance is evaluated in two ways, as a reduction of: 
@@ -486,9 +486,9 @@ ggplot(., aes(factor(warning_thres), no_of_treatments, group =programme, colour 
         text = element_text( size = 11))
 ```
   
-It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years. 
+It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years.   
   
-#Dose reduction for calendar treatment  
+# Dose reduction for calendar treatment  
 Possible dose reductions are calculated for the usual 7 day calendar treatment.  
 Calculate the dose reductions based on the model outputs. Dose is reduced to quarters based on the risk output. The maximum dose is applied if the risk is over 12EBH.
 

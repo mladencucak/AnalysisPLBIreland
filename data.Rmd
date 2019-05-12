@@ -361,7 +361,7 @@ OP %>%
 ggplot(aes(month_abb,rain,fill = factor(year_var)))+
   geom_bar( position="dodge", stat="identity", width = 0.7)+
   scale_fill_manual(values = colorRampPalette(brewer.pal(10, "Blues"))(10))+
-  annotate("text",x = 1:6, y = 24, 
+  annotate("text",x = 1:6, y = 52, 
           label=as.character(OP_months$rain))+
   theme_minimal()
 
