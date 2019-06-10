@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
     "tidyverse",
