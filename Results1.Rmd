@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup}
 list.of.packages <-
   c(
     "tidyverse",
@@ -38,8 +38,7 @@ new.packages <-
   list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 
 #Download packages that are not already present in the library
-if (length(new.packages))
-  install.packages(new.packages)
+if (length(new.packages))install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
 if ("gt" %in% installed.packages() == FALSE)
   remotes::install_github("rstudio/gt")
@@ -219,7 +218,7 @@ p3 <-
   ylab("AUROC") +
   theme_article()
 
-png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
+grDevices::png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
     width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()
@@ -260,7 +259,7 @@ poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
 poly_4_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
-compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
+rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
   add_column( Order = 1:4, .before = 1) %>% 
   gt() 
 ```

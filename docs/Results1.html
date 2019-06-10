@@ -479,17 +479,129 @@ new.packages &lt;-
   list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
 
 #Download packages that are not already present in the library
-if (length(new.packages))
-  install.packages(new.packages)
+if (length(new.packages))install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
 if (&quot;gt&quot; %in% installed.packages() == FALSE)
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
 packages_load &lt;-
-  lapply(list.of.packages, require, character.only = TRUE)
-
-#Print warning if there is a problem with installing/loading some of packages
+  lapply(list.of.packages, require, character.only = TRUE)</code></pre>
+<pre><code>## Loading required package: tidyverse</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;rvest&#39;:
+##   method            from
+##   read_xml.response xml2</code></pre>
+<pre><code>## -- Attaching packages ---------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.1.1     v purrr   0.3.2
+## v tibble  2.1.1     v dplyr   0.8.1
+## v tidyr   0.8.3     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## Loading required package: readxl</code></pre>
+<pre><code>## Loading required package: data.table</code></pre>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     transpose</code></pre>
+<pre><code>## Loading required package: knitr</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: imputeTS</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;xts&#39;:
+##   method     from
+##   as.zoo.xts zoo</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;forecast&#39;:
+##   method             from    
+##   fitted.fracdiff    fracdiff
+##   residuals.fracdiff fracdiff</code></pre>
+<pre><code>## 
+## Attaching package: &#39;imputeTS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:zoo&#39;:
+## 
+##     na.locf</code></pre>
+<pre><code>## Loading required package: ggthemes</code></pre>
+<pre><code>## Loading required package: rcompanion</code></pre>
+<pre><code>## Loading required package: mgsub</code></pre>
+<pre><code>## Loading required package: R.utils</code></pre>
+<pre><code>## Loading required package: R.oo</code></pre>
+<pre><code>## Loading required package: R.methodsS3</code></pre>
+<pre><code>## R.methodsS3 v1.7.1 (2016-02-15) successfully loaded. See ?R.methodsS3 for help.</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;R.oo&#39;:
+##   method        from       
+##   throw.default R.methodsS3</code></pre>
+<pre><code>## R.oo v1.22.0 (2018-04-21) successfully loaded. See ?R.oo for help.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;R.oo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:methods&#39;:
+## 
+##     getClasses, getMethods</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     attach, detach, gc, load, save</code></pre>
+<pre><code>## R.utils v2.8.0 successfully loaded. See ?R.utils for help.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;R.utils&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## The following object is masked from &#39;package:utils&#39;:
+## 
+##     timestamp</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     cat, commandArgs, getOption, inherits, isOpen, nullfile,
+##     parse, warnings</code></pre>
+<pre><code>## Loading required package: here</code></pre>
+<pre><code>## here() starts at C:/Users/mlade/Documents/Github/AnalysisPLBIreland</code></pre>
+<pre><code>## Loading required package: pander</code></pre>
+<pre><code>## 
+## Attaching package: &#39;pander&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:R.utils&#39;:
+## 
+##     wrap</code></pre>
+<pre><code>## Loading required package: egg</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## Loading required package: rsm</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rsm&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:data.table&#39;:
+## 
+##     cube</code></pre>
+<pre><code>## Loading required package: ggrepel</code></pre>
+<pre><code>## Loading required package: cowplot</code></pre>
+<pre><code>## 
+## Attaching package: &#39;cowplot&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggthemes&#39;:
+## 
+##     theme_map</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     ggsave</code></pre>
+<pre><code>## Loading required package: gt</code></pre>
+<pre class="r"><code>#Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
   warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
 } else {
@@ -530,7 +642,7 @@ ggplot(t_data, aes(x = difference)) +
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#otyyoorlbq .gt_table {
+#lnjxwhmnug .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -549,13 +661,13 @@ ggplot(t_data, aes(x = difference)) +
   /* table.border.top.color */
 }
 
-#otyyoorlbq .gt_heading {
+#lnjxwhmnug .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#otyyoorlbq .gt_title {
+#lnjxwhmnug .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -566,7 +678,7 @@ ggplot(t_data, aes(x = difference)) +
   border-bottom-width: 0;
 }
 
-#otyyoorlbq .gt_subtitle {
+#lnjxwhmnug .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -577,7 +689,7 @@ ggplot(t_data, aes(x = difference)) +
   border-top-width: 0;
 }
 
-#otyyoorlbq .gt_bottom_border {
+#lnjxwhmnug .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -586,7 +698,7 @@ ggplot(t_data, aes(x = difference)) +
   /* heading.border.bottom.color */
 }
 
-#otyyoorlbq .gt_column_spanner {
+#lnjxwhmnug .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -594,7 +706,7 @@ ggplot(t_data, aes(x = difference)) +
   padding-bottom: 4px;
 }
 
-#otyyoorlbq .gt_col_heading {
+#lnjxwhmnug .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -607,11 +719,11 @@ ggplot(t_data, aes(x = difference)) +
   margin: 10px;
 }
 
-#otyyoorlbq .gt_sep_right {
+#lnjxwhmnug .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#otyyoorlbq .gt_group_heading {
+#lnjxwhmnug .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -635,7 +747,7 @@ ggplot(t_data, aes(x = difference)) +
   vertical-align: middle;
 }
 
-#otyyoorlbq .gt_empty_group_heading {
+#lnjxwhmnug .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -659,29 +771,29 @@ ggplot(t_data, aes(x = difference)) +
   vertical-align: middle;
 }
 
-#otyyoorlbq .gt_striped {
+#lnjxwhmnug .gt_striped {
   background-color: #f2f2f2;
 }
 
-#otyyoorlbq .gt_row {
+#lnjxwhmnug .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#otyyoorlbq .gt_stub {
+#lnjxwhmnug .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#otyyoorlbq .gt_stub.gt_row {
+#lnjxwhmnug .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#otyyoorlbq .gt_summary_row {
+#lnjxwhmnug .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -690,13 +802,13 @@ ggplot(t_data, aes(x = difference)) +
   /* summary_row.text_transform */
 }
 
-#otyyoorlbq .gt_first_summary_row {
+#lnjxwhmnug .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#otyyoorlbq .gt_table_body {
+#lnjxwhmnug .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -711,55 +823,55 @@ ggplot(t_data, aes(x = difference)) +
   /* field.border.bottom.color */
 }
 
-#otyyoorlbq .gt_footnote {
+#lnjxwhmnug .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#otyyoorlbq .gt_sourcenote {
+#lnjxwhmnug .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#otyyoorlbq .gt_center {
+#lnjxwhmnug .gt_center {
   text-align: center;
 }
 
-#otyyoorlbq .gt_left {
+#lnjxwhmnug .gt_left {
   text-align: left;
 }
 
-#otyyoorlbq .gt_right {
+#lnjxwhmnug .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#otyyoorlbq .gt_font_normal {
+#lnjxwhmnug .gt_font_normal {
   font-weight: normal;
 }
 
-#otyyoorlbq .gt_font_bold {
+#lnjxwhmnug .gt_font_bold {
   font-weight: bold;
 }
 
-#otyyoorlbq .gt_font_italic {
+#lnjxwhmnug .gt_font_italic {
   font-style: italic;
 }
 
-#otyyoorlbq .gt_super {
+#lnjxwhmnug .gt_super {
   font-size: 65%;
 }
 
-#otyyoorlbq .gt_footnote_glyph {
+#lnjxwhmnug .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="otyyoorlbq" style="overflow-x:auto;"><!--gt table start-->
+<div id="lnjxwhmnug" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
@@ -909,7 +1021,7 @@ p3 &lt;-
   ylab(&quot;AUROC&quot;) +
   theme_article()
 
-png(filename = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;init_vis.png&quot;),
+grDevices::png(filename = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;init_vis.png&quot;),
     width = 400, height = 800,bg = &quot;white&quot;, res = NA, restoreConsole = TRUE)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()</code></pre>
@@ -1017,14 +1129,14 @@ poly_2_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
 poly_4_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
-compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
+rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
   add_column( Order = 1:4, .before = 1) %&gt;% 
   gt() </code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zemxvubnub .gt_table {
+#qfpxkewkbk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1043,13 +1155,13 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   /* table.border.top.color */
 }
 
-#zemxvubnub .gt_heading {
+#qfpxkewkbk .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#zemxvubnub .gt_title {
+#qfpxkewkbk .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1060,7 +1172,7 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   border-bottom-width: 0;
 }
 
-#zemxvubnub .gt_subtitle {
+#qfpxkewkbk .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1071,7 +1183,7 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   border-top-width: 0;
 }
 
-#zemxvubnub .gt_bottom_border {
+#qfpxkewkbk .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1080,7 +1192,7 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   /* heading.border.bottom.color */
 }
 
-#zemxvubnub .gt_column_spanner {
+#qfpxkewkbk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1088,7 +1200,7 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   padding-bottom: 4px;
 }
 
-#zemxvubnub .gt_col_heading {
+#qfpxkewkbk .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1101,11 +1213,11 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   margin: 10px;
 }
 
-#zemxvubnub .gt_sep_right {
+#qfpxkewkbk .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#zemxvubnub .gt_group_heading {
+#qfpxkewkbk .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1129,7 +1241,7 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   vertical-align: middle;
 }
 
-#zemxvubnub .gt_empty_group_heading {
+#qfpxkewkbk .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1153,29 +1265,29 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   vertical-align: middle;
 }
 
-#zemxvubnub .gt_striped {
+#qfpxkewkbk .gt_striped {
   background-color: #f2f2f2;
 }
 
-#zemxvubnub .gt_row {
+#qfpxkewkbk .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#zemxvubnub .gt_stub {
+#qfpxkewkbk .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#zemxvubnub .gt_stub.gt_row {
+#qfpxkewkbk .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#zemxvubnub .gt_summary_row {
+#qfpxkewkbk .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1184,13 +1296,13 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   /* summary_row.text_transform */
 }
 
-#zemxvubnub .gt_first_summary_row {
+#qfpxkewkbk .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#zemxvubnub .gt_table_body {
+#qfpxkewkbk .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1205,55 +1317,55 @@ compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
   /* field.border.bottom.color */
 }
 
-#zemxvubnub .gt_footnote {
+#qfpxkewkbk .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#zemxvubnub .gt_sourcenote {
+#qfpxkewkbk .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#zemxvubnub .gt_center {
+#qfpxkewkbk .gt_center {
   text-align: center;
 }
 
-#zemxvubnub .gt_left {
+#qfpxkewkbk .gt_left {
   text-align: left;
 }
 
-#zemxvubnub .gt_right {
+#qfpxkewkbk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zemxvubnub .gt_font_normal {
+#qfpxkewkbk .gt_font_normal {
   font-weight: normal;
 }
 
-#zemxvubnub .gt_font_bold {
+#qfpxkewkbk .gt_font_bold {
   font-weight: bold;
 }
 
-#zemxvubnub .gt_font_italic {
+#qfpxkewkbk .gt_font_italic {
   font-style: italic;
 }
 
-#zemxvubnub .gt_super {
+#qfpxkewkbk .gt_super {
   font-size: 65%;
 }
 
-#zemxvubnub .gt_footnote_glyph {
+#qfpxkewkbk .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zemxvubnub" style="overflow-x:auto;"><!--gt table start-->
+<div id="qfpxkewkbk" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Order</th>

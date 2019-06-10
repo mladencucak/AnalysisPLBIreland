@@ -1,8 +1,5 @@
 % Evaluation of Irish Rules model
-
-# Introduction 
-
-## Libraries
+# Libraries
 
 ```{r opts, echo = FALSE}
 knitr::opts_chunk$set(
@@ -57,14 +54,7 @@ if (any(as.numeric(packages_load) == 0)) {
 rm(list.of.packages, new.packages, packages_load)
 ```
 
-## Reproducibility
-Outputs of computational exhaustive procedures have been stored with the data and can be loaded directly.  
-
-# Data  
-
-## Bio data
-
-### Location
+# Location
 Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.
 ```{r}
 greenLeafIcon <- makeIcon(
@@ -88,6 +78,7 @@ leaflet() %>%
 
 ```
 
+# Bio data
 Planting date and first observation of the disease are loaded. 
 
 ```{r epidemic-initiation, fig.align='center'}
@@ -105,8 +96,8 @@ dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 
 Save processed bio data. 
 
-## Weather Data
-Historical weather data from Met Éireann  synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
+# Weather Data
+Historical weather data from Met Éireann synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years. 
 
 ```{r weather-data, message=FALSE, warning=FALSE,fig.align='center'}
 #Weather data, parameters and cut off dates
@@ -190,7 +181,7 @@ OP[which(OP$rh < 0 | OP$rh > 100), ]
 OP[which(OP$temp > 30), ]
 ```  
 
-Histogram of variables used in the analysis.577wks
+Histograms of variables used in the analysis.  
 ```{r wth_histograms,fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
 hist(OP$temp,col = "peachpuff", main = "Histogram of Temperatures",prob = TRUE) # prob = TRUE to show densities instead of frequencies
 lines(density(OP$temp), lwd = 2, col = "chocolate3")
@@ -216,9 +207,10 @@ legend(x = "topleft",
        c("Density plot", "Mean", "Median","Lower Quantile", "Upper Quantile"),
        col = c("chocolate3", "royalblue", "red", "darkgreen","green"),
        lwd = c(2, 2, 2))
-hist(OP$rain)
+hist(OP$rain[OP$rain>0], breaks = 15, main = "Freq. of rain > 0 mm",
+     xlab = "Rain (mm)/hour")
 ```
-
+We can see that there is no suspicious vlaues in the data.  Rain is often ocurenc at Oak Park, although those are not heavy rains, whihc makes it a very good ground for the spread of crop pathogens. 
 
 ```{r wth_summary_all}
 OP_rain <- 
@@ -238,18 +230,101 @@ OP_rain <-
 
 ```
 
-
-```{r wth_summary}
-
-  OP %>%
+```{r}
+ OP %>%
     filter(month %in% c(4:10)) %>%
-    group_by(year_var) %>%
     summarize(temp = round(mean(temp),1),
-              rain = sum(rain),
               rhum = round(mean(rhum),1)
-              ) %>% kable()
+              ) %>% 
+   bind_cols(., OP_rain) %>% 
+  kable(caption = "10 Year Averages Weather at Oak Park")
+```
+  
+  The 
+```{r temps_perhour_monthly}
+OP %>% 
+  mutate(hour = hour(date)) %>% 
+  filter(month %in% c(4:9)) %>% 
+  
+  group_by(year_var,month, hour) %>% 
+  mutate( month_abb = month(month, label = T)) %>% 
+  ggplot(aes(factor(hour), temp))+
+  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = "gray", linetype="dotted")+
+  geom_boxplot(width = 0.2,outlier.size = 0.2)+
+  geom_line(aes(hour, 10, color = "red"))+
+  facet_grid(~month_abb)+
+  theme_tufte()+
+  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
+  labs(title= "Average temperatures per hour for months April to September",
+       y = "Temperature",
+       x = "Hours of the day",
+       color = "10C Line")
+```
+  
+  Night temperatures are low are low in Months of April and May, and only start to kick off in June.   
+  Lets take a closer look into variations in different seasons. 
+```{r temps_perhour_all_years, fig.width= 10}
+OP %>% 
+  mutate(hour = hour(date)) %>% 
+  filter(month %in% c(4:7)) %>% 
+  
+  group_by(year_var,month, hour) %>% 
+  mutate( month_abb = month(month, label = T)) %>% 
+  ggplot(aes(factor(hour), temp))+
+  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = "gray", linetype="dotted")+
+  geom_boxplot(width = 0.2,outlier.size = 0.2)+
+  geom_line(aes(hour, 10, color = "red"))+
+  facet_grid(year_var~month_abb)+
+  theme(legend.position = "top")+
+  theme_tufte()+
+  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
+  labs(title= "Average temperatures per hour for months April to September",
+       y = "Temperature",
+       x = "Hours of the day",
+       color = "10C Line")
+```
+  
+Let us take a look into sums of hours with blight favourable conditions. 
+```{r}
+
+OP %>% 
+  mutate(hour = hour(date)) %>% 
+  mutate(humid = ifelse(rhum >= 90 & temp>= 10, 1,0)) %>% 
+  mutate(cond_night = ifelse(rhum >= 90 & temp>= 10 & hour %in% c(20:24,0:6), 1,0)) %>% 
+  filter(month %in% c(4:7)) %>% 
+  group_by(year_var,month) %>% 
+  summarise(cond = sum(humid),
+            cond_night = sum(cond_night)) %>% 
+  mutate( month_abb = month(month, label = T)) %>% 
+  select(-c(month)) %>% 
+  reshape2::melt(id.vars = c("year_var", "month_abb"),
+                 variable.name = "period_of_day",
+                 value.name = "humid") %>% 
+  group_by(month_abb,period_of_day ) %>% 
+  summarise(humid = mean(humid),
+             sd = sd(humid)) %>% 
+
+ggplot(aes( month_abb, humid, fill = period_of_day, group))+
+  geom_bar(stat = "identity", color = "black", position = position_dodge())+
+  geom_errorbar(aes(ymin = humid - sd, 
+                    ymax = humid + sd), width = 0.2) +
+  scale_fill_manual(
+    name= "Period of the day",
+    labels = c("Whole day" , "During night"),
+    values = c("#0D0887FF", "#CC4678FF")
+  ) + 
+  labs(
+    title = "Blight favourable weather averages.", 
+    subtitle = "Mean monthly sum of hours with T>=10 °C and RH>=90 %.",
+    y = "Humid weather (hours)",
+    x = "Month"
+  )+
+  theme_bw()
 
 ```
+
+
+
 
 ```{r}
 #Calculate average minimum daily temeperatures per month
@@ -361,7 +436,7 @@ OP %>%
 ggplot(aes(month_abb,rain,fill = factor(year_var)))+
   geom_bar( position="dodge", stat="identity", width = 0.7)+
   scale_fill_manual(values = colorRampPalette(brewer.pal(10, "Blues"))(10))+
-  annotate("text",x = 1:6, y = 52, 
+  annotate("text",x = 1:6, y = 51, 
           label=as.character(OP_months$rain))+
   theme_minimal()
 
