@@ -218,8 +218,9 @@ p3 <-
   ylab("AUROC") +
   theme_article()
 
+
 grDevices::png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
-    width = 400, height = 800,bg = "white", res = NA, restoreConsole = TRUE)
+    width = 400, height = 800,bg = "white", res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()
 p1;p2;p3
