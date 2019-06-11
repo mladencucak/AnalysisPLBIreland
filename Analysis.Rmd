@@ -14,16 +14,14 @@ Packages needed for the analysis are loaded. If the libraries do not exist local
 
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
-  c(
-    "tidyverse",
+  c("tidyverse",
     "readxl",
     "pracma",
     "remotes",
     "parallel",
     "pbapply",
     "R.utils",
-    "here"
-  )
+    "here")
 
 new.packages <-
   list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
@@ -42,7 +40,7 @@ packages_load <-
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
   warning("Package/s", paste(list.of.packages[!isTRUE(packages_load)]),
-                "not loaded!")
+          "not loaded!")
 } else {
   print("All packages were successfully loaded.")
 }
@@ -57,7 +55,6 @@ Implementation of the model
 IrishRulesModel <- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
-
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
   wet_before <- 3
@@ -79,7 +76,7 @@ IrishRulesModel <- function(weather,
   
   #threshold for estimation of leaf wetness using relative humidity
   lw_rhum_threshold <- 90
-    
+  
   weather[["rain"]] -> rain
   if ("rhum" %in% names(weather)) {
     weather[["rhum"]] -> rh
@@ -100,7 +97,8 @@ IrishRulesModel <- function(weather,
       round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap), 1)
     rh <-
       round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap), 0)
-    rh  <- sapply(rh, function(x) ifelse(x > 100, x <- 100, x))
+    rh  <- sapply(rh, function(x)
+      ifelse(x > 100, x <- 100, x))
   }
   
   if (sum(is.na(with(weather, rain, temp, rhum))) > 0) {
@@ -134,9 +132,10 @@ IrishRulesModel <- function(weather,
   } else{
     for (j in 1:length(idx)) {
       #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-      if (if (lw_rhum=="rain") {
+      if (if (lw_rhum == "rain") {
         #if only rain
-        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1)           #just see rain sum
+        #just see rain sum
+        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1) 
       } else{
         any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] >= lw_rhum_threshold)) |
             #take both as possible switches
@@ -207,10 +206,17 @@ dates_cut$planting_date <-
   as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
 dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
 #st warnning period to 14 days before disease onset
-dates_cut <- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
-                        .before = "disease_observed")
+dates_cut <-
+  add_column(
+    dates_cut,
+    disease_onset = as.Date(dates_cut$disease_observed) - 4,
+    .before = "disease_observed"
+  )
 
-dates_cut <- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = "disease_onset" )
+dates_cut <-
+  add_column(dates_cut,
+             warning = as.Date(dates_cut$disease_onset) - 10,
+             .before = "disease_onset")
 rownames(dates_cut) <- NULL
 
 dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
@@ -223,7 +229,9 @@ The set of the most important variables of Irish rules model is evaluated. The E
 #read in parameters
 parameters <-
   read_excel(here::here("data", "op_2007_16", "raw", "par.xlsx"), sheet = "par")
-parameters %>% kable() %>% kableExtra::kable_styling(latex_options = "striped",full_width = FALSE)
+parameters %>%
+  kable() %>%
+  kableExtra::kable_styling(latex_options = "striped", full_width = FALSE)
 ```
 
 
@@ -255,7 +263,7 @@ The model has been run with each set of parameters, and columns with model outpu
 
 ```{r run-model, eval=FALSE}
 # This chunk is not run
-load(OP, file = here::here("data", "op_2007_16",  "OP_2007-2016_infilled.RData"))
+load(OP, file = here::here("data", "op_2007_16", "OP_2007-2016_infilled.RData"))
 
 for(i in 1:nrow(parameters)) {
   loop_var <- apply(parameters[i, ], 1, function(x) {
@@ -409,10 +417,10 @@ SensParametersCalc <-
     #summary
     test <- data.frame(
       model = names(FP),
-      FP = t(FP[1,]),
-      tn = t(TN[1,]),
-      TP = t(TP[1,]),
-      FN = t(FN[1,])
+      FP = t(FP[1, ]),
+      tn = t(TN[1, ]),
+      TP = t(TP[1, ]),
+      FN = t(FN[1, ])
     )
     names(test) <- c("model", "FP", "TN", "TP", "FN")
     test <- data.frame(test, row.names = NULL)
@@ -461,7 +469,7 @@ load(file = here::here("data", "op_2007_16","results","ROC_output.Rdata"))
 Sort the outputs for each model variation.
 ```{r sort-ROC, fig.align='center'}
 ROC_data <-
-  as.data.frame(dplyr::row_bind(ROC))
+  as.data.frame(dplyr::bind_rows(ROC))
 rownames(ROC_data) <- NULL
 # rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data <-
@@ -470,7 +478,7 @@ ROC_data[[1]] %>% gt()
 ```
 
 ```{r}
-save(ROC_data, file = here::here("data", "op_2007_16",  "ROC_data.RData"))
+save(ROC_data, file = here::here("data", "op_2007_16", "ROC_data.RData"))
 
 ```
 
@@ -494,7 +502,7 @@ AUROC_data <-
   lapply(AUROC_data, function(x)
     mutate_if(x, is.factor, as.character))
 AUROC_data <- bind_rows(AUROC_data)
-save(AUROC_data, file = here::here("data", "op_2007_16",  "AUROC_data.RData"))
+save(AUROC_data, file = here::here("data", "op_2007_16", "AUROC_data.RData"))
 
 
 ```
