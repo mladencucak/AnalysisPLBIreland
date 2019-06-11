@@ -208,13 +208,15 @@ IrishRulesModel <- function(weather,
 ```
 
 ## Bio dates  
-Emergence takes up to 3 weeks under Irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.  
+Emergence takes up to 3 weeks under Irish conditions. Period when healthy host present from emergence until 14 days prior to a first observation of the disease in the field. Warning period 10-day ‘warning period’ considered to last from -14 days to –4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.  
 ```{r epidemic-initiation, fig.align='center'}
 #Get subsets of data for period before the epidemics were initiated
 dates_cut <-
   read_csv(
     here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
     col_types = cols(
+      year = col_factor(),
+      planting_date = col_date(format = "%d/%m/%Y"),
       disease_observed = col_date(format = "%d/%m/%Y"),
       last_assessment = col_date(format = "%d/%m/%Y")
     )
