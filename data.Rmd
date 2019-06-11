@@ -59,21 +59,25 @@ Primary disease outbreak data is acquired from Teagasc breeding program field tr
 ```{r}
 greenLeafIcon <- makeIcon(
   iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94,
+  iconWidth = 38,
+  iconHeight = 95,
+  iconAnchorX = 22,
+  iconAnchorY = 94,
   shadowUrl = "http://leafletjs.com/examples/custom-icons/leaf-shadow.png",
-  shadowWidth = 50, shadowHeight = 64,
-  shadowAnchorX = 4, shadowAnchorY = 62
+  shadowWidth = 50,
+  shadowHeight = 64,
+  shadowAnchorX = 4,
+  shadowAnchorY = 62
 )
 
 leaflet() %>%
   addTiles(group = "OSM (default)") %>%
-  setView(-8,53.5,6)%>%
-  addMarkers(lng = -6.9121167, lat = 52.8560667,
-             label = "Oak Park",
-             # color = "green",
-             icon=greenLeafIcon
-              # radius = 5
+  setView(-8, 53.5, 6) %>%
+  addMarkers(
+    lng = -6.9121167,
+    lat = 52.8560667,
+    label = "Oak Park",
+    icon = greenLeafIcon
   )
 
 ```
@@ -86,9 +90,7 @@ Planting date and first observation of the disease are loaded.
 dates_cut <-
   read_csv(
     here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
-    col_types = cols(
-      disease_observed = col_date(format = "%d/%m/%Y")
-    )
+    col_types = cols(disease_observed = col_date(format = "%d/%m/%Y"))
   )
 
 dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
