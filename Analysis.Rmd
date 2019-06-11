@@ -28,6 +28,7 @@ list.of.packages <-
     "pbapply",
     "R.utils",
     "here",
+    "kable",
     "kableExtra",
     "ggrepel")
 
@@ -241,8 +242,8 @@ The set of the most important variables of Irish rules model is evaluated. The E
 parameters <-
   read_excel(here::here("data", "op_2007_16", "raw", "par.xlsx"), sheet = "par")
 parameters %>%
-  kable() %>%
-  kableExtra::kable_styling(latex_options = "striped", full_width = FALSE)
+   kable() %>%
+   kableExtra::kable_styling(latex_options = "striped", full_width = FALSE)
 ```
 
 
