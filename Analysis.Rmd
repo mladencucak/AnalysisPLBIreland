@@ -27,7 +27,9 @@ list.of.packages <-
     "parallel",
     "pbapply",
     "R.utils",
-    "here")
+    "here",
+    "kableExtra",
+    "ggrepel")
 
 new.packages <-
   list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]

@@ -28,6 +28,7 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -473,29 +474,16 @@ div.tocify {
 <h2>Libraries</h2>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
-  c(
-    &quot;tidyverse&quot;,
+  c(&quot;tidyverse&quot;,
     &quot;readxl&quot;,
-    &quot;data.table&quot;,
-    &quot;knitr&quot;,
-    &quot;padr&quot;,
-    &quot;devtools&quot;,
     &quot;pracma&quot;,
     &quot;remotes&quot;,
     &quot;parallel&quot;,
     &quot;pbapply&quot;,
-    &quot;ggrepel&quot;,
-    &quot;ggthemes&quot;,
-    &quot;egg&quot;,
-    &quot;rsm&quot;,
-    &quot;GGally&quot;,
     &quot;R.utils&quot;,
-    &quot;rcompanion&quot;,
-    &quot;mgsub&quot;,
     &quot;here&quot;,
-    &quot;stringr&quot;,
-    &quot;pander&quot;
-  )
+    &quot;kableExtra&quot;,
+    &quot;ggrepel&quot;)
 
 new.packages &lt;-
   list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
@@ -504,7 +492,7 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages)
 
-if (&quot;gt&quot; %in% installed.packages() == FALSE)
+if (&quot;gt&quot; %in% !isTRUE(installed.packages()))
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
@@ -513,7 +501,8 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
+  warning(&quot;Package/s&quot;, paste(list.of.packages[!isTRUE(packages_load)]),
+          &quot;not loaded!&quot;)
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -527,16 +516,15 @@ if (any(as.numeric(packages_load) == 0)) {
 - Infection period starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).<br />
 Implementation of the model.</p>
 <pre class="r"><code>IrishRulesModel &lt;- function(weather,
-                            param = NULL,
-                            infill_gap = NULL) {
-
+                            param = TRUE,
+                            infill_gap = TRUE) {
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
   wet_before &lt;- 3
   wet_after &lt;- 3
   
   # Parameter list
-  if (is.null(param)) {
+  if (isTRUE(param)) {
     rh_thresh &lt;- 90 
     temp_thresh &lt;- 10
     hours &lt;- 12   #sum of hours before EBH accumulation
@@ -551,7 +539,7 @@ Implementation of the model.</p>
   
   #threshold for estimation of leaf wetness using relative humidity
   lw_rhum_threshold &lt;- 90
-    
+  
   weather[[&quot;rain&quot;]] -&gt; rain
   if (&quot;rhum&quot; %in% names(weather)) {
     weather[[&quot;rhum&quot;]] -&gt; rh
@@ -563,7 +551,7 @@ Implementation of the model.</p>
   
   # This function to infil missing values to let the model run
   #If maximum infill gap is not provided it is defaulted to 7
-  if (is.null(infill_gap)) {
+  if (isTRUE(infill_gap)) {
     infill_gap &lt;- 7
   }
   
@@ -572,7 +560,8 @@ Implementation of the model.</p>
       round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap), 1)
     rh &lt;-
       round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap), 0)
-    rh  &lt;- sapply(rh, function(x) ifelse(x &gt; 100, x &lt;- 100, x))
+    rh  &lt;- sapply(rh, function(x)
+      ifelse(x &gt; 100, x &lt;- 100, x))
   }
   
   if (sum(is.na(with(weather, rain, temp, rhum))) &gt; 0) {
@@ -606,9 +595,10 @@ Implementation of the model.</p>
   } else{
     for (j in 1:length(idx)) {
       #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-      if (if (lw_rhum==&quot;rain&quot;) {
+      if (if (lw_rhum == &quot;rain&quot;) {
         #if only rain
-        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1)           #just see rain sum
+        #just see rain sum
+        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1) 
       } else{
         any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] &gt;= lw_rhum_threshold)) |
             #take both as possible switches
@@ -681,10 +671,17 @@ dates_cut &lt;-
   as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
 dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
 #st warnning period to 14 days before disease onset
-dates_cut &lt;- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
-                        .before = &quot;disease_observed&quot;)
+dates_cut &lt;-
+  add_column(
+    dates_cut,
+    disease_onset = as.Date(dates_cut$disease_observed) - 4,
+    .before = &quot;disease_observed&quot;
+  )
 
-dates_cut &lt;- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = &quot;disease_onset&quot; )
+dates_cut &lt;-
+  add_column(dates_cut,
+             warning = as.Date(dates_cut$disease_onset) - 10,
+             .before = &quot;disease_onset&quot;)
 rownames(dates_cut) &lt;- NULL
 
 dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
@@ -701,58 +698,124 @@ dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &qu
 <pre class="r"><code>#read in parameters
 parameters &lt;-
   read_excel(here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;par.xlsx&quot;), sheet = &quot;par&quot;)
-parameters %&gt;% kable() %&gt;% kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
-<table>
+parameters %&gt;%
+  kable() %&gt;%
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;, full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">rh_thresh</th>
-<th align="right">temp_thresh</th>
-<th align="right">hours</th>
-<th align="left">lw_rh</th>
+<tr>
+<th style="text-align:right;">
+rh_thresh
+</th>
+<th style="text-align:right;">
+temp_thresh
+</th>
+<th style="text-align:right;">
+hours
+</th>
+<th style="text-align:left;">
+lw_rh
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">93</td>
-<td align="right">13</td>
-<td align="right">15</td>
-<td align="left">rain</td>
+<tr>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+rain
+</td>
 </tr>
-<tr class="even">
-<td align="right">92</td>
-<td align="right">12</td>
-<td align="right">14</td>
-<td align="left">rainrh</td>
+<tr>
+<td style="text-align:right;">
+92
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
 </tr>
-<tr class="odd">
-<td align="right">91</td>
-<td align="right">11</td>
-<td align="right">13</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="even">
-<td align="right">90</td>
-<td align="right">10</td>
-<td align="right">12</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+90
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="odd">
-<td align="right">89</td>
-<td align="right">9</td>
-<td align="right">11</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+89
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="even">
-<td align="right">88</td>
-<td align="right">8</td>
-<td align="right">10</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="right">7</td>
-<td align="right">9</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
 </tbody>
 </table>
@@ -785,7 +848,7 @@ str(parameters)</code></pre>
 <h2>Model Run</h2>
 <p>The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns correspond to the set of parameters supplied.</p>
 <pre class="r"><code># This chunk is not run
-load(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;OP_2007-2016_infilled.RData&quot;))
+load(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_2007-2016_infilled.RData&quot;))
 
 for(i in 1:nrow(parameters)) {
   loop_var &lt;- apply(parameters[i, ], 1, function(x) {
@@ -937,16 +1000,16 @@ head(OP[, c(1, 7, 9, 15, 24:30)], 5)</code></pre>
     #summary
     test &lt;- data.frame(
       model = names(FP),
-      FP = t(FP[1,]),
-      tn = t(TN[1,]),
-      TP = t(TP[1,]),
-      FN = t(FN[1,])
+      FP = t(FP[1, ]),
+      tn = t(TN[1, ]),
+      TP = t(TP[1, ]),
+      FN = t(FN[1, ])
     )
     names(test) &lt;- c(&quot;model&quot;, &quot;FP&quot;, &quot;TN&quot;, &quot;TP&quot;, &quot;FN&quot;)
     test &lt;- data.frame(test, row.names = NULL)
     
     
-    test$model &lt;-  str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
+    test$model &lt;- str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
     test$sens &lt;- with(test, TP / (TP + FN))  #PTP sensitivity
     test$spec &lt;- with(test, TN / (TN + FP))  #PTN specificity
     return_df &lt;- test[, c(&quot;model&quot;, &quot;sens&quot;)]
@@ -961,24 +1024,24 @@ head(OP[, c(1, 7, 9, 15, 24:30)], 5)</code></pre>
 warning_thresholds &lt;- 1:18
 begin &lt;- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
-cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1, 1) 
-cl &lt;- makeCluster(cores)
-clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
-clusterEvalQ(cl, library(&quot;tidyverse&quot;))
-  ROC &lt;- pbapply::pblapply(warning_thresholds, function(x)
-  {
-    xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
-    return(xx)
-  },
-  cl = cl
-  )
-begin- Sys.time() #check the duration of the process in the console
-stopCluster(cl)</code></pre>
+cores &lt;-
+  ifelse(parallel::detectCores() &gt; 1, parallel::detectCores() - 1, 1)
+cl &lt;- parallel::makeCluster(cores)
+parallel::clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
+parallel::clusterEvalQ(cl, library(&quot;tidyverse&quot;))
+ROC &lt;- pbapply::pblapply(warning_thresholds, function(x)
+{
+  xx &lt;- SensParametersCalc(x, OP, dates_cut, prot_duration = 7)
+  return(xx)
+},
+cl = cl)
+begin - Sys.time() #check the duration of the process in the console
+parallel::stopCluster(cl)</code></pre>
 <p>Rather, the results of calculations from a prior run can be directly loaded.</p>
 <pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;ROC_output.Rdata&quot;))</code></pre>
 <p>Sort the outputs for each model variation.</p>
 <pre class="r"><code>ROC_data &lt;-
-  as.data.frame(data.table::rbindlist(ROC))
+  as.data.frame(dplyr::bind_rows(ROC))
 rownames(ROC_data) &lt;- NULL
 # rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data &lt;-
@@ -988,7 +1051,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#baireizbfp .gt_table {
+#afnnjwzyat .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1007,13 +1070,13 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#baireizbfp .gt_heading {
+#afnnjwzyat .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#baireizbfp .gt_title {
+#afnnjwzyat .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1024,7 +1087,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#baireizbfp .gt_subtitle {
+#afnnjwzyat .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1035,7 +1098,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#baireizbfp .gt_bottom_border {
+#afnnjwzyat .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1044,7 +1107,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#baireizbfp .gt_column_spanner {
+#afnnjwzyat .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1052,7 +1115,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#baireizbfp .gt_col_heading {
+#afnnjwzyat .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1065,159 +1128,180 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#baireizbfp .gt_sep_right {
+#afnnjwzyat .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#baireizbfp .gt_group_heading {
+#afnnjwzyat .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#baireizbfp .gt_empty_group_heading {
+#afnnjwzyat .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#baireizbfp .gt_striped {
+#afnnjwzyat .gt_striped {
   background-color: #f2f2f2;
 }
 
-#baireizbfp .gt_row {
-  padding: 10px;
+#afnnjwzyat .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#afnnjwzyat .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#afnnjwzyat .gt_row {
+  padding: 8px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#baireizbfp .gt_stub {
+#afnnjwzyat .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#baireizbfp .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#baireizbfp .gt_summary_row {
+#afnnjwzyat .gt_summary_row {
+  color: #000000;
   background-color: #FFFFFF;
   /* summary_row.background.color */
-  padding: 6px;
+  padding: 8px;
   /* summary_row.padding */
   text-transform: inherit;
   /* summary_row.text_transform */
 }
 
-#baireizbfp .gt_first_summary_row {
+#afnnjwzyat .gt_grand_summary_row {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* grand_summary_row.background.color */
+  padding: 8px;
+  /* grand_summary_row.padding */
+  text-transform: inherit;
+  /* grand_summary_row.text_transform */
+}
+
+#afnnjwzyat .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#baireizbfp .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
+#afnnjwzyat .gt_first_grand_summary_row {
+  border-top-style: double;
+  border-top-width: 6px;
   border-top-color: #A8A8A8;
-  /* field.border.top.color */
+}
+
+#afnnjwzyat .gt_table_body {
+  border-top-style: solid;
+  /* table_body.border.top.style */
+  border-top-width: 2px;
+  /* table_body.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table_body.border.top.color */
   border-bottom-style: solid;
-  /* field.border.bottom.style */
+  /* table_body.border.bottom.style */
   border-bottom-width: 2px;
-  /* field.border.bottom.width */
+  /* table_body.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
+  /* table_body.border.bottom.color */
 }
 
-#baireizbfp .gt_footnote {
+#afnnjwzyat .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#baireizbfp .gt_sourcenote {
+#afnnjwzyat .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#baireizbfp .gt_center {
+#afnnjwzyat .gt_center {
   text-align: center;
 }
 
-#baireizbfp .gt_left {
+#afnnjwzyat .gt_left {
   text-align: left;
 }
 
-#baireizbfp .gt_right {
+#afnnjwzyat .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#baireizbfp .gt_font_normal {
+#afnnjwzyat .gt_font_normal {
   font-weight: normal;
 }
 
-#baireizbfp .gt_font_bold {
+#afnnjwzyat .gt_font_bold {
   font-weight: bold;
 }
 
-#baireizbfp .gt_font_italic {
+#afnnjwzyat .gt_font_italic {
   font-style: italic;
 }
 
-#baireizbfp .gt_super {
+#afnnjwzyat .gt_super {
   font-size: 65%;
 }
 
-#baireizbfp .gt_footnote_glyph {
+#afnnjwzyat .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="baireizbfp" style="overflow-x:auto;"><!--gt table start-->
+<div id="afnnjwzyat" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>model</th>
@@ -1338,7 +1422,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
 </table>
 <!--gt table end-->
 </div>
-<pre class="r"><code>save(ROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))</code></pre>
+<pre class="r"><code>save(ROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;ROC_data.RData&quot;))</code></pre>
 </div>
 <div id="roc" class="section level2">
 <h2>ROC</h2>
@@ -1358,7 +1442,7 @@ AUROC_data &lt;-
   lapply(AUROC_data, function(x)
     mutate_if(x, is.factor, as.character))
 AUROC_data &lt;- bind_rows(AUROC_data)
-save(AUROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;AUROC_data.RData&quot;))</code></pre>
+save(AUROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;AUROC_data.RData&quot;))</code></pre>
 <p>Empirical ROC curve was created for each variation of the model.</p>
 <pre class="r"><code>PlotROC &lt;- function(df, numbering = NULL) {
   df &lt;- df[rev(df$cut_point), ]
@@ -1465,7 +1549,7 @@ head(data) %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#mvebceviac .gt_table {
+#wltwcfinyj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1484,13 +1568,13 @@ head(data) %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#mvebceviac .gt_heading {
+#wltwcfinyj .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#mvebceviac .gt_title {
+#wltwcfinyj .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1501,7 +1585,7 @@ head(data) %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#mvebceviac .gt_subtitle {
+#wltwcfinyj .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1512,7 +1596,7 @@ head(data) %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#mvebceviac .gt_bottom_border {
+#wltwcfinyj .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1521,7 +1605,7 @@ head(data) %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#mvebceviac .gt_column_spanner {
+#wltwcfinyj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1529,7 +1613,7 @@ head(data) %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#mvebceviac .gt_col_heading {
+#wltwcfinyj .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1542,159 +1626,180 @@ head(data) %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#mvebceviac .gt_sep_right {
+#wltwcfinyj .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#mvebceviac .gt_group_heading {
+#wltwcfinyj .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#mvebceviac .gt_empty_group_heading {
+#wltwcfinyj .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#mvebceviac .gt_striped {
+#wltwcfinyj .gt_striped {
   background-color: #f2f2f2;
 }
 
-#mvebceviac .gt_row {
-  padding: 10px;
+#wltwcfinyj .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#wltwcfinyj .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#wltwcfinyj .gt_row {
+  padding: 8px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#mvebceviac .gt_stub {
+#wltwcfinyj .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#mvebceviac .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#mvebceviac .gt_summary_row {
+#wltwcfinyj .gt_summary_row {
+  color: #000000;
   background-color: #FFFFFF;
   /* summary_row.background.color */
-  padding: 6px;
+  padding: 8px;
   /* summary_row.padding */
   text-transform: inherit;
   /* summary_row.text_transform */
 }
 
-#mvebceviac .gt_first_summary_row {
+#wltwcfinyj .gt_grand_summary_row {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* grand_summary_row.background.color */
+  padding: 8px;
+  /* grand_summary_row.padding */
+  text-transform: inherit;
+  /* grand_summary_row.text_transform */
+}
+
+#wltwcfinyj .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#mvebceviac .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
+#wltwcfinyj .gt_first_grand_summary_row {
+  border-top-style: double;
+  border-top-width: 6px;
   border-top-color: #A8A8A8;
-  /* field.border.top.color */
+}
+
+#wltwcfinyj .gt_table_body {
+  border-top-style: solid;
+  /* table_body.border.top.style */
+  border-top-width: 2px;
+  /* table_body.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table_body.border.top.color */
   border-bottom-style: solid;
-  /* field.border.bottom.style */
+  /* table_body.border.bottom.style */
   border-bottom-width: 2px;
-  /* field.border.bottom.width */
+  /* table_body.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
+  /* table_body.border.bottom.color */
 }
 
-#mvebceviac .gt_footnote {
+#wltwcfinyj .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#mvebceviac .gt_sourcenote {
+#wltwcfinyj .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#mvebceviac .gt_center {
+#wltwcfinyj .gt_center {
   text-align: center;
 }
 
-#mvebceviac .gt_left {
+#wltwcfinyj .gt_left {
   text-align: left;
 }
 
-#mvebceviac .gt_right {
+#wltwcfinyj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mvebceviac .gt_font_normal {
+#wltwcfinyj .gt_font_normal {
   font-weight: normal;
 }
 
-#mvebceviac .gt_font_bold {
+#wltwcfinyj .gt_font_bold {
   font-weight: bold;
 }
 
-#mvebceviac .gt_font_italic {
+#wltwcfinyj .gt_font_italic {
   font-style: italic;
 }
 
-#mvebceviac .gt_super {
+#wltwcfinyj .gt_super {
   font-size: 65%;
 }
 
-#mvebceviac .gt_footnote_glyph {
+#wltwcfinyj .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="mvebceviac" style="overflow-x:auto;"><!--gt table start-->
+<div id="wltwcfinyj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -1760,67 +1865,47 @@ head(data) %&gt;% gt()</code></pre>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.6.0 (2019-04-26)
-## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 17134)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Mojave 10.14.5
 ## 
 ## Matrix products: default
+## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
 ## 
 ## locale:
-## [1] LC_COLLATE=English_United States.1252 
-## [2] LC_CTYPE=English_United States.1252   
-## [3] LC_MONETARY=English_United States.1252
-## [4] LC_NUMERIC=C                          
-## [5] LC_TIME=English_United States.1252    
+## [1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
 ## 
 ## attached base packages:
 ## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] gt_0.1.0          pander_0.6.3      here_0.1         
-##  [4] mgsub_1.7.1       rcompanion_2.1.7  R.utils_2.8.0    
-##  [7] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
-## [10] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-## [13] ggthemes_4.1.1    ggrepel_0.8.0     pbapply_1.4-0    
-## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
-## [19] devtools_2.0.2    padr_0.4.2        knitr_1.22       
-## [22] data.table_1.12.2 readxl_1.3.1      forcats_0.4.0    
-## [25] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
-## [28] readr_1.3.1       tidyr_0.8.3       tibble_2.1.1     
-## [31] ggplot2_3.1.1     tidyverse_1.2.1  
+##  [1] gt_0.1.0          ggrepel_0.8.1     kableExtra_1.1.0 
+##  [4] here_0.1          R.utils_2.8.0     R.oo_1.22.0      
+##  [7] R.methodsS3_1.7.1 pbapply_1.4-0     remotes_2.0.4    
+## [10] pracma_2.2.5      readxl_1.3.1      forcats_0.4.0    
+## [13] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
+## [16] readr_1.3.1       tidyr_0.8.3       tibble_2.1.3     
+## [19] ggplot2_3.1.1     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] TH.data_1.0-10     colorspace_1.4-1   modeltools_0.2-22 
-##  [4] rprojroot_1.3-2    estimability_1.3   fs_1.3.0          
-##  [7] rstudioapi_0.10    manipulate_1.0.1   mvtnorm_1.0-10    
-## [10] lubridate_1.7.4    coin_1.3-0         xml2_1.2.0        
-## [13] codetools_0.2-15   splines_3.6.0      libcoin_1.0-4     
-## [16] pkgload_1.0.2      jsonlite_1.6       broom_0.5.2       
-## [19] compiler_3.6.0     httr_1.4.0         emmeans_1.3.4     
-## [22] backports_1.1.4    assertthat_0.2.1   Matrix_1.2-14     
-## [25] lazyeval_0.2.2     cli_1.1.0          htmltools_0.3.6   
-## [28] prettyunits_1.0.2  tools_3.6.0        coda_0.19-2       
-## [31] gtable_0.3.0       glue_1.3.1         Rcpp_1.0.1        
-## [34] cellranger_1.1.0   nlme_3.1-137       lmtest_0.9-37     
-## [37] xfun_0.6           ps_1.3.0           testthat_2.1.1    
-## [40] rvest_0.3.3        MASS_7.3-50        zoo_1.8-5         
-## [43] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
-## [46] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
-## [49] memoise_1.1.0      sass_0.1.0.9000    EMT_1.1           
-## [52] reshape_0.8.8      stringi_1.4.3      highr_0.8         
-## [55] desc_1.2.0         nortest_1.0-4      checkmate_1.9.3   
-## [58] boot_1.3-20        pkgbuild_1.0.3     commonmark_1.7    
-## [61] rlang_0.3.4        pkgconfig_2.0.2    matrixStats_0.54.0
-## [64] evaluate_0.13      lattice_0.20-35    processx_3.3.0    
-## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
-## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
-## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.0      
-## [76] haven_2.1.0        foreign_0.8-70     withr_2.1.2       
-## [79] survival_2.42-3    modelr_0.1.4       crayon_1.3.4      
-## [82] rmarkdown_1.12.6   grid_3.6.0         callr_3.2.0       
-## [85] webshot_0.5.1      digest_0.6.19      xtable_1.8-4      
-## [88] stats4_3.6.0       munsell_0.5.0      viridisLite_0.3.0 
-## [91] kableExtra_1.1.0   sessioninfo_1.1.1</code></pre>
+##  [1] tidyselect_0.2.5  xfun_0.7          haven_2.1.0      
+##  [4] lattice_0.20-38   colorspace_1.4-1  generics_0.0.2   
+##  [7] viridisLite_0.3.0 htmltools_0.3.6   yaml_2.2.0       
+## [10] rlang_0.3.4       pillar_1.4.1      glue_1.3.1       
+## [13] withr_2.1.2       modelr_0.1.4      plyr_1.8.4       
+## [16] commonmark_1.7    munsell_0.5.0     gtable_0.3.0     
+## [19] cellranger_1.1.0  rvest_0.3.4       evaluate_0.14    
+## [22] knitr_1.23        highr_0.8         broom_0.5.2      
+## [25] Rcpp_1.0.1        checkmate_1.9.3   scales_1.0.0     
+## [28] backports_1.1.4   webshot_0.5.1     jsonlite_1.6     
+## [31] hms_0.4.2         digest_0.6.19     stringi_1.4.3    
+## [34] rprojroot_1.3-2   grid_3.6.0        cli_1.1.0        
+## [37] tools_3.6.0       sass_0.1.0.9000   magrittr_1.5     
+## [40] lazyeval_0.2.2    crayon_1.3.4      pkgconfig_2.0.2  
+## [43] xml2_1.2.0        lubridate_1.7.4   assertthat_0.2.1 
+## [46] rmarkdown_1.13    httr_1.4.0        rstudioapi_0.10  
+## [49] R6_2.4.0          nlme_3.1-139      compiler_3.6.0</code></pre>
 </div>
 </div>
 
