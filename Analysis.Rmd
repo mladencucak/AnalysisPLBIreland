@@ -27,7 +27,7 @@ list.of.packages <-
     "remotes",
     "parallel",
     "pbapply",
-    "R.utils",
+    "tools",
     "here",
     "kable",
     "kableExtra",
@@ -221,9 +221,9 @@ dates_cut <-
       last_assessment = col_date(format = "%d/%m/%Y")
     )
   )
-dates_cut$planting_date <-
-  as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
+
 dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
+
 #st warnning period to 14 days before disease onset
 dates_cut <-
   add_column(
@@ -236,9 +236,11 @@ dates_cut <-
   add_column(dates_cut,
              warning = as.Date(dates_cut$disease_onset) - 10,
              .before = "disease_onset")
-rownames(dates_cut) <- NULL
 
-dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
+dates_cut %>% 
+  rename_all(. %>%
+               gsub("_", " ", .) %>% 
+               toTitleCase())
 ```
 # The Analysis 
 
@@ -248,9 +250,8 @@ The set of the most important variables of Irish rules model is evaluated. The E
 #read in parameters
 parameters <-
   read_excel(here::here("data", "op_2007_16", "raw", "par.xlsx"), sheet = "par")
-parameters %>%
-  kable() %>%
-  kableExtra::kable_styling(latex_options = "striped", full_width = FALSE)
+
+parameters
 ```
 
 
