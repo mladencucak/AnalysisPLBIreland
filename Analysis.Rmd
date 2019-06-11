@@ -62,15 +62,15 @@ Implementation of the model.
 
 ```{r irish-model}
 IrishRulesModel <- function(weather,
-                            param = NULL,
-                            infill_gap = NULL) {
+                            param = TRUE,
+                            infill_gap = TRUE) {
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
   wet_before <- 3
   wet_after <- 3
   
   # Parameter list
-  if (is.null(param)) {
+  if (isTRUE(param)) {
     rh_thresh <- 90 
     temp_thresh <- 10
     hours <- 12   #sum of hours before EBH accumulation
@@ -97,7 +97,7 @@ IrishRulesModel <- function(weather,
   
   # This function to infil missing values to let the model run
   #If maximum infill gap is not provided it is defaulted to 7
-  if (is.null(infill_gap)) {
+  if (isTRUE(infill_gap)) {
     infill_gap <- 7
   }
   
