@@ -17,25 +17,12 @@ list.of.packages <-
   c(
     "tidyverse",
     "readxl",
-    "data.table",
-    "knitr",
-    "padr",
-    "devtools",
     "pracma",
     "remotes",
     "parallel",
     "pbapply",
-    "ggrepel",
-    "ggthemes",
-    "egg",
-    "rsm",
-    "GGally",
     "R.utils",
-    "rcompanion",
-    "mgsub",
-    "here",
-    "stringr",
-    "pander"
+    "here"
   )
 
 new.packages <-
@@ -54,7 +41,8 @@ packages_load <-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]),
+                "not loaded!"))
 } else {
   print("All packages were successfully loaded.")
 }
@@ -430,7 +418,7 @@ SensParametersCalc <-
     test <- data.frame(test, row.names = NULL)
     
     
-    test$model <-  str_replace(test$model, "_ebh", "")
+    test$model <- str_replace(test$model, "_ebh", "")
     test$sens <- with(test, TP / (TP + FN))  #PTP sensitivity
     test$spec <- with(test, TN / (TN + FP))  #PTN specificity
     return_df <- test[, c("model", "sens")]
@@ -449,10 +437,10 @@ This function was applied to output of each variation of the model with varying 
 warning_thresholds <- 1:18
 begin <- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
-cores <- ifelse(detectCores() > 1, detectCores()-1, 1) 
-cl <- makeCluster(cores)
-clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
-clusterEvalQ(cl, library("tidyverse"))
+cores <- ifelse(parallel::detectCores() > 1, parallel::detectCores()-1, 1)
+cl <- parallel::makeCluster(cores)
+parallel::clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
+parallel::clusterEvalQ(cl, library("tidyverse"))
   ROC <- pbapply::pblapply(warning_thresholds, function(x)
   {
     xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
@@ -461,7 +449,7 @@ clusterEvalQ(cl, library("tidyverse"))
   cl = cl
   )
 begin- Sys.time() #check the duration of the process in the console
-stopCluster(cl)
+parallel::stopCluster(cl)
 ```
 
 Rather, the results of calculations from a prior run can be directly loaded.
@@ -473,7 +461,7 @@ load(file = here::here("data", "op_2007_16","results","ROC_output.Rdata"))
 Sort the outputs for each model variation.
 ```{r sort-ROC, fig.align='center'}
 ROC_data <-
-  as.data.frame(data.table::rbindlist(ROC))
+  as.data.frame(dplyr::row_bind(ROC))
 rownames(ROC_data) <- NULL
 # rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data <-
