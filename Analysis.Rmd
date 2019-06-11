@@ -29,8 +29,6 @@ list.of.packages <-
     "pbapply",
     "tools",
     "here",
-    "kable",
-    "kableExtra",
     "ggrepel"
   )
 
