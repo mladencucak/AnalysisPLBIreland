@@ -1,3 +1,9 @@
+---
+title: "Habits"
+output:
+  html_document:
+    code_folding: hide
+---
 % Evaluation of Irish Rules model
 
 # Analysis 
@@ -49,7 +55,10 @@ rm(list.of.packages, new.packages, packages_load)
 
 ## The Model
 
-Implementation of the model
+According to original Irish Rules (Bourke, 1953), temperatures ≥ 10℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. Potato late blightThe blight epidemic onset risk is then estimated during periods fulfilling the following criteria:   
+-	Sporulation period is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;  
+-	Infection period starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was  a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).  
+Implementation of the model.
 
 ```{r irish-model}
 IrishRulesModel <- function(weather,
@@ -62,7 +71,7 @@ IrishRulesModel <- function(weather,
   
   # Parameter list
   if (is.null(param)) {
-    rh_thresh <- 90
+    rh_thresh <- 90 
     temp_thresh <- 10
     hours <- 12   #sum of hours before EBH accumulation
   } else {
@@ -159,22 +168,22 @@ IrishRulesModel <- function(weather,
         m <- n - 1
         
         s <- criteria[n]
-        if (s == 0 && (criteria[n + 2] == 1)) {
+        if (s == 0 & (criteria[n + 2] == 1)) {
           n = n + 2
           
           s = 1
           
-        } else if (s == 0 && (criteria[n + 3] == 1)) {
+        } else if (s == 0 & (criteria[n + 3] == 1)) {
           n = n + 3
           
           s = 1
           
-        } else if (s == 0 && (criteria[n + 4] == 1)) {
+        } else if (s == 0 & (criteria[n + 4] == 1)) {
           n = n + 4
           
           s = 1
           
-        } else if (s == 0 && (criteria[n + 5] == 1)) {
+        } else if (s == 0 & (criteria[n + 5] == 1)) {
           n = n + 5
           
           s = 1

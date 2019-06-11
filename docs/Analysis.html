@@ -11,7 +11,7 @@
 
 
 
-<title>Analysis.utf8.md</title>
+<title>Habits</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +23,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -265,6 +266,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -442,13 +451,22 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Evaluation of Irish Rules model</h1>
+
+<h1 class="title toc-ignore">Habits</h1>
 
 </div>
 
 
+<p>% Evaluation of Irish Rules model</p>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
 <div id="libraries" class="section level2">
@@ -504,7 +522,10 @@ if (any(as.numeric(packages_load) == 0)) {
 </div>
 <div id="the-model" class="section level2">
 <h2>The Model</h2>
-<p>Implementation of the model</p>
+<p>According to original Irish Rules (Bourke, 1953), temperatures ≥ 10℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. Potato late blightThe blight epidemic onset risk is then estimated during periods fulfilling the following criteria:<br />
+- Sporulation period is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;<br />
+- Infection period starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).<br />
+Implementation of the model.</p>
 <pre class="r"><code>IrishRulesModel &lt;- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
@@ -516,7 +537,7 @@ if (any(as.numeric(packages_load) == 0)) {
   
   # Parameter list
   if (is.null(param)) {
-    rh_thresh &lt;- 90
+    rh_thresh &lt;- 90 
     temp_thresh &lt;- 10
     hours &lt;- 12   #sum of hours before EBH accumulation
   } else {
@@ -611,22 +632,22 @@ if (any(as.numeric(packages_load) == 0)) {
         m &lt;- n - 1
         
         s &lt;- criteria[n]
-        if (s == 0 &amp;&amp; (criteria[n + 2] == 1)) {
+        if (s == 0 &amp; (criteria[n + 2] == 1)) {
           n = n + 2
           
           s = 1
           
-        } else if (s == 0 &amp;&amp; (criteria[n + 3] == 1)) {
+        } else if (s == 0 &amp; (criteria[n + 3] == 1)) {
           n = n + 3
           
           s = 1
           
-        } else if (s == 0 &amp;&amp; (criteria[n + 4] == 1)) {
+        } else if (s == 0 &amp; (criteria[n + 4] == 1)) {
           n = n + 4
           
           s = 1
           
-        } else if (s == 0 &amp;&amp; (criteria[n + 5] == 1)) {
+        } else if (s == 0 &amp; (criteria[n + 5] == 1)) {
           n = n + 5
           
           s = 1
@@ -967,7 +988,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#mehmcoruwd .gt_table {
+#baireizbfp .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -986,13 +1007,13 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#mehmcoruwd .gt_heading {
+#baireizbfp .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#mehmcoruwd .gt_title {
+#baireizbfp .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1003,7 +1024,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#mehmcoruwd .gt_subtitle {
+#baireizbfp .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1014,7 +1035,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#mehmcoruwd .gt_bottom_border {
+#baireizbfp .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1023,7 +1044,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#mehmcoruwd .gt_column_spanner {
+#baireizbfp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1031,7 +1052,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#mehmcoruwd .gt_col_heading {
+#baireizbfp .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1044,11 +1065,11 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#mehmcoruwd .gt_sep_right {
+#baireizbfp .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#mehmcoruwd .gt_group_heading {
+#baireizbfp .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1072,7 +1093,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#mehmcoruwd .gt_empty_group_heading {
+#baireizbfp .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1096,29 +1117,29 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#mehmcoruwd .gt_striped {
+#baireizbfp .gt_striped {
   background-color: #f2f2f2;
 }
 
-#mehmcoruwd .gt_row {
+#baireizbfp .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#mehmcoruwd .gt_stub {
+#baireizbfp .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#mehmcoruwd .gt_stub.gt_row {
+#baireizbfp .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#mehmcoruwd .gt_summary_row {
+#baireizbfp .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1127,13 +1148,13 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#mehmcoruwd .gt_first_summary_row {
+#baireizbfp .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#mehmcoruwd .gt_table_body {
+#baireizbfp .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1148,55 +1169,55 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#mehmcoruwd .gt_footnote {
+#baireizbfp .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#mehmcoruwd .gt_sourcenote {
+#baireizbfp .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#mehmcoruwd .gt_center {
+#baireizbfp .gt_center {
   text-align: center;
 }
 
-#mehmcoruwd .gt_left {
+#baireizbfp .gt_left {
   text-align: left;
 }
 
-#mehmcoruwd .gt_right {
+#baireizbfp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mehmcoruwd .gt_font_normal {
+#baireizbfp .gt_font_normal {
   font-weight: normal;
 }
 
-#mehmcoruwd .gt_font_bold {
+#baireizbfp .gt_font_bold {
   font-weight: bold;
 }
 
-#mehmcoruwd .gt_font_italic {
+#baireizbfp .gt_font_italic {
   font-style: italic;
 }
 
-#mehmcoruwd .gt_super {
+#baireizbfp .gt_super {
   font-size: 65%;
 }
 
-#mehmcoruwd .gt_footnote_glyph {
+#baireizbfp .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="mehmcoruwd" style="overflow-x:auto;"><!--gt table start-->
+<div id="baireizbfp" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>model</th>
@@ -1444,7 +1465,7 @@ head(data) %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#tqqrpcfxfo .gt_table {
+#mvebceviac .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1463,13 +1484,13 @@ head(data) %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#tqqrpcfxfo .gt_heading {
+#mvebceviac .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#tqqrpcfxfo .gt_title {
+#mvebceviac .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1480,7 +1501,7 @@ head(data) %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#tqqrpcfxfo .gt_subtitle {
+#mvebceviac .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1491,7 +1512,7 @@ head(data) %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#tqqrpcfxfo .gt_bottom_border {
+#mvebceviac .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1500,7 +1521,7 @@ head(data) %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#tqqrpcfxfo .gt_column_spanner {
+#mvebceviac .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1508,7 +1529,7 @@ head(data) %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#tqqrpcfxfo .gt_col_heading {
+#mvebceviac .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1521,11 +1542,11 @@ head(data) %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#tqqrpcfxfo .gt_sep_right {
+#mvebceviac .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#tqqrpcfxfo .gt_group_heading {
+#mvebceviac .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1549,7 +1570,7 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#tqqrpcfxfo .gt_empty_group_heading {
+#mvebceviac .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1573,29 +1594,29 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#tqqrpcfxfo .gt_striped {
+#mvebceviac .gt_striped {
   background-color: #f2f2f2;
 }
 
-#tqqrpcfxfo .gt_row {
+#mvebceviac .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#tqqrpcfxfo .gt_stub {
+#mvebceviac .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#tqqrpcfxfo .gt_stub.gt_row {
+#mvebceviac .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#tqqrpcfxfo .gt_summary_row {
+#mvebceviac .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1604,13 +1625,13 @@ head(data) %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#tqqrpcfxfo .gt_first_summary_row {
+#mvebceviac .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#tqqrpcfxfo .gt_table_body {
+#mvebceviac .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1625,55 +1646,55 @@ head(data) %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#tqqrpcfxfo .gt_footnote {
+#mvebceviac .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#tqqrpcfxfo .gt_sourcenote {
+#mvebceviac .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#tqqrpcfxfo .gt_center {
+#mvebceviac .gt_center {
   text-align: center;
 }
 
-#tqqrpcfxfo .gt_left {
+#mvebceviac .gt_left {
   text-align: left;
 }
 
-#tqqrpcfxfo .gt_right {
+#mvebceviac .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tqqrpcfxfo .gt_font_normal {
+#mvebceviac .gt_font_normal {
   font-weight: normal;
 }
 
-#tqqrpcfxfo .gt_font_bold {
+#mvebceviac .gt_font_bold {
   font-weight: bold;
 }
 
-#tqqrpcfxfo .gt_font_italic {
+#mvebceviac .gt_font_italic {
   font-style: italic;
 }
 
-#tqqrpcfxfo .gt_super {
+#mvebceviac .gt_super {
   font-size: 65%;
 }
 
-#tqqrpcfxfo .gt_footnote_glyph {
+#mvebceviac .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="tqqrpcfxfo" style="overflow-x:auto;"><!--gt table start-->
+<div id="mvebceviac" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -1764,7 +1785,7 @@ head(data) %&gt;% gt()</code></pre>
 ## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
 ## [19] devtools_2.0.2    padr_0.4.2        knitr_1.22       
 ## [22] data.table_1.12.2 readxl_1.3.1      forcats_0.4.0    
-## [25] stringr_1.4.0     dplyr_0.8.0.1     purrr_0.3.2      
+## [25] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
 ## [28] readr_1.3.1       tidyr_0.8.3       tibble_2.1.1     
 ## [31] ggplot2_3.1.1     tidyverse_1.2.1  
 ## 
@@ -1793,11 +1814,11 @@ head(data) %&gt;% gt()</code></pre>
 ## [64] evaluate_0.13      lattice_0.20-35    processx_3.3.0    
 ## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
 ## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
-## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.3.1      
+## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.0      
 ## [76] haven_2.1.0        foreign_0.8-70     withr_2.1.2       
 ## [79] survival_2.42-3    modelr_0.1.4       crayon_1.3.4      
 ## [82] rmarkdown_1.12.6   grid_3.6.0         callr_3.2.0       
-## [85] webshot_0.5.1      digest_0.6.18      xtable_1.8-4      
+## [85] webshot_0.5.1      digest_0.6.19      xtable_1.8-4      
 ## [88] stats4_3.6.0       munsell_0.5.0      viridisLite_0.3.0 
 ## [91] kableExtra_1.1.0   sessioninfo_1.1.1</code></pre>
 </div>
