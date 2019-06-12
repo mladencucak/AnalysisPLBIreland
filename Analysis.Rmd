@@ -38,7 +38,7 @@ new.packages <-
 if (length(new.packages))
   install.packages(new.packages)
 
-if ("gt" %in% !isTRUE(installed.packages()))
+if (!"gt" %in% installed.packages())
   remotes::install_github("rstudio/gt")
 
 list.of.packages <- c(list.of.packages, "gt")
@@ -47,8 +47,7 @@ packages_load <-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning("Package/s", paste(list.of.packages[!isTRUE(packages_load)]),
-          "not loaded!")
+  warning("Package/s", list.of.packages[!isTRUE(packages_load)], "not loaded!")
 } else {
   print("All packages were successfully loaded.")
 }
