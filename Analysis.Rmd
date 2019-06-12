@@ -652,15 +652,16 @@ AUROC_data <-
   separate(AUROC_data, model, into =  params, sep = "_")
 AUROC_data[, 1:3] <-
   lapply(AUROC_data[, 1:3], as.numeric)
+
 data_for_analysis <- data.frame(AUROC_data)
+
 head(data_for_analysis) %>%
   gt()
 ```
 
 
 ```{r}
-data
-save(data, file = here::here("data", "op_2007_16",  "data_for_analysis.RData"))
+save(data_for_analysis, file = here::here("data", "op_2007_16",  "data_for_analysis.RData"))
 ```
 
 Packages used
