@@ -491,7 +491,7 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages)
 
-if (&quot;gt&quot; %in% !isTRUE(installed.packages()))
+if (!&quot;gt&quot; %in% installed.packages())
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
@@ -500,8 +500,7 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(&quot;Package/s&quot;, paste(list.of.packages[!isTRUE(packages_load)]),
-          &quot;not loaded!&quot;)
+  warning(&quot;Package/s&quot;, list.of.packages[!isTRUE(packages_load)], &quot;not loaded!&quot;)
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -940,7 +939,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#yodaopozmp .gt_table {
+#slkoaxqfmz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -959,13 +958,13 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#yodaopozmp .gt_heading {
+#slkoaxqfmz .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#yodaopozmp .gt_title {
+#slkoaxqfmz .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -976,7 +975,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#yodaopozmp .gt_subtitle {
+#slkoaxqfmz .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -987,7 +986,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#yodaopozmp .gt_bottom_border {
+#slkoaxqfmz .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -996,7 +995,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#yodaopozmp .gt_column_spanner {
+#slkoaxqfmz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1004,7 +1003,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#yodaopozmp .gt_col_heading {
+#slkoaxqfmz .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1017,11 +1016,11 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#yodaopozmp .gt_sep_right {
+#slkoaxqfmz .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#yodaopozmp .gt_group_heading {
+#slkoaxqfmz .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1045,7 +1044,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#yodaopozmp .gt_empty_group_heading {
+#slkoaxqfmz .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1069,33 +1068,33 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#yodaopozmp .gt_striped {
+#slkoaxqfmz .gt_striped {
   background-color: #f2f2f2;
 }
 
-#yodaopozmp .gt_from_md > :first-child {
+#slkoaxqfmz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yodaopozmp .gt_from_md > :last-child {
+#slkoaxqfmz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yodaopozmp .gt_row {
+#slkoaxqfmz .gt_row {
   padding: 8px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#yodaopozmp .gt_stub {
+#slkoaxqfmz .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#yodaopozmp .gt_summary_row {
+#slkoaxqfmz .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   /* summary_row.background.color */
@@ -1105,7 +1104,7 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#yodaopozmp .gt_grand_summary_row {
+#slkoaxqfmz .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   /* grand_summary_row.background.color */
@@ -1115,19 +1114,19 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* grand_summary_row.text_transform */
 }
 
-#yodaopozmp .gt_first_summary_row {
+#slkoaxqfmz .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#yodaopozmp .gt_first_grand_summary_row {
+#slkoaxqfmz .gt_first_grand_summary_row {
   border-top-style: double;
   border-top-width: 6px;
   border-top-color: #A8A8A8;
 }
 
-#yodaopozmp .gt_table_body {
+#slkoaxqfmz .gt_table_body {
   border-top-style: solid;
   /* table_body.border.top.style */
   border-top-width: 2px;
@@ -1142,55 +1141,55 @@ ROC_data[[1]] %&gt;% gt()</code></pre>
   /* table_body.border.bottom.color */
 }
 
-#yodaopozmp .gt_footnote {
+#slkoaxqfmz .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#yodaopozmp .gt_sourcenote {
+#slkoaxqfmz .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#yodaopozmp .gt_center {
+#slkoaxqfmz .gt_center {
   text-align: center;
 }
 
-#yodaopozmp .gt_left {
+#slkoaxqfmz .gt_left {
   text-align: left;
 }
 
-#yodaopozmp .gt_right {
+#slkoaxqfmz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yodaopozmp .gt_font_normal {
+#slkoaxqfmz .gt_font_normal {
   font-weight: normal;
 }
 
-#yodaopozmp .gt_font_bold {
+#slkoaxqfmz .gt_font_bold {
   font-weight: bold;
 }
 
-#yodaopozmp .gt_font_italic {
+#slkoaxqfmz .gt_font_italic {
   font-style: italic;
 }
 
-#yodaopozmp .gt_super {
+#slkoaxqfmz .gt_super {
   font-size: 65%;
 }
 
-#yodaopozmp .gt_footnote_glyph {
+#slkoaxqfmz .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="yodaopozmp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
+<div id="slkoaxqfmz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>model</th>
@@ -1455,14 +1454,16 @@ AUROC_data &lt;-
   separate(AUROC_data, model, into =  params, sep = &quot;_&quot;)
 AUROC_data[, 1:3] &lt;-
   lapply(AUROC_data[, 1:3], as.numeric)
+
 data_for_analysis &lt;- data.frame(AUROC_data)
+
 head(data_for_analysis) %&gt;%
   gt()</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#rxphnpgaew .gt_table {
+#dtmktdbqio .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1481,13 +1482,13 @@ head(data_for_analysis) %&gt;%
   /* table.border.top.color */
 }
 
-#rxphnpgaew .gt_heading {
+#dtmktdbqio .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#rxphnpgaew .gt_title {
+#dtmktdbqio .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1498,7 +1499,7 @@ head(data_for_analysis) %&gt;%
   border-bottom-width: 0;
 }
 
-#rxphnpgaew .gt_subtitle {
+#dtmktdbqio .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1509,7 +1510,7 @@ head(data_for_analysis) %&gt;%
   border-top-width: 0;
 }
 
-#rxphnpgaew .gt_bottom_border {
+#dtmktdbqio .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1518,7 +1519,7 @@ head(data_for_analysis) %&gt;%
   /* heading.border.bottom.color */
 }
 
-#rxphnpgaew .gt_column_spanner {
+#dtmktdbqio .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1526,7 +1527,7 @@ head(data_for_analysis) %&gt;%
   padding-bottom: 4px;
 }
 
-#rxphnpgaew .gt_col_heading {
+#dtmktdbqio .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1539,11 +1540,11 @@ head(data_for_analysis) %&gt;%
   margin: 10px;
 }
 
-#rxphnpgaew .gt_sep_right {
+#dtmktdbqio .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#rxphnpgaew .gt_group_heading {
+#dtmktdbqio .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1567,7 +1568,7 @@ head(data_for_analysis) %&gt;%
   vertical-align: middle;
 }
 
-#rxphnpgaew .gt_empty_group_heading {
+#dtmktdbqio .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1591,33 +1592,33 @@ head(data_for_analysis) %&gt;%
   vertical-align: middle;
 }
 
-#rxphnpgaew .gt_striped {
+#dtmktdbqio .gt_striped {
   background-color: #f2f2f2;
 }
 
-#rxphnpgaew .gt_from_md > :first-child {
+#dtmktdbqio .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rxphnpgaew .gt_from_md > :last-child {
+#dtmktdbqio .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rxphnpgaew .gt_row {
+#dtmktdbqio .gt_row {
   padding: 8px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#rxphnpgaew .gt_stub {
+#dtmktdbqio .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#rxphnpgaew .gt_summary_row {
+#dtmktdbqio .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   /* summary_row.background.color */
@@ -1627,7 +1628,7 @@ head(data_for_analysis) %&gt;%
   /* summary_row.text_transform */
 }
 
-#rxphnpgaew .gt_grand_summary_row {
+#dtmktdbqio .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   /* grand_summary_row.background.color */
@@ -1637,19 +1638,19 @@ head(data_for_analysis) %&gt;%
   /* grand_summary_row.text_transform */
 }
 
-#rxphnpgaew .gt_first_summary_row {
+#dtmktdbqio .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#rxphnpgaew .gt_first_grand_summary_row {
+#dtmktdbqio .gt_first_grand_summary_row {
   border-top-style: double;
   border-top-width: 6px;
   border-top-color: #A8A8A8;
 }
 
-#rxphnpgaew .gt_table_body {
+#dtmktdbqio .gt_table_body {
   border-top-style: solid;
   /* table_body.border.top.style */
   border-top-width: 2px;
@@ -1664,55 +1665,55 @@ head(data_for_analysis) %&gt;%
   /* table_body.border.bottom.color */
 }
 
-#rxphnpgaew .gt_footnote {
+#dtmktdbqio .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#rxphnpgaew .gt_sourcenote {
+#dtmktdbqio .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#rxphnpgaew .gt_center {
+#dtmktdbqio .gt_center {
   text-align: center;
 }
 
-#rxphnpgaew .gt_left {
+#dtmktdbqio .gt_left {
   text-align: left;
 }
 
-#rxphnpgaew .gt_right {
+#dtmktdbqio .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rxphnpgaew .gt_font_normal {
+#dtmktdbqio .gt_font_normal {
   font-weight: normal;
 }
 
-#rxphnpgaew .gt_font_bold {
+#dtmktdbqio .gt_font_bold {
   font-weight: bold;
 }
 
-#rxphnpgaew .gt_font_italic {
+#dtmktdbqio .gt_font_italic {
   font-style: italic;
 }
 
-#rxphnpgaew .gt_super {
+#dtmktdbqio .gt_super {
   font-size: 65%;
 }
 
-#rxphnpgaew .gt_footnote_glyph {
+#dtmktdbqio .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="rxphnpgaew" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
+<div id="dtmktdbqio" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
@@ -1768,189 +1769,7 @@ head(data_for_analysis) %&gt;%
 </table>
 <!--gt table end-->
 </div>
-<pre class="r"><code>data</code></pre>
-<pre><code>## function (..., list = character(), package = NULL, lib.loc = NULL, 
-##     verbose = getOption(&quot;verbose&quot;), envir = .GlobalEnv, overwrite = TRUE) 
-## {
-##     fileExt &lt;- function(x) {
-##         db &lt;- grepl(&quot;\\.[^.]+\\.(gz|bz2|xz)$&quot;, x)
-##         ans &lt;- sub(&quot;.*\\.&quot;, &quot;&quot;, x)
-##         ans[db] &lt;- sub(&quot;.*\\.([^.]+\\.)(gz|bz2|xz)$&quot;, &quot;\\1\\2&quot;, 
-##             x[db])
-##         ans
-##     }
-##     names &lt;- c(as.character(substitute(list(...))[-1L]), list)
-##     if (!is.null(package)) {
-##         if (!is.character(package)) 
-##             stop(&quot;&#39;package&#39; must be a character string or NULL&quot;)
-##         if (any(package %in% &quot;base&quot;)) 
-##             warning(&quot;datasets have been moved from package &#39;base&#39; to package &#39;datasets&#39;&quot;)
-##         if (any(package %in% &quot;stats&quot;)) 
-##             warning(&quot;datasets have been moved from package &#39;stats&#39; to package &#39;datasets&#39;&quot;)
-##         package[package %in% c(&quot;base&quot;, &quot;stats&quot;)] &lt;- &quot;datasets&quot;
-##     }
-##     paths &lt;- find.package(package, lib.loc, verbose = verbose)
-##     if (is.null(lib.loc)) 
-##         paths &lt;- c(path.package(package, TRUE), if (!length(package)) getwd(), 
-##             paths)
-##     paths &lt;- unique(normalizePath(paths[file.exists(paths)]))
-##     paths &lt;- paths[dir.exists(file.path(paths, &quot;data&quot;))]
-##     dataExts &lt;- tools:::.make_file_exts(&quot;data&quot;)
-##     if (length(names) == 0L) {
-##         db &lt;- matrix(character(), nrow = 0L, ncol = 4L)
-##         for (path in paths) {
-##             entries &lt;- NULL
-##             packageName &lt;- if (file_test(&quot;-f&quot;, file.path(path, 
-##                 &quot;DESCRIPTION&quot;))) 
-##                 basename(path)
-##             else &quot;.&quot;
-##             if (file_test(&quot;-f&quot;, INDEX &lt;- file.path(path, &quot;Meta&quot;, 
-##                 &quot;data.rds&quot;))) {
-##                 entries &lt;- readRDS(INDEX)
-##             }
-##             else {
-##                 dataDir &lt;- file.path(path, &quot;data&quot;)
-##                 entries &lt;- tools::list_files_with_type(dataDir, 
-##                   &quot;data&quot;)
-##                 if (length(entries)) {
-##                   entries &lt;- unique(tools::file_path_sans_ext(basename(entries)))
-##                   entries &lt;- cbind(entries, &quot;&quot;)
-##                 }
-##             }
-##             if (NROW(entries)) {
-##                 if (is.matrix(entries) &amp;&amp; ncol(entries) == 2L) 
-##                   db &lt;- rbind(db, cbind(packageName, dirname(path), 
-##                     entries))
-##                 else warning(gettextf(&quot;data index for package %s is invalid and will be ignored&quot;, 
-##                   sQuote(packageName)), domain = NA, call. = FALSE)
-##             }
-##         }
-##         colnames(db) &lt;- c(&quot;Package&quot;, &quot;LibPath&quot;, &quot;Item&quot;, &quot;Title&quot;)
-##         footer &lt;- if (missing(package)) 
-##             paste0(&quot;Use &quot;, sQuote(paste(&quot;data(package =&quot;, &quot;.packages(all.available = TRUE))&quot;)), 
-##                 &quot;\n&quot;, &quot;to list the data sets in all *available* packages.&quot;)
-##         else NULL
-##         y &lt;- list(title = &quot;Data sets&quot;, header = NULL, results = db, 
-##             footer = footer)
-##         class(y) &lt;- &quot;packageIQR&quot;
-##         return(y)
-##     }
-##     paths &lt;- file.path(paths, &quot;data&quot;)
-##     for (name in names) {
-##         found &lt;- FALSE
-##         for (p in paths) {
-##             tmp_env &lt;- if (overwrite) 
-##                 envir
-##             else new.env()
-##             if (file_test(&quot;-f&quot;, file.path(p, &quot;Rdata.rds&quot;))) {
-##                 rds &lt;- readRDS(file.path(p, &quot;Rdata.rds&quot;))
-##                 if (name %in% names(rds)) {
-##                   found &lt;- TRUE
-##                   if (verbose) 
-##                     message(sprintf(&quot;name=%s:\t found in Rdata.rds&quot;, 
-##                       name), domain = NA)
-##                   thispkg &lt;- sub(&quot;.*/([^/]*)/data$&quot;, &quot;\\1&quot;, p)
-##                   thispkg &lt;- sub(&quot;_.*$&quot;, &quot;&quot;, thispkg)
-##                   thispkg &lt;- paste0(&quot;package:&quot;, thispkg)
-##                   objs &lt;- rds[[name]]
-##                   lazyLoad(file.path(p, &quot;Rdata&quot;), envir = tmp_env, 
-##                     filter = function(x) x %in% objs)
-##                   break
-##                 }
-##                 else if (verbose) 
-##                   message(sprintf(&quot;name=%s:\t NOT found in names() of Rdata.rds, i.e.,\n\t%s\n&quot;, 
-##                     name, paste(names(rds), collapse = &quot;,&quot;)), 
-##                     domain = NA)
-##             }
-##             if (file_test(&quot;-f&quot;, file.path(p, &quot;Rdata.zip&quot;))) {
-##                 warning(&quot;zipped data found for package &quot;, sQuote(basename(dirname(p))), 
-##                   &quot;.\nThat is defunct, so please re-install the package.&quot;, 
-##                   domain = NA)
-##                 if (file_test(&quot;-f&quot;, fp &lt;- file.path(p, &quot;filelist&quot;))) 
-##                   files &lt;- file.path(p, scan(fp, what = &quot;&quot;, quiet = TRUE))
-##                 else {
-##                   warning(gettextf(&quot;file &#39;filelist&#39; is missing for directory %s&quot;, 
-##                     sQuote(p)), domain = NA)
-##                   next
-##                 }
-##             }
-##             else {
-##                 files &lt;- list.files(p, full.names = TRUE)
-##             }
-##             files &lt;- files[grep(name, files, fixed = TRUE)]
-##             if (length(files) &gt; 1L) {
-##                 o &lt;- match(fileExt(files), dataExts, nomatch = 100L)
-##                 paths0 &lt;- dirname(files)
-##                 paths0 &lt;- factor(paths0, levels = unique(paths0))
-##                 files &lt;- files[order(paths0, o)]
-##             }
-##             if (length(files)) {
-##                 for (file in files) {
-##                   if (verbose) 
-##                     message(&quot;name=&quot;, name, &quot;:\t file= ...&quot;, .Platform$file.sep, 
-##                       basename(file), &quot;::\t&quot;, appendLF = FALSE, 
-##                       domain = NA)
-##                   ext &lt;- fileExt(file)
-##                   if (basename(file) != paste0(name, &quot;.&quot;, ext)) 
-##                     found &lt;- FALSE
-##                   else {
-##                     found &lt;- TRUE
-##                     zfile &lt;- file
-##                     zipname &lt;- file.path(dirname(file), &quot;Rdata.zip&quot;)
-##                     if (file.exists(zipname)) {
-##                       Rdatadir &lt;- tempfile(&quot;Rdata&quot;)
-##                       dir.create(Rdatadir, showWarnings = FALSE)
-##                       topic &lt;- basename(file)
-##                       rc &lt;- .External(C_unzip, zipname, topic, 
-##                         Rdatadir, FALSE, TRUE, FALSE, FALSE)
-##                       if (rc == 0L) 
-##                         zfile &lt;- file.path(Rdatadir, topic)
-##                     }
-##                     if (zfile != file) 
-##                       on.exit(unlink(zfile))
-##                     switch(ext, R = , r = {
-##                       library(&quot;utils&quot;)
-##                       sys.source(zfile, chdir = TRUE, envir = tmp_env)
-##                     }, RData = , rdata = , rda = load(zfile, 
-##                       envir = tmp_env), TXT = , txt = , tab = , 
-##                       tab.gz = , tab.bz2 = , tab.xz = , txt.gz = , 
-##                       txt.bz2 = , txt.xz = assign(name, read.table(zfile, 
-##                         header = TRUE, as.is = FALSE), envir = tmp_env), 
-##                       CSV = , csv = , csv.gz = , csv.bz2 = , 
-##                       csv.xz = assign(name, read.table(zfile, 
-##                         header = TRUE, sep = &quot;;&quot;, as.is = FALSE), 
-##                         envir = tmp_env), found &lt;- FALSE)
-##                   }
-##                   if (found) 
-##                     break
-##                 }
-##                 if (verbose) 
-##                   message(if (!found) 
-##                     &quot;*NOT* &quot;, &quot;found&quot;, domain = NA)
-##             }
-##             if (found) 
-##                 break
-##         }
-##         if (!found) {
-##             warning(gettextf(&quot;data set %s not found&quot;, sQuote(name)), 
-##                 domain = NA)
-##         }
-##         else if (!overwrite) {
-##             for (o in ls(envir = tmp_env, all.names = TRUE)) {
-##                 if (exists(o, envir = envir, inherits = FALSE)) 
-##                   warning(gettextf(&quot;an object named %s already exists and will not be overwritten&quot;, 
-##                     sQuote(o)))
-##                 else assign(o, get(o, envir = tmp_env, inherits = FALSE), 
-##                   envir = envir)
-##             }
-##             rm(tmp_env)
-##         }
-##     }
-##     invisible(names)
-## }
-## &lt;bytecode: 0x7f7f0f362048&gt;
-## &lt;environment: namespace:utils&gt;</code></pre>
-<pre class="r"><code>save(data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;data_for_analysis.RData&quot;))</code></pre>
+<pre class="r"><code>save(data_for_analysis, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;data_for_analysis.RData&quot;))</code></pre>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.6.0 (2019-04-26)
