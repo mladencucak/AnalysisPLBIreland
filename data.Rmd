@@ -1,4 +1,10 @@
-% Evaluation of Irish Rules model
+---
+title: "Evaluation of Irish Rules Model"
+output:
+  html_document:
+    code_folding: hide
+---
+
 # Libraries
 
 ```{r opts, echo = FALSE}
@@ -7,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Packages needed for the data preparatin are loaded. If the libraries do not exist locally, they will be downloaded.
+Packages needed for the data preparation are loaded. If the libraries do not exist locally, they will be downloaded.
 
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
@@ -28,7 +34,8 @@ list.of.packages <-
     "leaflet",
     "ggridges",
     "lubridate",
-    "RColorBrewer"
+    "RColorBrewer",
+    "egg"
   )
 
 new.packages <-
@@ -38,7 +45,12 @@ new.packages <-
 if (length(new.packages))
   install.packages(new.packages)
 
-if ("gt" %in% installed.packages() == FALSE)
+
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
+
+if (!"gt" %in% installed.packages())
   remotes::install_github("rstudio/gt")
 
 list.of.packages <- c(list.of.packages, "gt")
@@ -47,7 +59,7 @@ packages_load <-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+  warning("Package/s", list.of.packages[!(packages_load)], "not loaded!")
 } else {
   print("All packages were successfully loaded.")
 }
@@ -59,23 +71,28 @@ Primary disease outbreak data is acquired from Teagasc breeding program field tr
 ```{r}
 greenLeafIcon <- makeIcon(
   iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94,
+  iconWidth = 38,
+  iconHeight = 95,
+  iconAnchorX = 22,
+  iconAnchorY = 94,
   shadowUrl = "http://leafletjs.com/examples/custom-icons/leaf-shadow.png",
-  shadowWidth = 50, shadowHeight = 64,
-  shadowAnchorX = 4, shadowAnchorY = 62
+  shadowWidth = 50,
+  shadowHeight = 64,
+  shadowAnchorX = 4,
+  shadowAnchorY = 62
 )
 
 leaflet() %>%
   addTiles(group = "OSM (default)") %>%
-  setView(-8,53.5,6)%>%
-  addMarkers(lng = -6.9121167, lat = 52.8560667,
-             label = "Oak Park",
-             # color = "green",
-             icon=greenLeafIcon
-              # radius = 5
+  setView(-8, 53.5, 6) %>%
+  addMarkers(
+    lng = -6.9121167,
+    lat = 52.8560667,
+    label = "Oak Park",
+    # color = "green",
+    icon = greenLeafIcon
+    # radius = 5
   )
-
 ```
 
 # Bio data
@@ -86,12 +103,11 @@ Planting date and first observation of the disease are loaded.
 dates_cut <-
   read_csv(
     here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
-    col_types = cols(
-      disease_observed = col_date(format = "%d/%m/%Y")
-    )
+    col_types = cols(disease_observed = col_date(format = "%d/%m/%Y"))
   )
 
-dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
+dates_cut %>%
+  rename_all(. %>% capitalize() %>% gsub("_", " ", .))
 ```
 
 Save processed bio data. 
@@ -122,7 +138,8 @@ Remove the variables we don't need for the analysis, to make some speed gains.
 
 Get a summary of missing values for the variables of interest. 
 ```{r summarise-missing-OP}
-OP %>% group_by(year_var)  %>%
+OP %>% 
+  group_by(year_var) %>%
   summarize(
     NA_rain = sum(is.na(rain)),
     NA_temp = sum(is.na(temp)),
@@ -165,8 +182,7 @@ OP %>% group_by(year_var)  %>%
 There are missing values and it is safe to proceed with the analysis.   
 Save the output for the analysis.  
 ```{r save_data}
-save(OP, file = here::here("data", "op_2007_16",  "OP_2007-2016_infilled.RData"))
-
+save(OP, file = here::here("data", "op_2007_16", "OP_2007-2016_infilled.RData"))
 ```
 
 ## Weather summaries
@@ -183,341 +199,402 @@ OP[which(OP$temp > 30), ]
 
 Histograms of variables used in the analysis.  
 ```{r wth_histograms,fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
-hist(OP$temp,col = "peachpuff", main = "Histogram of Temperatures",prob = TRUE) # prob = TRUE to show densities instead of frequencies
+hist(OP$temp,
+     col = "peachpuff",
+     main = "Histogram of Temperatures",
+     prob = TRUE) # prob = TRUE to show densities instead of frequencies
 lines(density(OP$temp), lwd = 2, col = "chocolate3")
-abline(v = mean(OP$temp),col = "royalblue", lwd = 2)
-abline(v = median(OP$temp),col = "red", lwd = 2)
-abline(v=quantile(OP$temp,0.25),col="darkgreen",lty=2)
-abline(v=quantile(OP$temp,0.75),col="green",lty=2)
+abline(v = mean(OP$temp),
+       col = "royalblue",
+       lwd = 2)
+abline(v = median(OP$temp),
+       col = "red",
+       lwd = 2)
+abline(v = quantile(OP$temp, 0.25),
+       col = "darkgreen",
+       lty = 2)
+abline(v = quantile(OP$temp, 0.75),
+       col = "green",
+       lty = 2)
 
-legend(x = "topleft", 
-       bty = "n",
-       c("Density plot", "Mean", "Median","Lower Quantile", "Upper Quantile"),
-       col = c("chocolate3", "royalblue", "red", "darkgreen","green"),
-       lwd = c(2, 2, 2))
+legend(
+  x = "topleft",
+  bty = "n",
+  c(
+    "Density plot",
+    "Mean",
+    "Median",
+    "Lower Quantile",
+    "Upper Quantile"
+  ),
+  col = c("chocolate3", "royalblue", "red", "darkgreen", "green"),
+  lwd = c(2, 2, 2)
+)
 
-hist(OP$rhum,col = "lightblue", main = "Histogram of Temperatures",prob = TRUE) 
+hist(OP$rhum,
+     col = "lightblue",
+     main = "Histogram of Temperatures",
+     prob = TRUE)
 lines(density(OP$rhum), lwd = 2, col = "chocolate3")
-abline(v = mean(OP$rhum),col = "royalblue", lwd = 2)
-abline(v=quantile(OP$rhum,0.25),col="darkgreen",lty=2)
-abline(v=quantile(OP$rhum,0.75),col="green",lty=2)
-abline(v = median(OP$rhum),col = "red", lwd = 2)
-legend(x = "topleft", 
-       bty = "n",
-       c("Density plot", "Mean", "Median","Lower Quantile", "Upper Quantile"),
-       col = c("chocolate3", "royalblue", "red", "darkgreen","green"),
-       lwd = c(2, 2, 2))
-hist(OP$rain[OP$rain>0], breaks = 15, main = "Freq. of rain > 0 mm",
+abline(v = mean(OP$rhum),
+       col = "royalblue",
+       lwd = 2)
+abline(v = quantile(OP$rhum, 0.25),
+       col = "darkgreen",
+       lty = 2)
+abline(v = quantile(OP$rhum, 0.75),
+       col = "green",
+       lty = 2)
+abline(v = median(OP$rhum),
+       col = "red",
+       lwd = 2)
+legend(
+  x = "topleft",
+  bty = "n",
+  c(
+    "Density plot",
+    "Mean",
+    "Median",
+    "Lower Quantile",
+    "Upper Quantile"
+  ),
+  col = c("chocolate3", "royalblue", "red", "darkgreen", "green"),
+  lwd = c(2, 2, 2)
+)
+hist(OP$rain[OP$rain > 0],
+     breaks = 15,
+     main = "Freq. of rain > 0 mm",
      xlab = "Rain (mm)/hour")
 ```
-We can see that there is no suspicious vlaues in the data.  Rain is often ocurenc at Oak Park, although those are not heavy rains, whihc makes it a very good ground for the spread of crop pathogens. 
+
+We can see that there is no suspicious values in the data. Rain is often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens. 
 
 ```{r wth_summary_all}
-OP_rain <- 
+OP_rain <-
   OP %>%
-    filter(month %in% c(4:10)) %>%
-    group_by(year_var) %>%
-    summarize(rain = sum(rain)) %>% 
-   ungroup() %>% 
-    summarize(rain = mean(rain)) 
- OP %>%
-    filter(month %in% c(4:10)) %>%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %>% 
-   bind_cols(., OP_rain) %>% 
-  kable(caption = "10 Year Averages Weather at Oak Park")
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var) %>%
+  summarize(rain = sum(rain)) %>%
+  ungroup() %>%
+  summarize(rain = mean(rain))
 
-```
-
-```{r}
- OP %>%
-    filter(month %in% c(4:10)) %>%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %>% 
-   bind_cols(., OP_rain) %>% 
+OP %>%
+  filter(month %in% c(4:10)) %>%
+  summarize(temp = round(mean(temp), 1),
+            rhum = round(mean(rhum), 1)) %>%
+  bind_cols(., OP_rain) %>%
   kable(caption = "10 Year Averages Weather at Oak Park")
 ```
+
+The average temperature and relative humidity are ideal for disease development over the course of the season as well. 
   
-  The 
 ```{r temps_perhour_monthly}
-OP %>% 
-  mutate(hour = hour(date)) %>% 
-  filter(month %in% c(4:9)) %>% 
+OP %>%
+  mutate(hour = hour(date)) %>%
+  filter(month %in% c(4:9)) %>%
   
-  group_by(year_var,month, hour) %>% 
-  mutate( month_abb = month(month, label = T)) %>% 
-  ggplot(aes(factor(hour), temp))+
-  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = "gray", linetype="dotted")+
-  geom_boxplot(width = 0.2,outlier.size = 0.2)+
-  geom_line(aes(hour, 10, color = "red"))+
-  facet_grid(~month_abb)+
-  theme_tufte()+
-  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
-  labs(title= "Average temperatures per hour for months April to September",
-       y = "Temperature",
-       x = "Hours of the day",
-       color = "10C Line")
-```
-  
-  Night temperatures are low are low in Months of April and May, and only start to kick off in June.   
-  Lets take a closer look into variations in different seasons. 
-```{r temps_perhour_all_years, fig.width= 10}
-OP %>% 
-  mutate(hour = hour(date)) %>% 
-  filter(month %in% c(4:7)) %>% 
-  
-  group_by(year_var,month, hour) %>% 
-  mutate( month_abb = month(month, label = T)) %>% 
-  ggplot(aes(factor(hour), temp))+
-  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = "gray", linetype="dotted")+
-  geom_boxplot(width = 0.2,outlier.size = 0.2)+
-  geom_line(aes(hour, 10, color = "red"))+
-  facet_grid(year_var~month_abb)+
-  theme(legend.position = "top")+
-  theme_tufte()+
-  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
-  labs(title= "Average temperatures per hour for months April to September",
-       y = "Temperature",
-       x = "Hours of the day",
-       color = "10C Line")
-```
-  
-Let us take a look into sums of hours with blight favourable conditions. 
-```{r}
-
-OP %>% 
-  mutate(hour = hour(date)) %>% 
-  mutate(humid = ifelse(rhum >= 90 & temp>= 10, 1,0)) %>% 
-  mutate(cond_night = ifelse(rhum >= 90 & temp>= 10 & hour %in% c(20:24,0:6), 1,0)) %>% 
-  filter(month %in% c(4:7)) %>% 
-  group_by(year_var,month) %>% 
-  summarise(cond = sum(humid),
-            cond_night = sum(cond_night)) %>% 
-  mutate( month_abb = month(month, label = T)) %>% 
-  select(-c(month)) %>% 
-  reshape2::melt(id.vars = c("year_var", "month_abb"),
-                 variable.name = "period_of_day",
-                 value.name = "humid") %>% 
-  group_by(month_abb,period_of_day ) %>% 
-  summarise(humid = mean(humid),
-             sd = sd(humid)) %>% 
-
-ggplot(aes( month_abb, humid, fill = period_of_day, group))+
-  geom_bar(stat = "identity", color = "black", position = position_dodge())+
-  geom_errorbar(aes(ymin = humid - sd, 
-                    ymax = humid + sd), width = 0.2) +
-  scale_fill_manual(
-    name= "Period of the day",
-    labels = c("Whole day" , "During night"),
-    values = c("#0D0887FF", "#CC4678FF")
-  ) + 
+  group_by(year_var, month, hour) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  ggplot(aes(factor(hour), temp)) +
+  geom_vline(
+    xintercept = seq(0, 24, 6),
+    size = 0.1,
+    color = "gray",
+    linetype = "dotted"
+  ) +
+  geom_boxplot(width = 0.2, outlier.size = 0.2) +
+  geom_line(aes(hour, 10, color = "red")) +
+  facet_grid( ~ month_abb) +
+  theme_article() +
+  scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
   labs(
-    title = "Blight favourable weather averages.", 
+    title = "Average temperatures per hour for months April to September",
+    y = "Temperature",
+    x = "Hours of the day",
+    color = "10 ˚C Line"
+  )
+```
+  
+Night temperatures are low are low in Months of April and May, and only start to kick off in June.
+
+Lets take a closer look into variations in different seasons.
+
+```{r temps_perhour_all_years, fig.width= 10}
+OP %>%
+  mutate(hour = hour(date)) %>%
+  filter(month %in% c(4:7)) %>%
+  group_by(year_var, month, hour) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  ggplot(aes(factor(hour), temp)) +
+  geom_vline(
+    xintercept = seq(0, 24, 6),
+    size = 0.1,
+    color = "gray",
+    linetype = "dotted"
+  ) +
+  geom_boxplot(width = 0.2, outlier.size = 0.2) +
+  geom_line(aes(hour, 10, color = "red")) +
+  facet_grid(year_var ~ month_abb) +
+  theme(legend.position = "top") +
+  theme_article() +
+  scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
+  labs(
+    title = "Average temperatures per hour for months April to September",
+    y = "Temperature",
+    x = "Hours of the day",
+    color = "10 ˚C Line"
+  )
+```
+  
+Let us take a look into sums of hours with blight favourable conditions.
+
+```{r}
+OP %>%
+  mutate(hour = hour(date)) %>%
+  mutate(humid = ifelse(rhum >= 90 & temp >= 10, 1, 0)) %>%
+  mutate(cond_night = ifelse(rhum >= 90 &
+                               temp >= 10 & hour %in% c(20:24, 0:6), 1, 0)) %>%
+  filter(month %in% c(4:7)) %>%
+  group_by(year_var, month) %>%
+  summarise(cond = sum(humid),
+            cond_night = sum(cond_night)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  select(-c(month)) %>%
+  reshape2::melt(
+    id.vars = c("year_var", "month_abb"),
+    variable.name = "period_of_day",
+    value.name = "humid"
+  ) %>%
+  group_by(month_abb, period_of_day) %>%
+  summarise(humid = mean(humid),
+            sd = sd(humid)) %>%
+  ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
+  geom_bar(stat = "identity",
+           color = "black",
+           position = position_dodge()) +
+  geom_errorbar(aes(ymin = humid - sd,
+                    ymax = humid + sd),
+                width = 0.2,
+                na.rm = TRUE) +
+  scale_fill_brewer(
+    palette = "Dark2",
+    name = "Period of the day",
+    labels = c("Whole day" , "During night")
+  ) +
+  labs(
+    title = "Blight favourable weather averages.",
     subtitle = "Mean monthly sum of hours with T>=10 °C and RH>=90 %.",
     y = "Humid weather (hours)",
     x = "Month"
-  )+
-  theme_bw()
-
+  ) +
+  theme_article()
 ```
 
+## Plot weather data
 
+Let's do some work with the data to create summaries of the weather data so we can more easily visualise it.
 
-
-```{r}
+```{r summarise_wth}
 #Calculate average minimum daily temeperatures per month
-OP_rain <- 
-OP %>%
+OP_rain <-
+  OP %>%
   filter(month %in% c(4:10)) %>%
-  group_by(year_var, month) %>% 
-  summarize(rain = sum(rain)) %>% 
-    mutate( month_abb = month(month, label = T)) %>% 
-  group_by(month) %>% 
+  group_by(year_var, month) %>%
+  summarize(rain = sum(rain)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  group_by(month) %>%
   summarize(rain = round(mean(rain), 1))
 
 #Calculate average minimum daily temeperatures per month
-OP_min_temp <- 
-OP %>%
+OP_min_temp <-
+  OP %>%
   filter(month %in% c(4:10)) %>%
-  group_by(year_var, month, short_date) %>% 
-  summarize(min_temp = round(min(temp),1)) %>% 
-    mutate( month_abb = month(month, label = T)) %>% 
-  group_by(month) %>% 
-  summarize(min_temp = round(mean(min_temp), 1)) %>% 
+  group_by(year_var, month, short_date) %>%
+  summarize(min_temp = round(min(temp), 1)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  group_by(month) %>%
+  summarize(min_temp = round(mean(min_temp), 1)) %>%
   left_join(., OP_rain, "month")
 
-OP_months <- 
+OP_months <-
   OP %>%
-    filter(month %in% c(4:10)) %>%
-    group_by( month) %>%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %>% 
+  filter(month %in% c(4:10)) %>%
+  group_by(month) %>%
+  summarize(temp = round(mean(temp), 1),
+            rhum = round(mean(rhum), 1)) %>%
   left_join(., OP_min_temp, "month")
-OP_months%>% kable(caption = "Monthly Averages")
+OP_months %>% kable(caption = "Monthly Averages")
 ```
 
+### Plot temperature values
 
+Plot monthly temperature values.
 
 ```{r gens_ridges, fig.align='center', fig.show = "hold",fig.width=6, fig.height=6}
 OP$month_abb <- month(OP$month, label = T) 
 
-ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
-  geom_density_ridges_gradient(
-    aes(fill = ..x..), scale = 2, size = 0.2
-  ) +
-  scale_fill_gradientn(
-    colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
-    name = "Temp. (°C)"
-  )+
-  ggtitle( "Temperatures at Oak Park")+
-  xlab("Temperature (°C)")+
-  ylab("Month")+
-  theme_tufte()+
+ggplot(OP, aes(x = temp, y = factor(month_abb, ordered = T))) +
+  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
+  scale_fill_gradientn(colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
+                       name = "Temp. (°C)") +
+  ggtitle("Temperatures at Oak Park") +
+  xlab("Temperature (°C)") +
+  ylab("Month") +
+  theme_article() +
   theme_ridges(font_size = 13, grid = TRUE)
+```
 
+Plot average daily temperature values
+
+```{r avg_t, fig.align='center', fig.show = "hold",fig.width=6, fig.height=6}
 #Average temperatures plot
-OP_temp <- 
-OP %>%
+OP_temp <-
+  OP %>%
   filter(month %in% c(4:10)) %>%
-  group_by(year_var, month, short_date) %>% 
-  summarize(temp = round(mean(temp),1)) %>% 
-    mutate( month_abb = month(month, label = T))  
-ggplot(OP_temp,aes(month_abb,temp))+
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
-  geom_boxplot( width = 0.3)+
- annotate("text",x = 1:6, y = 24, 
-          label=as.character(round(OP_months$temp,2)) )+
-  ggtitle("Average Daily Temperatures Per Month at Oak Park")+
-  ylab("Temperature (°C)")+
-  xlab("Month")+
-  theme_minimal()
+  group_by(year_var, month, short_date) %>%
+  summarize(temp = round(mean(temp), 1)) %>%
+  mutate(month_abb = month(month, label = T))
+ggplot(OP_temp, aes(month_abb, temp)) +
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
+  geom_boxplot(width = 0.3, outlier.shape = NA) +
+  scale_colour_brewer("Year",
+                      palette = "Set3") +
+  annotate("text",
+           x = 1:6,
+           y = 24,
+           label = as.character(round(OP_months$temp, 2))) +
+  ggtitle("Average Daily Temperatures Per Month at Oak Park") +
+  ylab("Temperature (°C)") +
+  xlab("Month") +
+  theme_article()
+```
 
+Plot daily minimum temperature values.
+
+```{r min_t, fig.align='center', fig.show = "hold",fig.width=6, fig.height=6}
 #Minimum temperatures plot
 OP %>%
   filter(month %in% c(4:10)) %>%
-  group_by(year_var, month, short_date) %>% 
-  summarize(min_temp = round(min(temp),1)) %>% 
-    mutate( month_abb = month(month, label = T)) %>% 
-ggplot(aes(month_abb,min_temp))+
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
-  geom_boxplot( width = 0.3)+
-  annotate("text",x = 1:6, y = 24, 
-          label=as.character(round(OP_months$min_temp,2)) )+
-  ggtitle("Minimum Daily Temperatures Per Month at Oak Park")+
-  ylab("Temperature (°C)")+
-  xlab("Month")+
-  theme_minimal()
+  group_by(year_var, month, short_date) %>%
+  summarize(min_temp = round(min(temp), 1)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  ggplot(aes(month_abb, min_temp)) +
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
+  geom_boxplot(width = 0.3, outlier.shape = NA) +
+  scale_colour_brewer("Year",
+                      palette = "Set3") +
+  annotate("text",
+           x = 1:6,
+           y = 24,
+           label = as.character(round(OP_months$min_temp, 2))) +
+  ggtitle("Minimum Daily Temperatures Per Month at Oak Park") +
+  ylab("Temperature (°C)") +
+  xlab("Month") +
+  theme_article()
 
-ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
-  geom_density_ridges_gradient(
-    aes(fill = ..x..), scale = 2, size = 0.2
-  ) +
-  scale_fill_gradientn(
-    colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
-    name = "RH (%)"
-  )+
+ggplot(OP, aes(x = rhum, y = factor(month_abb, ordered = T))) +
+  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
+  scale_fill_gradientn(colours = c("#0D0887FF", "#CC4678FF", "#F0F921FF"),
+                       name = "RH (%)") +
   scale_x_continuous(expand = c(0.1, 0)) +
-  ggtitle( "Relative Humidity at Oak Park")+
-  xlab("Relative Humidity (%)")+
-  ylab("Month")+
-  theme_tufte()+
+  ggtitle("Relative Humidity at Oak Park") +
+  xlab("Relative Humidity (%)") +
+  ylab("Month") +
+  theme_article() +
   theme_ridges(font_size = 13, grid = TRUE)
+```
 
+Plot daily rainfall values.
+
+```{r rain_plots, fig.align='center', fig.show = "hold",fig.width=6, fig.height=6}
 #Rain plot
 OP %>%
   filter(month %in% c(4:10)) %>%
-  group_by(year_var, month, short_date) %>% 
-  summarize(rain = sum(rain)
-  ) %>% 
-    mutate( month_abb = month(month, label = T)) %>% 
-ggplot(aes(month_abb,rain,fill = factor(year_var)))+
-  geom_bar( position="dodge", stat="identity", width = 0.7)+
-  scale_fill_manual(values = colorRampPalette(brewer.pal(10, "Blues"))(10))+
-  annotate("text",x = 1:6, y = 51, 
-          label=as.character(OP_months$rain))+
-  theme_minimal()
-
-
+  group_by(year_var, month, short_date) %>%
+  summarize(rain = sum(rain)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
+  ggplot(aes(month_abb, rain, fill = factor(year_var))) +
+  geom_bar(position = "dodge",
+           stat = "identity",
+           width = 0.7) +
+  scale_fill_brewer("Year",
+                    palette = "Set3") +
+  annotate("text",
+           x = 1:6,
+           y = 51,
+           label = as.character(OP_months$rain)) +
+  theme_article()
 ```
-```{r wth_daily, fig.height=18, fig.width=11}
+
+```{r wth_daily, fig.height=18, fig.width=11, warning=FALSE}
 OP %>%
-    filter(month %in% c(4:10)) %>%
-    group_by(year_var, month, short_date) %>% 
-    summarize(temp = round(mean(temp),1),
-              rain = sum(rain),
-              wdsp = mean(wdsp),
-              rhum = round(mean(rhum),1)
-              
-    ) %>% rename(date = short_date) %>% 
+  filter(month %in% c(4:10)) %>%
+  group_by(year_var, month, short_date) %>%
+  summarize(
+    temp = round(mean(temp), 1),
+    rain = sum(rain),
+    wdsp = mean(wdsp),
+    rhum = round(mean(rhum), 1)
+    
+  ) %>% rename(date = short_date) %>%
   ggplot() +
-    geom_line(aes(
-      x = date,
-      y = rhum,
-      color = "Relative humidity (%)",
-      fill = "Relative humidity (%)"
-    ),
-    size = 0.1) +
-    geom_line(aes(
-      x = date,
-      y = temp,
-      colour = "Temperature (˚C)",
-      fill = "Temperature (˚C)"
-    ),
-    size = 0.1) +
-    geom_col(
-      aes(date,
-          rain,
-          colour = "Precipitation (mm/day)",
-          fill = "Precipitation (mm/day)"),
-      size = 1 ,
-      inherit.aes = TRUE,
-      width = 0.05
-    ) +
-    geom_hline(aes(yintercept = 88,
-                   linetype = "88 % RH"),
-               colour = "#ff7f00",
-               size = 0.3) +
-    geom_hline(aes(yintercept = 10,
-                   linetype = "10 ˚C"),
-               colour = "#e31a1c",
-               size = 0.3) +
-    labs(x = "", y = "T (˚C), PR (mm), RH (%) and Wind (m/s)") +
-    scale_colour_manual(
-      "Weather",
-      values = c(
-        "Relative humidity (%)" = "blue",
-        "Temperature (˚C)" = "#fb9a99",
-        "Precipitation (mm/day)" = "#a6cee3"
-      )
-    ) +
-    scale_fill_manual(
-      "Weather",
-      values = c(
-        "Relative humidity (%)" =  "blue",
-        "Temperature (˚C)" = "#fb9a99",
-        "Precipitation (mm/day)" = "#a6cee3"
-      )
-    ) +
-    scale_linetype_manual(name = "Limits",
-                          values = c(1, 2, 3)) +
-    theme(
-      plot.title = element_text(size = 22),
-      text = element_text(family = "Garamond"),
-      axis.title.x = element_blank()
-    ) +
-    facet_wrap(. ~ year_var, scales = "free_x", ncol = 1) +
-    ggtitle("Hourly weather data for Oak Park") +
-    theme_minimal()+
-   theme(axis.title.x = element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        legend.position="top")
-
-
+  geom_line(aes(x = date,
+                y = rhum,
+                color = "Relative humidity (%)",
+                fill = "Relative humidity (%)"),
+            size = 0.1) +
+  geom_line(aes(x = date,
+                y = temp,
+                colour = "Temperature (˚C)",
+                fill = "Temperature (˚C)",),
+            size = 0.1) +
+  geom_col(
+    aes(date,
+        rain,
+        colour = "Precipitation (mm/day)",
+        fill = "Precipitation (mm/day)"),
+    size = 1 ,
+    inherit.aes = TRUE,
+    width = 0.05
+  ) +
+  geom_hline(aes(yintercept = 88,
+                 linetype = "88 % RH"),
+             colour = "#ff7f00",
+             size = 0.3) +
+  geom_hline(aes(yintercept = 10,
+                 linetype = "10 ˚C"),
+             colour = "#e31a1c",
+             size = 0.3) +
+  labs(x = "", y = "T (˚C), PR (mm), RH (%) and Wind (m/s)") +
+  scale_colour_manual(
+    "Weather",
+    values = c(
+      "Relative humidity (%)" = "blue",
+      "Temperature (˚C)" = "#fb9a99",
+      "Precipitation (mm/day)" = "#a6cee3"
+    )
+  ) +
+  scale_fill_manual(
+    "Weather",
+    values = c(
+      "Relative humidity (%)" =  "blue",
+      "Temperature (˚C)" = "#fb9a99",
+      "Precipitation (mm/day)" = "#a6cee3"
+    )
+  ) +
+  scale_linetype_manual(name = "Limits",
+                        values = c(1, 2, 3)) +
+  theme_article() +
+  theme(
+    plot.title = element_text(size = 22),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "top"
+  ) +
+  facet_wrap(. ~ year_var, scales = "free_x", ncol = 1) +
+  ggtitle("Hourly weather data for Oak Park")
 ```

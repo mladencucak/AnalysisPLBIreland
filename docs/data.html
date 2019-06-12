@@ -11,7 +11,7 @@
 
 
 
-<title>data.utf8.md</title>
+<title>Evaluation of Irish Rules Model</title>
 
 <script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +23,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -273,6 +274,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -415,21 +424,21 @@ div.tocify {
 </li>
 <li>
   <a href="Analysis.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-file-code-o"></span>
      
     Analysis
   </a>
 </li>
 <li>
   <a href="Results1.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-bar-chart"></span>
      
     Results
   </a>
 </li>
 <li>
   <a href="FungicideTreatments.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-lightbulb-o"></span>
      
     Usefulness
   </a>
@@ -450,16 +459,24 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Evaluation of Irish Rules model</h1>
+
+<h1 class="title toc-ignore">Evaluation of Irish Rules Model</h1>
 
 </div>
 
 
 <div id="libraries" class="section level1">
 <h1>Libraries</h1>
-<p>Packages needed for the data preparatin are loaded. If the libraries do not exist locally, they will be downloaded.</p>
+<p>Packages needed for the data preparation are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
   c(
     &quot;tidyverse&quot;,
@@ -478,7 +495,8 @@ div.tocify {
     &quot;leaflet&quot;,
     &quot;ggridges&quot;,
     &quot;lubridate&quot;,
-    &quot;RColorBrewer&quot;
+    &quot;RColorBrewer&quot;,
+    &quot;egg&quot;
   )
 
 new.packages &lt;-
@@ -488,7 +506,12 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages)
 
-if (&quot;gt&quot; %in% installed.packages() == FALSE)
+
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
+
+if (!&quot;gt&quot; %in% installed.packages())
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
@@ -497,7 +520,7 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
+  warning(&quot;Package/s&quot;, list.of.packages[!(packages_load)], &quot;not loaded!&quot;)
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -509,24 +532,30 @@ if (any(as.numeric(packages_load) == 0)) {
 <p>Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.</p>
 <pre class="r"><code>greenLeafIcon &lt;- makeIcon(
   iconUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-green.png&quot;,
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94,
+  iconWidth = 38,
+  iconHeight = 95,
+  iconAnchorX = 22,
+  iconAnchorY = 94,
   shadowUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-shadow.png&quot;,
-  shadowWidth = 50, shadowHeight = 64,
-  shadowAnchorX = 4, shadowAnchorY = 62
+  shadowWidth = 50,
+  shadowHeight = 64,
+  shadowAnchorX = 4,
+  shadowAnchorY = 62
 )
 
 leaflet() %&gt;%
   addTiles(group = &quot;OSM (default)&quot;) %&gt;%
-  setView(-8,53.5,6)%&gt;%
-  addMarkers(lng = -6.9121167, lat = 52.8560667,
-             label = &quot;Oak Park&quot;,
-             # color = &quot;green&quot;,
-             icon=greenLeafIcon
-              # radius = 5
+  setView(-8, 53.5, 6) %&gt;%
+  addMarkers(
+    lng = -6.9121167,
+    lat = 52.8560667,
+    label = &quot;Oak Park&quot;,
+    # color = &quot;green&quot;,
+    icon = greenLeafIcon
+    # radius = 5
   )</code></pre>
-<div id="htmlwidget-bff9f0a20ae3a3c92a08" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bff9f0a20ae3a3c92a08">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0de65a01752ae6dc786c" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0de65a01752ae6dc786c">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="bio-data" class="section level1">
 <h1>Bio data</h1>
@@ -535,15 +564,14 @@ leaflet() %&gt;%
 dates_cut &lt;-
   read_csv(
     here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;plantingdates.csv&quot;),
-    col_types = cols(
-      disease_observed = col_date(format = &quot;%d/%m/%Y&quot;)
-    )
-  )</code></pre>
-<pre><code>## Warning: Missing column names filled in: &#39;X4&#39; [4]</code></pre>
-<pre class="r"><code>dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
+    col_types = cols(disease_observed = col_date(format = &quot;%d/%m/%Y&quot;))
+  )
+
+dates_cut %&gt;%
+  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Disease observed"],"name":[3],"type":["date"],"align":["right"]},{"label":["X4"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"2007","2":"3/4/2007","3":"2007-06-30","4":"23/8/2007"},{"1":"2008","2":"7/4/2008","3":"2008-07-02","4":"13/8/2008"},{"1":"2009","2":"21/04/2009","3":"2009-07-06","4":"8/8/2009"},{"1":"2010","2":"4/5/2010","3":"2010-07-19","4":"30/8/2010"},{"1":"2011","2":"6/5/2011","3":"2011-07-28","4":"25/8/2011"},{"1":"2012","2":"28/05/2012","3":"2012-07-13","4":"28/8/2012"},{"1":"2013","2":"3/6/2013","3":"2013-08-23","4":"20/9/2013"},{"1":"2014","2":"23/05/2014","3":"2014-08-01","4":"11/9/2014"},{"1":"2015","2":"22/05/2015","3":"2015-07-31","4":"18/9/2015"},{"1":"2016","2":"31/05/2016","3":"2016-07-22","4":"16/9/2016"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Disease observed"],"name":[3],"type":["date"],"align":["right"]},{"label":["Last assessment"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"2007","2":"3/4/2007","3":"2007-06-30","4":"23/8/2007"},{"1":"2008","2":"7/4/2008","3":"2008-07-02","4":"13/8/2008"},{"1":"2009","2":"21/04/2009","3":"2009-07-06","4":"8/8/2009"},{"1":"2010","2":"4/5/2010","3":"2010-07-19","4":"30/8/2010"},{"1":"2011","2":"6/5/2011","3":"2011-07-28","4":"25/8/2011"},{"1":"2012","2":"28/05/2012","3":"2012-07-13","4":"28/8/2012"},{"1":"2013","2":"3/6/2013","3":"2013-08-23","4":"20/9/2013"},{"1":"2014","2":"23/05/2014","3":"2014-08-01","4":"11/9/2014"},{"1":"2015","2":"22/05/2015","3":"2015-07-31","4":"18/9/2015"},{"1":"2016","2":"31/05/2016","3":"2016-07-22","4":"16/9/2016"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Save processed bio data.</p>
@@ -559,7 +587,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zqckddjkib .gt_table {
+#ngbvkgymxz .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -578,13 +606,13 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#zqckddjkib .gt_heading {
+#ngbvkgymxz .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#zqckddjkib .gt_title {
+#ngbvkgymxz .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -595,7 +623,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#zqckddjkib .gt_subtitle {
+#ngbvkgymxz .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -606,7 +634,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#zqckddjkib .gt_bottom_border {
+#ngbvkgymxz .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -615,7 +643,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#zqckddjkib .gt_column_spanner {
+#ngbvkgymxz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -623,7 +651,7 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#zqckddjkib .gt_col_heading {
+#ngbvkgymxz .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -636,159 +664,180 @@ OP[1:5, 1:20] %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#zqckddjkib .gt_sep_right {
+#ngbvkgymxz .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#zqckddjkib .gt_group_heading {
+#ngbvkgymxz .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#zqckddjkib .gt_empty_group_heading {
+#ngbvkgymxz .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
-  /* stub_group.background.color */
+  /* row_group.background.color */
   font-size: 16px;
-  /* stub_group.font.size */
+  /* row_group.font.size */
   font-weight: initial;
-  /* stub_group.font.weight */
+  /* row_group.font.weight */
   border-top-style: solid;
-  /* stub_group.border.top.style */
+  /* row_group.border.top.style */
   border-top-width: 2px;
-  /* stub_group.border.top.width */
+  /* row_group.border.top.width */
   border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
+  /* row_group.border.top.color */
   border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
+  /* row_group.border.bottom.style */
   border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
+  /* row_group.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
+  /* row_group.border.bottom.color */
   vertical-align: middle;
 }
 
-#zqckddjkib .gt_striped {
+#ngbvkgymxz .gt_striped {
   background-color: #f2f2f2;
 }
 
-#zqckddjkib .gt_row {
-  padding: 10px;
+#ngbvkgymxz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ngbvkgymxz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ngbvkgymxz .gt_row {
+  padding: 8px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#zqckddjkib .gt_stub {
+#ngbvkgymxz .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#zqckddjkib .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#zqckddjkib .gt_summary_row {
+#ngbvkgymxz .gt_summary_row {
+  color: #000000;
   background-color: #FFFFFF;
   /* summary_row.background.color */
-  padding: 6px;
+  padding: 8px;
   /* summary_row.padding */
   text-transform: inherit;
   /* summary_row.text_transform */
 }
 
-#zqckddjkib .gt_first_summary_row {
+#ngbvkgymxz .gt_grand_summary_row {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* grand_summary_row.background.color */
+  padding: 8px;
+  /* grand_summary_row.padding */
+  text-transform: inherit;
+  /* grand_summary_row.text_transform */
+}
+
+#ngbvkgymxz .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#zqckddjkib .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
+#ngbvkgymxz .gt_first_grand_summary_row {
+  border-top-style: double;
+  border-top-width: 6px;
   border-top-color: #A8A8A8;
-  /* field.border.top.color */
+}
+
+#ngbvkgymxz .gt_table_body {
+  border-top-style: solid;
+  /* table_body.border.top.style */
+  border-top-width: 2px;
+  /* table_body.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table_body.border.top.color */
   border-bottom-style: solid;
-  /* field.border.bottom.style */
+  /* table_body.border.bottom.style */
   border-bottom-width: 2px;
-  /* field.border.bottom.width */
+  /* table_body.border.bottom.width */
   border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
+  /* table_body.border.bottom.color */
 }
 
-#zqckddjkib .gt_footnote {
+#ngbvkgymxz .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#zqckddjkib .gt_sourcenote {
+#ngbvkgymxz .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#zqckddjkib .gt_center {
+#ngbvkgymxz .gt_center {
   text-align: center;
 }
 
-#zqckddjkib .gt_left {
+#ngbvkgymxz .gt_left {
   text-align: left;
 }
 
-#zqckddjkib .gt_right {
+#ngbvkgymxz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zqckddjkib .gt_font_normal {
+#ngbvkgymxz .gt_font_normal {
   font-weight: normal;
 }
 
-#zqckddjkib .gt_font_bold {
+#ngbvkgymxz .gt_font_bold {
   font-weight: bold;
 }
 
-#zqckddjkib .gt_font_italic {
+#ngbvkgymxz .gt_font_italic {
   font-style: italic;
 }
 
-#zqckddjkib .gt_super {
+#ngbvkgymxz .gt_super {
   font-size: 65%;
 }
 
-#zqckddjkib .gt_footnote_glyph {
+#ngbvkgymxz .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zqckddjkib" style="overflow-x:auto;"><!--gt table start-->
+<div id="ngbvkgymxz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
@@ -937,7 +986,8 @@ OP &lt;-
 <pre class="r"><code>OP &lt;- subset(OP, month &gt; 3 &amp; month &lt; 10)</code></pre>
 <p>Remove the variables we don’t need for the analysis, to make some speed gains.</p>
 <p>Get a summary of missing values for the variables of interest.</p>
-<pre class="r"><code>OP %&gt;% group_by(year_var)  %&gt;%
+<pre class="r"><code>OP %&gt;% 
+  group_by(year_var) %&gt;%
   summarize(
     NA_rain = sum(is.na(rain)),
     NA_temp = sum(is.na(temp)),
@@ -984,7 +1034,7 @@ OP %&gt;% group_by(year_var)  %&gt;%
 </div>
 <p>There are missing values and it is safe to proceed with the analysis.<br />
 Save the output for the analysis.</p>
-<pre class="r"><code>save(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;OP_2007-2016_infilled.RData&quot;))</code></pre>
+<pre class="r"><code>save(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_2007-2016_infilled.RData&quot;))</code></pre>
 <div id="weather-summaries" class="section level2">
 <h2>Weather summaries</h2>
 <p>Do some weather data quality checks.</p>
@@ -1010,46 +1060,87 @@ OP[which(OP$temp &gt; 30), ]</code></pre>
   </script>
 </div>
 <p>Histograms of variables used in the analysis.</p>
-<pre class="r"><code>hist(OP$temp,col = &quot;peachpuff&quot;, main = &quot;Histogram of Temperatures&quot;,prob = TRUE) # prob = TRUE to show densities instead of frequencies
+<pre class="r"><code>hist(OP$temp,
+     col = &quot;peachpuff&quot;,
+     main = &quot;Histogram of Temperatures&quot;,
+     prob = TRUE) # prob = TRUE to show densities instead of frequencies
 lines(density(OP$temp), lwd = 2, col = &quot;chocolate3&quot;)
-abline(v = mean(OP$temp),col = &quot;royalblue&quot;, lwd = 2)
-abline(v = median(OP$temp),col = &quot;red&quot;, lwd = 2)
-abline(v=quantile(OP$temp,0.25),col=&quot;darkgreen&quot;,lty=2)
-abline(v=quantile(OP$temp,0.75),col=&quot;green&quot;,lty=2)
+abline(v = mean(OP$temp),
+       col = &quot;royalblue&quot;,
+       lwd = 2)
+abline(v = median(OP$temp),
+       col = &quot;red&quot;,
+       lwd = 2)
+abline(v = quantile(OP$temp, 0.25),
+       col = &quot;darkgreen&quot;,
+       lty = 2)
+abline(v = quantile(OP$temp, 0.75),
+       col = &quot;green&quot;,
+       lty = 2)
 
-legend(x = &quot;topleft&quot;, 
-       bty = &quot;n&quot;,
-       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;,&quot;Lower Quantile&quot;, &quot;Upper Quantile&quot;),
-       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
-       lwd = c(2, 2, 2))
+legend(
+  x = &quot;topleft&quot;,
+  bty = &quot;n&quot;,
+  c(
+    &quot;Density plot&quot;,
+    &quot;Mean&quot;,
+    &quot;Median&quot;,
+    &quot;Lower Quantile&quot;,
+    &quot;Upper Quantile&quot;
+  ),
+  col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;, &quot;green&quot;),
+  lwd = c(2, 2, 2)
+)
 
-hist(OP$rhum,col = &quot;lightblue&quot;, main = &quot;Histogram of Temperatures&quot;,prob = TRUE) 
+hist(OP$rhum,
+     col = &quot;lightblue&quot;,
+     main = &quot;Histogram of Temperatures&quot;,
+     prob = TRUE)
 lines(density(OP$rhum), lwd = 2, col = &quot;chocolate3&quot;)
-abline(v = mean(OP$rhum),col = &quot;royalblue&quot;, lwd = 2)
-abline(v=quantile(OP$rhum,0.25),col=&quot;darkgreen&quot;,lty=2)
-abline(v=quantile(OP$rhum,0.75),col=&quot;green&quot;,lty=2)
-abline(v = median(OP$rhum),col = &quot;red&quot;, lwd = 2)
-legend(x = &quot;topleft&quot;, 
-       bty = &quot;n&quot;,
-       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;,&quot;Lower Quantile&quot;, &quot;Upper Quantile&quot;),
-       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
-       lwd = c(2, 2, 2))
-hist(OP$rain[OP$rain&gt;0], breaks = 15, main = &quot;Freq. of rain &gt; 0 mm&quot;,
+abline(v = mean(OP$rhum),
+       col = &quot;royalblue&quot;,
+       lwd = 2)
+abline(v = quantile(OP$rhum, 0.25),
+       col = &quot;darkgreen&quot;,
+       lty = 2)
+abline(v = quantile(OP$rhum, 0.75),
+       col = &quot;green&quot;,
+       lty = 2)
+abline(v = median(OP$rhum),
+       col = &quot;red&quot;,
+       lwd = 2)
+legend(
+  x = &quot;topleft&quot;,
+  bty = &quot;n&quot;,
+  c(
+    &quot;Density plot&quot;,
+    &quot;Mean&quot;,
+    &quot;Median&quot;,
+    &quot;Lower Quantile&quot;,
+    &quot;Upper Quantile&quot;
+  ),
+  col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;, &quot;green&quot;),
+  lwd = c(2, 2, 2)
+)
+hist(OP$rain[OP$rain &gt; 0],
+     breaks = 15,
+     main = &quot;Freq. of rain &gt; 0 mm&quot;,
      xlab = &quot;Rain (mm)/hour&quot;)</code></pre>
-<p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /> We can see that there is no suspicious vlaues in the data. Rain is often ocurenc at Oak Park, although those are not heavy rains, whihc makes it a very good ground for the spread of crop pathogens.</p>
-<pre class="r"><code>OP_rain &lt;- 
+<p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /></p>
+<p>We can see that there is no suspicious values in the data. Rain is often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens.</p>
+<pre class="r"><code>OP_rain &lt;-
   OP %&gt;%
-    filter(month %in% c(4:10)) %&gt;%
-    group_by(year_var) %&gt;%
-    summarize(rain = sum(rain)) %&gt;% 
-   ungroup() %&gt;% 
-    summarize(rain = mean(rain)) 
- OP %&gt;%
-    filter(month %in% c(4:10)) %&gt;%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %&gt;% 
-   bind_cols(., OP_rain) %&gt;% 
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var) %&gt;%
+  summarize(rain = sum(rain)) %&gt;%
+  ungroup() %&gt;%
+  summarize(rain = mean(rain))
+
+OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  summarize(temp = round(mean(temp), 1),
+            rhum = round(mean(rhum), 1)) %&gt;%
+  bind_cols(., OP_rain) %&gt;%
   kable(caption = &quot;10 Year Averages Weather at Oak Park&quot;)</code></pre>
 <table>
 <caption>10 Year Averages Weather at Oak Park</caption>
@@ -1068,136 +1159,133 @@ hist(OP$rain[OP$rain&gt;0], breaks = 15, main = &quot;Freq. of rain &gt; 0 mm&qu
 </tr>
 </tbody>
 </table>
-<pre class="r"><code> OP %&gt;%
-    filter(month %in% c(4:10)) %&gt;%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %&gt;% 
-   bind_cols(., OP_rain) %&gt;% 
-  kable(caption = &quot;10 Year Averages Weather at Oak Park&quot;)</code></pre>
-<table>
-<caption>10 Year Averages Weather at Oak Park</caption>
-<thead>
-<tr class="header">
-<th align="right">temp</th>
-<th align="right">rhum</th>
-<th align="right">rain</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">13</td>
-<td align="right">80.2</td>
-<td align="right">398.31</td>
-</tr>
-</tbody>
-</table>
-<p>The</p>
-<pre class="r"><code>OP %&gt;% 
-  mutate(hour = hour(date)) %&gt;% 
-  filter(month %in% c(4:9)) %&gt;% 
+<p>The average temperature and relative humidity are ideal for disease development over the course of the season as well.</p>
+<pre class="r"><code>OP %&gt;%
+  mutate(hour = hour(date)) %&gt;%
+  filter(month %in% c(4:9)) %&gt;%
   
-  group_by(year_var,month, hour) %&gt;% 
-  mutate( month_abb = month(month, label = T)) %&gt;% 
-  ggplot(aes(factor(hour), temp))+
-  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  geom_boxplot(width = 0.2,outlier.size = 0.2)+
-  geom_line(aes(hour, 10, color = &quot;red&quot;))+
-  facet_grid(~month_abb)+
-  theme_tufte()+
-  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
-  labs(title= &quot;Average temperatures per hour for months April to September&quot;,
-       y = &quot;Temperature&quot;,
-       x = &quot;Hours of the day&quot;,
-       color = &quot;10C Line&quot;)</code></pre>
+  group_by(year_var, month, hour) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  ggplot(aes(factor(hour), temp)) +
+  geom_vline(
+    xintercept = seq(0, 24, 6),
+    size = 0.1,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
+  ) +
+  geom_boxplot(width = 0.2, outlier.size = 0.2) +
+  geom_line(aes(hour, 10, color = &quot;red&quot;)) +
+  facet_grid( ~ month_abb) +
+  theme_article() +
+  scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
+  labs(
+    title = &quot;Average temperatures per hour for months April to September&quot;,
+    y = &quot;Temperature&quot;,
+    x = &quot;Hours of the day&quot;,
+    color = &quot;10 ˚C Line&quot;
+  )</code></pre>
 <p><img src="images/temps_perhour_monthly-1.png" width="672" /></p>
-<p>Night temperatures are low are low in Months of April and May, and only start to kick off in June.<br />
-Lets take a closer look into variations in different seasons.</p>
-<pre class="r"><code>OP %&gt;% 
-  mutate(hour = hour(date)) %&gt;% 
-  filter(month %in% c(4:7)) %&gt;% 
-  
-  group_by(year_var,month, hour) %&gt;% 
-  mutate( month_abb = month(month, label = T)) %&gt;% 
-  ggplot(aes(factor(hour), temp))+
-  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  geom_boxplot(width = 0.2,outlier.size = 0.2)+
-  geom_line(aes(hour, 10, color = &quot;red&quot;))+
-  facet_grid(year_var~month_abb)+
-  theme(legend.position = &quot;top&quot;)+
-  theme_tufte()+
-  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
-  labs(title= &quot;Average temperatures per hour for months April to September&quot;,
-       y = &quot;Temperature&quot;,
-       x = &quot;Hours of the day&quot;,
-       color = &quot;10C Line&quot;)</code></pre>
+<p>Night temperatures are low are low in Months of April and May, and only start to kick off in June.</p>
+<p>Lets take a closer look into variations in different seasons.</p>
+<pre class="r"><code>OP %&gt;%
+  mutate(hour = hour(date)) %&gt;%
+  filter(month %in% c(4:7)) %&gt;%
+  group_by(year_var, month, hour) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  ggplot(aes(factor(hour), temp)) +
+  geom_vline(
+    xintercept = seq(0, 24, 6),
+    size = 0.1,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
+  ) +
+  geom_boxplot(width = 0.2, outlier.size = 0.2) +
+  geom_line(aes(hour, 10, color = &quot;red&quot;)) +
+  facet_grid(year_var ~ month_abb) +
+  theme(legend.position = &quot;top&quot;) +
+  theme_article() +
+  scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
+  labs(
+    title = &quot;Average temperatures per hour for months April to September&quot;,
+    y = &quot;Temperature&quot;,
+    x = &quot;Hours of the day&quot;,
+    color = &quot;10 ˚C Line&quot;
+  )</code></pre>
 <p><img src="images/temps_perhour_all_years-1.png" width="960" /></p>
 <p>Let us take a look into sums of hours with blight favourable conditions.</p>
-<pre class="r"><code>OP %&gt;% 
-  mutate(hour = hour(date)) %&gt;% 
-  mutate(humid = ifelse(rhum &gt;= 90 &amp; temp&gt;= 10, 1,0)) %&gt;% 
-  mutate(cond_night = ifelse(rhum &gt;= 90 &amp; temp&gt;= 10 &amp; hour %in% c(20:24,0:6), 1,0)) %&gt;% 
-  filter(month %in% c(4:7)) %&gt;% 
-  group_by(year_var,month) %&gt;% 
+<pre class="r"><code>OP %&gt;%
+  mutate(hour = hour(date)) %&gt;%
+  mutate(humid = ifelse(rhum &gt;= 90 &amp; temp &gt;= 10, 1, 0)) %&gt;%
+  mutate(cond_night = ifelse(rhum &gt;= 90 &amp;
+                               temp &gt;= 10 &amp; hour %in% c(20:24, 0:6), 1, 0)) %&gt;%
+  filter(month %in% c(4:7)) %&gt;%
+  group_by(year_var, month) %&gt;%
   summarise(cond = sum(humid),
-            cond_night = sum(cond_night)) %&gt;% 
-  mutate( month_abb = month(month, label = T)) %&gt;% 
-  select(-c(month)) %&gt;% 
-  reshape2::melt(id.vars = c(&quot;year_var&quot;, &quot;month_abb&quot;),
-                 variable.name = &quot;period_of_day&quot;,
-                 value.name = &quot;humid&quot;) %&gt;% 
-  group_by(month_abb,period_of_day ) %&gt;% 
+            cond_night = sum(cond_night)) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  select(-c(month)) %&gt;%
+  reshape2::melt(
+    id.vars = c(&quot;year_var&quot;, &quot;month_abb&quot;),
+    variable.name = &quot;period_of_day&quot;,
+    value.name = &quot;humid&quot;
+  ) %&gt;%
+  group_by(month_abb, period_of_day) %&gt;%
   summarise(humid = mean(humid),
-             sd = sd(humid)) %&gt;% 
-
-ggplot(aes( month_abb, humid, fill = period_of_day, group))+
-  geom_bar(stat = &quot;identity&quot;, color = &quot;black&quot;, position = position_dodge())+
-  geom_errorbar(aes(ymin = humid - sd, 
-                    ymax = humid + sd), width = 0.2) +
-  scale_fill_manual(
-    name= &quot;Period of the day&quot;,
-    labels = c(&quot;Whole day&quot; , &quot;During night&quot;),
-    values = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;)
-  ) + 
+            sd = sd(humid)) %&gt;%
+  ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
+  geom_bar(stat = &quot;identity&quot;,
+           color = &quot;black&quot;,
+           position = position_dodge()) +
+  geom_errorbar(aes(ymin = humid - sd,
+                    ymax = humid + sd),
+                width = 0.2,
+                na.rm = TRUE) +
+  scale_fill_brewer(
+    palette = &quot;Dark2&quot;,
+    name = &quot;Period of the day&quot;,
+    labels = c(&quot;Whole day&quot; , &quot;During night&quot;)
+  ) +
   labs(
-    title = &quot;Blight favourable weather averages.&quot;, 
+    title = &quot;Blight favourable weather averages.&quot;,
     subtitle = &quot;Mean monthly sum of hours with T&gt;=10 °C and RH&gt;=90 %.&quot;,
     y = &quot;Humid weather (hours)&quot;,
     x = &quot;Month&quot;
-  )+
-  theme_bw()</code></pre>
-<pre><code>## Warning: Removed 8 rows containing missing values (geom_errorbar).</code></pre>
-<p><img src="images/unnamed-chunk-3-1.png" width="672" /></p>
+  ) +
+  theme_article()</code></pre>
+<p><img src="images/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="plot-weather-data" class="section level2">
+<h2>Plot weather data</h2>
+<p>Let’s do some work with the data to create summaries of the weather data so we can more easily visualise it.</p>
 <pre class="r"><code>#Calculate average minimum daily temeperatures per month
-OP_rain &lt;- 
-OP %&gt;%
+OP_rain &lt;-
+  OP %&gt;%
   filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month) %&gt;% 
-  summarize(rain = sum(rain)) %&gt;% 
-    mutate( month_abb = month(month, label = T)) %&gt;% 
-  group_by(month) %&gt;% 
+  group_by(year_var, month) %&gt;%
+  summarize(rain = sum(rain)) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  group_by(month) %&gt;%
   summarize(rain = round(mean(rain), 1))
 
 #Calculate average minimum daily temeperatures per month
-OP_min_temp &lt;- 
-OP %&gt;%
+OP_min_temp &lt;-
+  OP %&gt;%
   filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;% 
-  summarize(min_temp = round(min(temp),1)) %&gt;% 
-    mutate( month_abb = month(month, label = T)) %&gt;% 
-  group_by(month) %&gt;% 
-  summarize(min_temp = round(mean(min_temp), 1)) %&gt;% 
+  group_by(year_var, month, short_date) %&gt;%
+  summarize(min_temp = round(min(temp), 1)) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  group_by(month) %&gt;%
+  summarize(min_temp = round(mean(min_temp), 1)) %&gt;%
   left_join(., OP_rain, &quot;month&quot;)
 
-OP_months &lt;- 
+OP_months &lt;-
   OP %&gt;%
-    filter(month %in% c(4:10)) %&gt;%
-    group_by( month) %&gt;%
-    summarize(temp = round(mean(temp),1),
-              rhum = round(mean(rhum),1)
-              ) %&gt;% 
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(month) %&gt;%
+  summarize(temp = round(mean(temp), 1),
+            rhum = round(mean(rhum), 1)) %&gt;%
   left_join(., OP_min_temp, &quot;month&quot;)
-OP_months%&gt;% kable(caption = &quot;Monthly Averages&quot;)</code></pre>
+OP_months %&gt;% kable(caption = &quot;Monthly Averages&quot;)</code></pre>
 <table>
 <caption>Monthly Averages</caption>
 <thead>
@@ -1254,165 +1342,168 @@ OP_months%&gt;% kable(caption = &quot;Monthly Averages&quot;)</code></pre>
 </tr>
 </tbody>
 </table>
+<div id="plot-temperature-values" class="section level3">
+<h3>Plot temperature values</h3>
+<p>Plot monthly temperature values.</p>
 <pre class="r"><code>OP$month_abb &lt;- month(OP$month, label = T) 
 
-ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
-  geom_density_ridges_gradient(
-    aes(fill = ..x..), scale = 2, size = 0.2
-  ) +
-  scale_fill_gradientn(
-    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
-    name = &quot;Temp. (°C)&quot;
-  )+
-  ggtitle( &quot;Temperatures at Oak Park&quot;)+
-  xlab(&quot;Temperature (°C)&quot;)+
-  ylab(&quot;Month&quot;)+
-  theme_tufte()+
+ggplot(OP, aes(x = temp, y = factor(month_abb, ordered = T))) +
+  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
+  scale_fill_gradientn(colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+                       name = &quot;Temp. (°C)&quot;) +
+  ggtitle(&quot;Temperatures at Oak Park&quot;) +
+  xlab(&quot;Temperature (°C)&quot;) +
+  ylab(&quot;Month&quot;) +
+  theme_article() +
   theme_ridges(font_size = 13, grid = TRUE)</code></pre>
 <pre><code>## Picking joint bandwidth of 0.512</code></pre>
+<p><img src="images/gens_ridges-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>Plot average daily temperature values</p>
 <pre class="r"><code>#Average temperatures plot
-OP_temp &lt;- 
+OP_temp &lt;-
+  OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;%
+  summarize(temp = round(mean(temp), 1)) %&gt;%
+  mutate(month_abb = month(month, label = T))
+ggplot(OP_temp, aes(month_abb, temp)) +
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
+  geom_boxplot(width = 0.3, outlier.shape = NA) +
+  scale_colour_brewer(&quot;Year&quot;,
+                      palette = &quot;Set3&quot;) +
+  annotate(&quot;text&quot;,
+           x = 1:6,
+           y = 24,
+           label = as.character(round(OP_months$temp, 2))) +
+  ggtitle(&quot;Average Daily Temperatures Per Month at Oak Park&quot;) +
+  ylab(&quot;Temperature (°C)&quot;) +
+  xlab(&quot;Month&quot;) +
+  theme_article()</code></pre>
+<p><img src="images/avg_t-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>Plot daily minimum temperature values.</p>
+<pre class="r"><code>#Minimum temperatures plot
 OP %&gt;%
   filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;% 
-  summarize(temp = round(mean(temp),1)) %&gt;% 
-    mutate( month_abb = month(month, label = T))  
-ggplot(OP_temp,aes(month_abb,temp))+
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
-  geom_boxplot( width = 0.3)+
- annotate(&quot;text&quot;,x = 1:6, y = 24, 
-          label=as.character(round(OP_months$temp,2)) )+
-  ggtitle(&quot;Average Daily Temperatures Per Month at Oak Park&quot;)+
-  ylab(&quot;Temperature (°C)&quot;)+
-  xlab(&quot;Month&quot;)+
-  theme_minimal()
+  group_by(year_var, month, short_date) %&gt;%
+  summarize(min_temp = round(min(temp), 1)) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  ggplot(aes(month_abb, min_temp)) +
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
+  geom_boxplot(width = 0.3, outlier.shape = NA) +
+  scale_colour_brewer(&quot;Year&quot;,
+                      palette = &quot;Set3&quot;) +
+  annotate(&quot;text&quot;,
+           x = 1:6,
+           y = 24,
+           label = as.character(round(OP_months$min_temp, 2))) +
+  ggtitle(&quot;Minimum Daily Temperatures Per Month at Oak Park&quot;) +
+  ylab(&quot;Temperature (°C)&quot;) +
+  xlab(&quot;Month&quot;) +
+  theme_article()
 
-#Minimum temperatures plot
-OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;% 
-  summarize(min_temp = round(min(temp),1)) %&gt;% 
-    mutate( month_abb = month(month, label = T)) %&gt;% 
-ggplot(aes(month_abb,min_temp))+
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
-  geom_boxplot( width = 0.3)+
-  annotate(&quot;text&quot;,x = 1:6, y = 24, 
-          label=as.character(round(OP_months$min_temp,2)) )+
-  ggtitle(&quot;Minimum Daily Temperatures Per Month at Oak Park&quot;)+
-  ylab(&quot;Temperature (°C)&quot;)+
-  xlab(&quot;Month&quot;)+
-  theme_minimal()
-
-ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
-  geom_density_ridges_gradient(
-    aes(fill = ..x..), scale = 2, size = 0.2
-  ) +
-  scale_fill_gradientn(
-    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
-    name = &quot;RH (%)&quot;
-  )+
+ggplot(OP, aes(x = rhum, y = factor(month_abb, ordered = T))) +
+  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
+  scale_fill_gradientn(colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+                       name = &quot;RH (%)&quot;) +
   scale_x_continuous(expand = c(0.1, 0)) +
-  ggtitle( &quot;Relative Humidity at Oak Park&quot;)+
-  xlab(&quot;Relative Humidity (%)&quot;)+
-  ylab(&quot;Month&quot;)+
-  theme_tufte()+
+  ggtitle(&quot;Relative Humidity at Oak Park&quot;) +
+  xlab(&quot;Relative Humidity (%)&quot;) +
+  ylab(&quot;Month&quot;) +
+  theme_article() +
   theme_ridges(font_size = 13, grid = TRUE)</code></pre>
 <pre><code>## Picking joint bandwidth of 2.11</code></pre>
+<p><img src="images/min_t-1.png" width="576" style="display: block; margin: auto;" /><img src="images/min_t-2.png" width="576" style="display: block; margin: auto;" /></p>
+<p>Plot daily rainfall values.</p>
 <pre class="r"><code>#Rain plot
 OP %&gt;%
   filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;% 
-  summarize(rain = sum(rain)
-  ) %&gt;% 
-    mutate( month_abb = month(month, label = T)) %&gt;% 
-ggplot(aes(month_abb,rain,fill = factor(year_var)))+
-  geom_bar( position=&quot;dodge&quot;, stat=&quot;identity&quot;, width = 0.7)+
-  scale_fill_manual(values = colorRampPalette(brewer.pal(10, &quot;Blues&quot;))(10))+
-  annotate(&quot;text&quot;,x = 1:6, y = 51, 
-          label=as.character(OP_months$rain))+
-  theme_minimal()</code></pre>
-<pre><code>## Warning in brewer.pal(10, &quot;Blues&quot;): n too large, allowed maximum for palette Blues is 9
-## Returning the palette you asked for with that many colors</code></pre>
-<p><img src="images/gens_ridges-1.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-2.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-3.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-4.png" width="576" style="display: block; margin: auto;" /><img src="images/gens_ridges-5.png" width="576" style="display: block; margin: auto;" /></p>
+  group_by(year_var, month, short_date) %&gt;%
+  summarize(rain = sum(rain)) %&gt;%
+  mutate(month_abb = month(month, label = T)) %&gt;%
+  ggplot(aes(month_abb, rain, fill = factor(year_var))) +
+  geom_bar(position = &quot;dodge&quot;,
+           stat = &quot;identity&quot;,
+           width = 0.7) +
+  scale_fill_brewer(&quot;Year&quot;,
+                    palette = &quot;Set3&quot;) +
+  annotate(&quot;text&quot;,
+           x = 1:6,
+           y = 51,
+           label = as.character(OP_months$rain)) +
+  theme_article()</code></pre>
+<p><img src="images/rain_plots-1.png" width="576" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>OP %&gt;%
-    filter(month %in% c(4:10)) %&gt;%
-    group_by(year_var, month, short_date) %&gt;% 
-    summarize(temp = round(mean(temp),1),
-              rain = sum(rain),
-              wdsp = mean(wdsp),
-              rhum = round(mean(rhum),1)
-              
-    ) %&gt;% rename(date = short_date) %&gt;% 
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;%
+  summarize(
+    temp = round(mean(temp), 1),
+    rain = sum(rain),
+    wdsp = mean(wdsp),
+    rhum = round(mean(rhum), 1)
+    
+  ) %&gt;% rename(date = short_date) %&gt;%
   ggplot() +
-    geom_line(aes(
-      x = date,
-      y = rhum,
-      color = &quot;Relative humidity (%)&quot;,
-      fill = &quot;Relative humidity (%)&quot;
-    ),
-    size = 0.1) +
-    geom_line(aes(
-      x = date,
-      y = temp,
-      colour = &quot;Temperature (˚C)&quot;,
-      fill = &quot;Temperature (˚C)&quot;
-    ),
-    size = 0.1) +
-    geom_col(
-      aes(date,
-          rain,
-          colour = &quot;Precipitation (mm/day)&quot;,
-          fill = &quot;Precipitation (mm/day)&quot;),
-      size = 1 ,
-      inherit.aes = TRUE,
-      width = 0.05
-    ) +
-    geom_hline(aes(yintercept = 88,
-                   linetype = &quot;88 % RH&quot;),
-               colour = &quot;#ff7f00&quot;,
-               size = 0.3) +
-    geom_hline(aes(yintercept = 10,
-                   linetype = &quot;10 ˚C&quot;),
-               colour = &quot;#e31a1c&quot;,
-               size = 0.3) +
-    labs(x = &quot;&quot;, y = &quot;T (˚C), PR (mm), RH (%) and Wind (m/s)&quot;) +
-    scale_colour_manual(
-      &quot;Weather&quot;,
-      values = c(
-        &quot;Relative humidity (%)&quot; = &quot;blue&quot;,
-        &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
-        &quot;Precipitation (mm/day)&quot; = &quot;#a6cee3&quot;
-      )
-    ) +
-    scale_fill_manual(
-      &quot;Weather&quot;,
-      values = c(
-        &quot;Relative humidity (%)&quot; =  &quot;blue&quot;,
-        &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
-        &quot;Precipitation (mm/day)&quot; = &quot;#a6cee3&quot;
-      )
-    ) +
-    scale_linetype_manual(name = &quot;Limits&quot;,
-                          values = c(1, 2, 3)) +
-    theme(
-      plot.title = element_text(size = 22),
-      text = element_text(family = &quot;Garamond&quot;),
-      axis.title.x = element_blank()
-    ) +
-    facet_wrap(. ~ year_var, scales = &quot;free_x&quot;, ncol = 1) +
-    ggtitle(&quot;Hourly weather data for Oak Park&quot;) +
-    theme_minimal()+
-   theme(axis.title.x = element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        legend.position=&quot;top&quot;)</code></pre>
-<pre><code>## Warning: Ignoring unknown aesthetics: fill
-
-## Warning: Ignoring unknown aesthetics: fill</code></pre>
+  geom_line(aes(x = date,
+                y = rhum,
+                color = &quot;Relative humidity (%)&quot;,
+                fill = &quot;Relative humidity (%)&quot;),
+            size = 0.1) +
+  geom_line(aes(x = date,
+                y = temp,
+                colour = &quot;Temperature (˚C)&quot;,
+                fill = &quot;Temperature (˚C)&quot;,),
+            size = 0.1) +
+  geom_col(
+    aes(date,
+        rain,
+        colour = &quot;Precipitation (mm/day)&quot;,
+        fill = &quot;Precipitation (mm/day)&quot;),
+    size = 1 ,
+    inherit.aes = TRUE,
+    width = 0.05
+  ) +
+  geom_hline(aes(yintercept = 88,
+                 linetype = &quot;88 % RH&quot;),
+             colour = &quot;#ff7f00&quot;,
+             size = 0.3) +
+  geom_hline(aes(yintercept = 10,
+                 linetype = &quot;10 ˚C&quot;),
+             colour = &quot;#e31a1c&quot;,
+             size = 0.3) +
+  labs(x = &quot;&quot;, y = &quot;T (˚C), PR (mm), RH (%) and Wind (m/s)&quot;) +
+  scale_colour_manual(
+    &quot;Weather&quot;,
+    values = c(
+      &quot;Relative humidity (%)&quot; = &quot;blue&quot;,
+      &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
+      &quot;Precipitation (mm/day)&quot; = &quot;#a6cee3&quot;
+    )
+  ) +
+  scale_fill_manual(
+    &quot;Weather&quot;,
+    values = c(
+      &quot;Relative humidity (%)&quot; =  &quot;blue&quot;,
+      &quot;Temperature (˚C)&quot; = &quot;#fb9a99&quot;,
+      &quot;Precipitation (mm/day)&quot; = &quot;#a6cee3&quot;
+    )
+  ) +
+  scale_linetype_manual(name = &quot;Limits&quot;,
+                        values = c(1, 2, 3)) +
+  theme_article() +
+  theme(
+    plot.title = element_text(size = 22),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = &quot;top&quot;
+  ) +
+  facet_wrap(. ~ year_var, scales = &quot;free_x&quot;, ncol = 1) +
+  ggtitle(&quot;Hourly weather data for Oak Park&quot;)</code></pre>
 <p><img src="images/wth_daily-1.png" width="1056" /></p>
+</div>
 </div>
 </div>
 

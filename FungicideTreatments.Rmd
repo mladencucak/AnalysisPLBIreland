@@ -5,7 +5,6 @@ output:
     code_folding: hide
 ---
 
-
 # Libraries
 
 ```{r opts, echo = FALSE}
