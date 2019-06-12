@@ -84,6 +84,7 @@ The performance is evaluated in two ways, as a reduction of:
 # Cut-off Dates
 
 Soil temperature data.
+
 ```{r soiltemps , warning=FALSE}
 soildf <-
   read_csv(
@@ -132,7 +133,7 @@ dates_cut <-
     data.frame(
       year = 2007,
       plant_date = as.Date(strptime(paste(
-        "2007", mean(dates_cut$plant_doy, na.rm = T)
+        "2007", mean(dates_cut$plant_doy, na.rm = TRUE)
       ), format = "%Y %j")),
       plant_doy = mean(dates_cut$plant_doy)
     )
@@ -362,7 +363,6 @@ ControlFreqFun <-
     trt_df_window <-
       split(trt_df, trt_df$year_var)
     
-    
     for (year in seq_along(trt_df_window)) {
       x <- trt_df_window[[year]]
       trt_df_window[[year]] <-
@@ -375,7 +375,6 @@ ControlFreqFun <-
     
     trt_df_window <-  bind_rows(trt_df_window)
     
-    
     #Combine the data for both scenarios
     trt_df <- bind_cols(trt_df_one, trt_df_window)
     
@@ -383,7 +382,8 @@ ControlFreqFun <-
     sum_df <-
       trt_df %>%
       group_by(year_var) %>%
-      summarise_at(colnames(trt_df[, grep("ir", colnames(trt_df))]), .funs = sum)
+      summarise_at(colnames(trt_df[, grep("ir", colnames(trt_df))]),
+                   .funs = sum)
     
     sum_df$warning_thres <-  warning_threshold
     
@@ -493,6 +493,7 @@ control_eval_long %>%
     alpha = 0.6,
     size = 1
   ) +
+  scale_colour_brewer(palette = "Set3") +
   geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_seven + 0.8 , label = "7-day freq."),
@@ -583,7 +584,6 @@ control_eval_long %>%
     color = "gray",
     linetype = "solid"
   ) +
-  
   geom_line(aes()) +
   geom_line(aes(warning_thres, 12), colour = gray.colors(2)[1]) +
   geom_label(
@@ -601,7 +601,7 @@ control_eval_long %>%
     label.size = NA,
     size = 3
   ) +
-  facet_wrap( ~ Years, ncol = 5) +
+  facet_wrap(~ Years, ncol = 5) +
   ggtitle("Treatment Frequency as a Factor the Decision Threshold") +
   theme(strip.text.y = element_blank()) +
   xlab("Warning thresholds (EBH)") +
@@ -615,8 +615,8 @@ control_eval_long %>%
   ) +
   scale_x_discrete(breaks = seq(0, 18, 3)) +
   scale_y_continuous(breaks = seq(0, 30, 5)) +
-  scale_colour_manual("Model",
-                      values = c("#a6cee3", "#1f78b4", "#7570b3", "orange", "red", "yellow")) +
+  scale_colour_brewer("Model",
+                      palette = "Dark2") +
   theme(legend.position = "top",
         text = element_text(size = 11))
 ```
@@ -692,7 +692,9 @@ dosedf %>%
       ifelse(model == "ir_low_risk", "Low Risk IR", "")
     )
   )) %>%
-  mutate(model = factor(model, levels = c("Default IR", "Optimised IR", "Low Risk IR"))) %>%
+  mutate(model = factor(model, levels = c("Default IR",
+                                          "Optimised IR",
+                                          "Low Risk IR"))) %>%
   group_by(year_var, model) %>%
   do(Summary(.$dose)) %>%
   ggplot(aes(
@@ -714,8 +716,8 @@ dosedf %>%
     position = position_dodge(0.9),
     size = 2.7
   ) +
-  scale_fill_manual("Model", values = c("#f0f0f0", "#bdbdbd", "#636363")) +
-  theme_bw() +
+  scale_fill_brewer("Model", palette = "Dark2") +
+  theme_article() +
   facet_grid( ~ year_var, scales = "free") +
   scale_y_continuous(limits = c(0, 1)) +
   labs(x = "Year",
@@ -782,7 +784,7 @@ dosedf %>%
   ) +
   geom_errorbar(aes(ymin = mean - sd,
                     ymax = mean + sd), width = 0.2) +
-  scale_fill_manual("Model", values = c("#f0f0f0", "#bdbdbd", "#636363")) +
+  scale_fill_brewer("Model", palette = "Dark2") +
   theme_article() +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   labs(x = "Model",
