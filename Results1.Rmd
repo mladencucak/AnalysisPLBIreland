@@ -288,9 +288,10 @@ rcompanion::compareLM(poly_1_fit, poly_2_fit, poly_3_fit, poly_4_fit)[[2]] %>%
   gt() 
 ```
 
-Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R^2^, while the distribution of residuals is still fulfilling the assumption of normality. Model of 4^th^ order seems to provide very little gain in terms of fit Adj. R^2^ comparing to 3^rd^ order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4^th^ order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data. 
+The cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data to understand underlying relationships between variable thresholds of our model. Hence, our priority is the increase in explanatory power, for which our main guide is adjusted R^2^, while the distribution of residuals is still fulfilling the assumption of normality. The model of 4^th^ order seems to provide very little gain in terms of fit  using Adj. R^2^ comparing to 3^rd^ order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4^th^ order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data. 
 
-Looking at the concordance between local regression (loess) and polynomial models, we have:
+Looking at the concordance between local regression (LOESS) and polynomial models, we have:
+
 ```{r concordance}
 pred_cd_data <-
   data.frame(
@@ -549,7 +550,6 @@ contour(poly_3_fit,
         at = data.frame(Tt = 3, RHt = 0, SDt = 0))
 ```
 
-
 ### Further investigation
 
 Based on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed: 
@@ -580,7 +580,6 @@ plot_grid(pl[[1]],
           pl[[6]],
           ncol = 3)
 ```
-
 
 
 ```{r plot-ROC-figures, fig.align='center', fig.width=7, fig.height=7, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
