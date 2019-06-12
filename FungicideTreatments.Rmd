@@ -117,8 +117,8 @@ dates_cut <-
     pl_date <- x[match(3, criteria_sum) + 1, "date"]
     data.frame("year" = unique(year(x$date)),
                date = pl_date[1, 1])
-    
-  }) %>% bind_rows() %>%
+    }) %>% 
+  bind_rows() %>%
   rename("plant_date"  = date)
 rm(soildf, dfls)
 ```
@@ -143,13 +143,13 @@ dates_cut <-
 We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows. 
   
 ```{r}
-meet_in_rows <- 5*7
+meet_in_rows <- 5 * 7
 dates_cut$prot_start <- with(dates_cut, plant_doy + meet_in_rows)
 dates_cut$prot_start <- paste(dates_cut$year,
                               dates_cut$prot_start,
-                              sep = "-") %>% 
-                              strptime(format="%Y-%j") %>% 
-                              as.Date()
+                              sep = "-") %>%
+  strptime(format = "%Y-%j") %>%
+  as.Date()
 ```
    
 For the purposes of this study we will assume that the growing season lasts 120 days. However, the pesticide protection lasts for at least another three weeks to allow the tuber growth.   
@@ -165,7 +165,7 @@ dates_cut$season_end <-
                 strptime(format = "%Y-%j") %>%
   as.Date()
 
-dates_cut %>% kable()
+dates_cut
 ```
 
 
@@ -191,7 +191,7 @@ df <-
     "90_10_12_rain_ebh",
     "88_12_10_rainrh_ebh",
     "88_10_10_rainrh_ebh"
-  )]  
+  )]
 
 #Keep only  columns needed for faster code execution
 df <-  dplyr::rename(df,
@@ -206,7 +206,7 @@ Calculate the number of calendar treatments, assuming they would start 5 weeks a
 
 ```{r}
 (calendar_five <- round(c(duration_of_season - 5 * 7) / 5, 0))
-(calendar_seven <- round(c(duration_of_season - 5 * 7)/7, 0))
+(calendar_seven <- round(c(duration_of_season - 5 * 7) / 7, 0))
 
 ```
 
@@ -437,6 +437,7 @@ control_eval_long %>%
 
 ```{r plot_models, warning=F, fig.align="center", fig.dim= c(11,7)}
 
+
 control_eval_long %>%
   # control_eval_long%>%
   mutate(programme = ifelse(
@@ -514,7 +515,7 @@ control_eval_long %>%
               se = FALSE,
               color = gray.colors(2)[1],
               aes(group = 1)) +
-  facet_wrap( ~ programme, ncol = 3) +
+  facet_wrap(~ programme, ncol = 3) +
   ggtitle("Cost effectiveness of model versions") +
   
   xlab("Warning thresholds (EBH)") +
@@ -526,7 +527,6 @@ control_eval_long %>%
   
   The figure shows how does the frequency of recommended  treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.  
   
-
 There is variation in the data and it would be interesting to see if there is an effect of year. 
 
 ```{r plot_years, warning=F, fig.align="center", fig.dim= c(11,9)}
@@ -601,7 +601,7 @@ control_eval_long %>%
     label.size = NA,
     size = 3
   ) +
-  facet_wrap(~ Years, ncol = 5) +
+  facet_wrap( ~ Years, ncol = 5) +
   ggtitle("Treatment Frequency as a Factor the Decision Threshold") +
   theme(strip.text.y = element_blank()) +
   xlab("Warning thresholds (EBH)") +
