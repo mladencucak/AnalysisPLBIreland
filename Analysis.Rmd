@@ -551,11 +551,10 @@ PlotROC <- function(df, numbering = NULL) {
     )) %>%
     ungroup()
   
-  
   #find AUROC value for selected model
   if ("model" %in% names(AUROC_data)) {
     AUROC_lab <-
-      paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+      paste("AUROC = ", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
   } else {
     #some changes in next chnk of code made this necessary, col model will be split and removed
     if (str_split(unique(df$model), "_")[[1]][4] == "rainrh") {
