@@ -1,10 +1,9 @@
 ---
-title: "Habits"
+title: "Evaluation of Irish Rules Model"
 output:
   html_document:
     code_folding: hide
 ---
-% Evaluation of Irish Rules model
 
 # Analysis 
 
@@ -16,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded and installed automatically.
+Packages needed for the analysis are loaded. If the libraries are not installed locally, they will be downloaded and installed automatically.
 
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
@@ -654,15 +653,15 @@ AUROC_data <-
   separate(AUROC_data, model, into =  params, sep = "_")
 AUROC_data[, 1:3] <-
   lapply(AUROC_data[, 1:3], as.numeric)
-AUROC_data <- data.frame(AUROC_data)
-head(AUROC_data) %>%
+data_for_analysis <- data.frame(AUROC_data)
+head(data_for_analysis) %>%
   gt()
 ```
 
 
 ```{r}
 data
-save(data, file = here::here("data", "op_2007_16",  "AUROC_data.RData"))
+save(data, file = here::here("data", "op_2007_16",  "data_for_analysis.RData"))
 ```
 
 Packages used
