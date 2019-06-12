@@ -28,7 +28,8 @@ list.of.packages <-
     "pbapply",
     "tools",
     "here",
-    "ggrepel"
+    "ggrepel",
+    "egg"
   )
 
 new.packages <-
@@ -631,7 +632,7 @@ PlotROC <- function(df, numbering = NULL) {
       label = AUROC_lab,
       size = 5
     ) +
-    theme_bw() +
+    theme_article() +
     theme(
       text = element_text(size = 10.5),
       panel.grid.major = element_blank(),

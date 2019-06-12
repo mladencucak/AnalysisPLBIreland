@@ -37,7 +37,8 @@ list.of.packages <-
     "egg",
     "rsm",
     "ggrepel",
-    "cowplot"
+    "cowplot",
+    "viridis"
   )
 
 new.packages <-
@@ -102,7 +103,8 @@ group_by(data_for_analysis, lw_rh) %>%
 shapiro.test(t_data$difference)
 ```
 The p-value < 0.05 implying that the distribution of the data is significantly different from normal distribution.
-Use paired-sample Wilcoxon test to determine if median AUROC with r as lw estimator is as good as the median auc with both r and rh as estimators. 
+
+Use paired-sample Wilcoxon test to determine if median AUROC with rain as LW estimator is as good as the median auc with both rain and RH as estimators. 
 
 ```{r wilcoxon-test}
 w.test <- with(t_data,
@@ -122,22 +124,31 @@ Model outputs with rain as single predictor are removed from further analysis.
 ```{r plot_lw_estim}
 p1 <-
   data_for_analysis  %>%
-  mutate(Leaf_Wetness = factor(ifelse(lw_rh == "rainrh", "rain and rh", "only rain"))) %>%
+  mutate(Leaf_Wetness = factor(ifelse(lw_rh == "rainrh",
+                                      "rain and rh",
+                                      "only rain"))) %>%
   ggplot(aes(
     x = factor(lw_rh),
     y = auc,
     group = Leaf_Wetness
   )) +
-  geom_boxplot(aes(colour = Leaf_Wetness), width = 0.4) +
-  # geom_label(aes_string(x=1.5, y=height, label=paste("p =",w.test$p.value)), label.size =0.02 )+
-  scale_color_discrete(name = "Leaf Wetness",
-                       labels = c("Rain>0.01", "Rain>0.01 & RH>=90%")) +
+  geom_boxplot(aes(fill = Leaf_Wetness),
+               width = 0.4) +
+  scale_fill_viridis(
+    name = "Leaf Wetness",
+    labels = c("Rain>0.01", "Rain>0.01 & RH>=90%"),
+    discrete = TRUE,
+    option = "plasma",
+    alpha = 0.7
+  ) +
   scale_x_discrete(breaks = c(0, 90),
-                   labels = c("rain", "rh and rain")) +
+                   labels = c("rain", "rh and rain"),
+                   palette()) +
   xlab("Infection period switch") +
   ylab("AUROC") +
   theme_article() +
   coord_equal(10 / 1)
+
 p1 + ggsave(
   here::here("data", "op_2007_16", "results", "LWswithc.png"),
   width = 11,
@@ -154,23 +165,23 @@ data_for_analysis <-
   select(-lw_rh)
 ```
 
-## T, RH and Sporulation duration
+## T, RH and sporulation duration
 
 ### Initial exploration
 
 Scatter plot matrix shows some relationships between y and other variables.
 
-```{r interactions, fig.align='center'}
+```{r interactions, fig.align='center', message=FALSE}
 GGally::ggpairs(data_for_analysis,
                 lower = list(continuous = "points"),
                 upper = list(continuous = "cor"))
 ```
 
-Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC. 
+Increasing temperature threshold had positive, while reducing RH and duration of sporulation threshold had negative correlation with AUROC. 
 
 Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.
 
-```{r desc_stat, fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
+```{r desc_stat, fig.align='center', fig.show = "hold",fig.width=6, fig.height=4, message=FALSE, warning=FALSE}
 p1 <-  
   data_for_analysis[order(data_for_analysis$hours), ] %>%
   ggplot(., aes(factor(hours), auc)) +
@@ -229,7 +240,6 @@ p3 <-
   ylab("AUROC") +
   theme_article()
 
-
 grDevices::png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
     width = 400, height = 800,bg = "white", res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
@@ -253,7 +263,7 @@ cd_data <- coded.data(data_for_analysis,
                       RHt ~ (rh_thresh - 90),
                       SDt ~ (hours - 12))
 str(cd_data)
-head(cd_data) %>% kable()
+head(cd_data)
 ```
 
 We may use non-parametric local regression (LOESS) to obtain predicted values for the 4-dimensional response surface, using RHt, SDt, and Tt, and all 3- and 2-way iterations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255--268).
@@ -474,10 +484,9 @@ for (i in seq(nrow(par_cut))) {
 
 Plots show relationship between variation in parameters of two variables with third variable fixed at three levels and response as AUROC. 3D surface plots indicate that reduced sporulation duration and relative humidity threshold improves accuracy of the model; while model versions with increased temperature threshold have better diagnostic performance. 
 
-Another way to present this data is with contour plots. We will plot contour plots corresponding to the above 3D surfaces 
+Another way to present this data is with contour plots. We will plot contour plots corresponding to the above 3D surfaces.
 
 ```{r countour, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=5, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
-
 
 par(
   mar = c(3, 4, 4, 2),
@@ -486,29 +495,60 @@ par(
   cex.axis = 1.06,
   cex.lab = 1.1
 )
-# c(5, 4, 4, 2)
 
 contour(poly_3_fit,
         ~ Tt + RHt,
         image = TRUE,
+        img.col = color_var,
         at = data.frame(Tt = 0, RHt = 0, SDt = -3))
-# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0))
-# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
+
+# contour(poly_3_fit,
+#         ~ Tt + RHt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
+# 
+# contour(poly_3_fit,
+#         ~ Tt + RHt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
 
 contour(poly_3_fit,
         ~ Tt + SDt,
         image = TRUE,
+        img.col = color_var,
         at = data.frame(Tt = 0, RHt = -3, SDt = 0))
-# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
-# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 3, SDt = 0 ))
 
-# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = -3, RHt = 0, SDt = 0 ))
-# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
+# contour(poly_3_fit,
+#         ~ Tt + SDt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
+# 
+# contour(poly_3_fit,
+#         ~ Tt + SDt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = 0, RHt = 3, SDt = 0))
+
+# contour(poly_3_fit,
+#         ~ SDt + RHt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = -3, RHt = 0, SDt = 0))
+# 
+# contour(poly_3_fit,
+#         ~ SDt + RHt,
+#         image = TRUE,
+#         img.col = color_var,
+#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
+
 contour(poly_3_fit,
         ~ SDt + RHt,
         image = TRUE,
+        img.col = color_var,
         at = data.frame(Tt = 3, RHt = 0, SDt = 0))
-
 ```
 
 
@@ -581,18 +621,19 @@ rename(df, Model = model) %>%
     color = Model,
     label = cut_point
   )) +
-  # geom_abline(intercept=0, slope = 1, color="black", linetype="dashed")+
   geom_point() +
   geom_text_repel(size = 2) +
   geom_path(colour = "gray") +
   geom_line() +
+  scale_colour_viridis(discrete = TRUE,
+                       option = "plasma") +
   scale_y_continuous(limits = c(0, 1),
                      expand = c(0, 0),
                      name = "Sensitivity") +
   scale_x_continuous(limits = c(0, 1),
                      expand = c(0, 0),
                      name = "1- Specificity") +
-  theme_minimal() +
+  theme_article() +
   theme(
     text = element_text(size = 14),
     panel.grid.major = element_blank(),
@@ -611,5 +652,5 @@ rename(df, Model = model) %>%
   ggtitle("ROC for selected models")
 ```
 
-IR have failed to indicate any risk in 2  and the warning threshold of 12 hour was reached in only 4 years out of 10. 
+IR have failed to indicate any risk in 2 and the warning threshold of 12 hour was reached in only 4 years out of 10. 
 
