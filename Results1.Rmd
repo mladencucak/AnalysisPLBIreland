@@ -1,4 +1,9 @@
-% Evaluation of Irish Rules model
+---
+title: "Evaluation of Irish Rules Model"
+output:
+  html_document:
+    code_folding: hide
+---
 
 # Parameter evaluation
 
@@ -15,6 +20,7 @@ Packages needed for the analysis are loaded. If the libraries do not exist local
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
+    "DescTools",
     "tidyverse",
     "readxl",
     "data.table",
@@ -63,10 +69,10 @@ Differences between pairs of models with same parameters, differing only in leaf
 
 ```{r leaf-wet-graphs, fig.align='center'}
 # load the data
-load( file = here::here("data", "op_2007_16",  "data.RData"))
+load(file = here::here("data", "op_2007_16",  "data_for_analysis.RData"))
 
 t_data <-
-  data %>%
+  data_for_analysis %>%
   group_by(rh_thresh, temp_thresh, hours) %>%
   unite(var, rh_thresh, temp_thresh, hours) %>%
   spread(key = lw_rh, value = auc) %>%
@@ -83,7 +89,7 @@ ggplot(t_data, aes(x = difference)) +
 
 Compute summary statistics by groups.
 ```{r leaf-wet summary}
-group_by(data, lw_rh) %>%
+group_by(data_for_analysis, lw_rh) %>%
   summarise(
     count = n(),
     median = median(auc, na.rm = TRUE),
@@ -114,11 +120,9 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs with rain as single predictor are removed from further analysis.
 
 ```{r plot_lw_estim}
-plot <- 
-data %>%
-  mutate(Leaf_Wetness = factor(ifelse(
-    lw_rh == "rainrh", "rain and rh", "only rain"
-  ))) %>%
+p1 <-
+  data_for_analysis  %>%
+  mutate(Leaf_Wetness = factor(ifelse(lw_rh == "rainrh", "rain and rh", "only rain"))) %>%
   ggplot(aes(
     x = factor(lw_rh),
     y = auc,
@@ -134,14 +138,20 @@ data %>%
   ylab("AUROC") +
   theme_article() +
   coord_equal(10 / 1)
-plot+ggsave(here::here("data", "op_2007_16","results","LWswithc.png"), width = 11, height = 11, units = "cm")
-
+p1 + ggsave(
+  here::here("data", "op_2007_16", "results", "LWswithc.png"),
+  width = 11,
+  height = 11,
+  units = "cm"
+)
 ```
 
 ```{r remove-single-rain}
-#Remove the data containg only rain as estimator
-# data <- subset(data, lw_rh == "rainrh")
-# data$lw_rh <- NULL
+#remove the data containg only rain as estimator
+data_for_analysis <- 
+  data_for_analysis %>% 
+  filter(lw_rh == "rainrh") %>% 
+  select(-lw_rh)
 ```
 
 ## T, RH and Sporulation duration
@@ -151,7 +161,7 @@ plot+ggsave(here::here("data", "op_2007_16","results","LWswithc.png"), width = 1
 Scatter plot matrix shows some relationships between y and other variables.
 
 ```{r interactions, fig.align='center'}
-GGally::ggpairs(data,
+GGally::ggpairs(data_for_analysis,
                 lower = list(continuous = "points"),
                 upper = list(continuous = "cor"))
 ```
@@ -162,7 +172,7 @@ Take initial look at descriptive statistics and trend of AUROC response as a fac
 
 ```{r desc_stat, fig.align='center', fig.show = "hold",fig.width=6, fig.height=4}
 p1 <-  
-  data[order(data$hours), ] %>%
+  data_for_analysis[order(data_for_analysis$hours), ] %>%
   ggplot(., aes(factor(hours), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
@@ -181,7 +191,7 @@ p1 <-
   theme_article()
 
 p2 <- 
-  ggplot(data, aes(factor(rh_thresh), auc)) +
+  ggplot(data_for_analysis, aes(factor(rh_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -199,7 +209,7 @@ p2 <-
   theme_article()
 
 p3 <-  
-  ggplot(data, aes(factor(temp_thresh), auc)) +
+  ggplot(data_for_analysis, aes(factor(temp_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -232,21 +242,21 @@ p1;p2;p3
 ### Model fitting 
 
 ```{r mod_fit_data}
-lapply(data[, 1:3], function(x)
+lapply(data_for_analysis[, 1:3], function(x)
   sort(unique(x)))
 ```
 Create coded data set. Seven levels of each variable are used. 
 
 ```{r code_data}
-cd_data <- coded.data(data, Tt ~  (temp_thresh - 10),
+cd_data <- coded.data(data_for_analysis,
+                      Tt ~  (temp_thresh - 10),
                       RHt ~ (rh_thresh - 90),
-                      SDt ~ (hours - 12)
-                      )
+                      SDt ~ (hours - 12))
 str(cd_data)
 head(cd_data) %>% kable()
 ```
 
-We may use non-parametric local regression (loess) to obtain predicted values for the 4-dimensional response surface, using RHt, SDt, and Tt, and all 3- and 2-way iterations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255--268).
+We may use non-parametric local regression (LOESS) to obtain predicted values for the 4-dimensional response surface, using RHt, SDt, and Tt, and all 3- and 2-way iterations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255--268).
 
 ```{r loess}
 lo_fit1 <- loess(auc ~ RHt * SDt * Tt, data = cd_data)
@@ -256,13 +266,17 @@ lo_pred <- predict(lo_fit1)
 Fit models of first to fourth order, and evaluate fits.
 
 ```{r model_fit}
-poly_1_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
-poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
-poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
-poly_4_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
+poly_1_fit <-
+  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
+poly_2_fit <-
+  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
+poly_3_fit <-
+  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
+poly_4_fit <-
+  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
-rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
-  add_column( Order = 1:4, .before = 1) %>% 
+rcompanion::compareLM(poly_1_fit, poly_2_fit, poly_3_fit, poly_4_fit)[[2]] %>%
+  add_column(Order = 1:4, .before = 1) %>%
   gt() 
 ```
 
@@ -270,9 +284,7 @@ Cubic model seems to be the best fit for our purpose. We want to get the best po
 
 Looking at the concordance between local regression (loess) and polynomial models, we have:
 ```{r concordance}
-
-library(DescTools)
-pred_cd_data <- 
+pred_cd_data <-
   data.frame(
     lo_pred,
     predict(poly_1_fit),
@@ -280,28 +292,43 @@ pred_cd_data <-
     predict(poly_3_fit),
     predict(poly_4_fit)
   )
-c1 <- CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_1_fit.)$rho
-c2 <- CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_2_fit.)$rho
-c3 <- CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_3_fit.)$rho
-c4 <- CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_4_fit.)$rho
+c1 <-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_1_fit.)$rho
+c2 <-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_2_fit.)$rho
+c3 <-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_3_fit.)$rho
+c4 <-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_4_fit.)$rho
 
-plot(c(c1$est,c2$est,c3$est,c4$est), ylim = c(.8,1), pch = 16, type = "o",
-     ylab = "Concordance with local regression prediction",
-     xlab = "Polynomial degree", xaxt = "n")
-axis(1, 1:4, 1:4); abline(h = 1, lty = 3)
-arrows(1:4, c(c1$lwr.ci,c2$lwr.ci,c3$lwr.ci,c4$lwr.ci),
-       1:4, c(c1$upr.ci,c2$upr.ci,c3$upr.ci,c4$upr.ci),
-       code = 3, length = .05, angle = 90)
+plot(
+  c(c1$est, c2$est, c3$est, c4$est),
+  ylim = c(.8, 1),
+  pch = 16,
+  type = "o",
+  ylab = "Concordance with local regression prediction",
+  xlab = "Polynomial degree",
+  xaxt = "n"
+)
+axis(1, 1:4, 1:4)
+abline(h = 1, lty = 3)
+arrows(
+  1:4,
+  c(c1$lwr.ci, c2$lwr.ci, c3$lwr.ci, c4$lwr.ci),
+  1:4,
+  c(c1$upr.ci, c2$upr.ci, c3$upr.ci, c4$upr.ci),
+  code = 3,
+  length = .05,
+  angle = 90
+)
 ```
 
 This reinforces the choice of the polynomial model of degree 3, which yields predictions that agree the most with the local, non-parametric regression, and hence adequately reproduces the behaviour of the response surface.
 
 ```{r summary_table2, warning=FALSE }
-
-library(pander)
 panderOptions('round', 2)
 panderOptions('keep.trailing.zeros', TRUE)
-pander(poly_3_fit,add.significance.stars = T)
+pander(poly_3_fit, add.significance.stars = TRUE)
 ```
 
 
@@ -313,7 +340,7 @@ Evaluate model fit with diagnostic plot.
 
 ```{r diag_plot,out.width = '50%',fig.show = "hold"}
 poly_3_fit$studres <- rstudent(poly_3_fit)
-plot(poly_3_fit$studres, main="Residuals vs Order of data")
+plot(poly_3_fit$studres, main = "Residuals vs Order of data")
 abline(h = 0, col = "red")
 hist(resid(poly_3_fit)) #distriburion of residuals should be approximately  normal
 ```
@@ -323,41 +350,47 @@ Assumptions of normality of residuals are fulfilled.
 Extract the model formula. The code has been borrowed from [this StackOverflow thread](https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel)
 
 ```{r equation}
-processPolyNames = function(coef){
-  members = strsplit(mgsub::mgsub(coef,c("poly\\(",", degre.*"),c("","")),", ")[[1]]
-  degree = as.numeric(strsplit(strsplit(coef,")")[[1]][2],"\\.")[[1]])
+processPolyNames = function(coef) {
+  members = strsplit(mgsub::mgsub(coef, c("poly\\(", ", degre.*"), c("", "")), ", ")[[1]]
+  degree = as.numeric(strsplit(strsplit(coef, ")")[[1]][2], "\\.")[[1]])
   coef_out = ""
-  for(d in seq_along(degree)){
-    if(degree[d] == 0) next
-    if(degree[d] == 1){
-      if(coef_out == ""){
+  for (d in seq_along(degree)) {
+    if (degree[d] == 0)
+      next
+    if (degree[d] == 1) {
+      if (coef_out == "") {
         coef_out = members[d]
       } else {
-        coef_out = paste0(coef_out,"*",members[d])
+        coef_out = paste0(coef_out, "*", members[d])
       }
     } else {
-      if(coef_out == ""){
-        coef_out = paste0(members[d],"^",degree[d],"^")
+      if (coef_out == "") {
+        coef_out = paste0(members[d], "^", degree[d], "^")
       } else {
-        coef_out = paste0(coef_out,"*",members[d],"^",degree[d],"^")
+        coef_out = paste0(coef_out, "*", members[d], "^", degree[d], "^")
       }
     }
   }
   return(coef_out)
 }
 
-coefs = summary(poly_3_fit)$coef[,1]
-prettyNames = lapply(names(coefs)[-1],processPolyNames)
+coefs = summary(poly_3_fit)$coef[, 1]
+prettyNames = lapply(names(coefs)[-1], processPolyNames)
 prettyModel = ""
-for(i in seq_along(coefs)){
-  if(i == 1){
-    prettyModel = paste0(prettyModel,round(coefs[i],2))
+for (i in seq_along(coefs)) {
+  if (i == 1) {
+    prettyModel = paste0(prettyModel, round(coefs[i], 2))
   } else {
-    prettyModel = paste0(prettyModel,ifelse(coefs[i] >= 0," + "," "),round(coefs[i],2),"*",prettyNames[[i-1]])
+    prettyModel = paste0(prettyModel,
+                         ifelse(coefs[i] >= 0, " + ", " "),
+                         round(coefs[i], 2),
+                         "*",
+                         prettyNames[[i - 1]])
   }
 }
 prettyModel <-  paste("AUROC =", gsub("-", "- ", prettyModel))
-cat(prettyModel);rm(processPolyNames,coefs,prettyNames)
+cat(prettyModel)
+rm(processPolyNames, coefs, prettyNames)
 
 ```
 `r format(prettyModel)`
@@ -371,8 +404,8 @@ rm(prettyModel)
 Visualise fitted response surface. 
 
 ```{r persp, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
-z_min <- min(data$auc) - c(min(data$auc) * 0.02)
-z_max <- max(data$auc) + c(max(data$auc) * 0.02)
+z_min <- min(data_for_analysis$auc) - c(min(data_for_analysis$auc) * 0.02)
+z_max <- max(data_for_analysis$auc) + c(max(data_for_analysis$auc) * 0.02)
 
 # use a viridis palette for usability
 library(viridis)
@@ -383,32 +416,33 @@ par(mar = c(1.5, 4.5, 3.5, 1.5),
     cex = 0.5)
 
 par_cut <- data.frame(
-  Tt = c(rep(0, 6), -3, 0,+3),
-  RHt = c(rep(0, 3), -3, 0,+3, rep(0, 3)),
-  SDt = c(-3, 0,+3, rep(0, 6))
+  Tt = c(rep(0, 6), -3, 0, +3),
+  RHt = c(rep(0, 3), -3, 0, +3, rep(0, 3)),
+  SDt = c(-3, 0, +3, rep(0, 6))
 )
 
 plot_ls <- list()
 
 for (i in seq(nrow(par_cut))) {
-  persp(poly_3_fit,
-        if (i <= 3) {
-          ~ RHt + Tt
-        } else if (i %in% 4:6) {
-          ~ SDt + Tt
-        } else if (i >= 7) {
-          ~ SDt + RHt
-        }
-        ,
-        at = data.frame(par_cut[i,]),
+  persp(
+    poly_3_fit,
+    if (i <= 3) {
+      ~ RHt + Tt
+    } else if (i %in% 4:6) {
+      ~ SDt + Tt
+    } else if (i >= 7) {
+      ~ SDt + RHt
+    }
+    ,
+    at = data.frame(par_cut[i, ]),
     zlab = "\nAUROC",
     xlab = if (i <= 3) {
-          c("RHt (%)","Tt (°C)")
-        } else if (i %in% 4:6) {
-          c("SDt (hours)", "Tt (°C)")
-        } else if (i >= 7) {
-          c("SDt (hours)", "RHt (%)")
-        },
+      c("RHt (%)", "Tt (°C)")
+    } else if (i %in% 4:6) {
+      c("SDt (hours)", "Tt (°C)")
+    } else if (i >= 7) {
+      c("SDt (hours)", "RHt (%)")
+    },
     col = color_var,
     zlim = c(z_min, z_max),
     theta = 37,
@@ -418,12 +452,22 @@ for (i in seq(nrow(par_cut))) {
     cex.main = 1.8,
     cex.axis = 1.06,
     cex.lab = 1.8,
-    main = paste0("\n",letters[i],") ", "Response at ", 
-                  "Tt = ", par_cut[i,1] + 10,"°C;",
-                   "\n",
-                  "RHt = ", par_cut[i,2] + 90, "%; ",
-                  "SDt = ", par_cut[i,3] +12, " hours."
-                  )
+    main = paste0(
+      "\n",
+      letters[i],
+      ") ",
+      "Response at ",
+      "Tt = ",
+      par_cut[i, 1] + 10,
+      "°C;",
+      "\n",
+      "RHt = ",
+      par_cut[i, 2] + 90,
+      "%; ",
+      "SDt = ",
+      par_cut[i, 3] + 12,
+      " hours."
+    )
   )
 }
 ```
@@ -434,25 +478,36 @@ Another way to present this data is with contour plots. We will plot contour plo
 
 ```{r countour, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=5, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
 
+
 par(
   mar = c(3, 4, 4, 2),
-    mfrow = c(3, 1),
-    cex.main = 1.2,
-    cex.axis = 1.06,
-    cex.lab = 1.1)
+  mfrow = c(3, 1),
+  cex.main = 1.2,
+  cex.axis = 1.06,
+  cex.lab = 1.1
+)
 # c(5, 4, 4, 2)
 
-contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = -3 ))
+contour(poly_3_fit,
+        ~ Tt + RHt,
+        image = TRUE,
+        at = data.frame(Tt = 0, RHt = 0, SDt = -3))
 # contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0))
 # contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
 
-contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = -3, SDt = 0 ))
+contour(poly_3_fit,
+        ~ Tt + SDt,
+        image = TRUE,
+        at = data.frame(Tt = 0, RHt = -3, SDt = 0))
 # contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
 # contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 3, SDt = 0 ))
 
 # contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = -3, RHt = 0, SDt = 0 ))
 # contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
-contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 3, RHt = 0, SDt = 0 ))
+contour(poly_3_fit,
+        ~ SDt + RHt,
+        image = TRUE,
+        at = data.frame(Tt = 3, RHt = 0, SDt = 0))
 
 ```
 
@@ -467,12 +522,11 @@ Based on the sensitivity analysis following model parameterisations were compare
 #     mfrow = c(1, 4)
 #   )
 #Load function and the data
-load( file = here::here("data", "op_2007_16",  "ROC_data.RData"))
-load( file = here::here("data", "op_2007_16",  "AUROC_data.RData"))
-load( file = here::here("data", "op_2007_16",  "PlotROC.RData"))
+load(file = here::here("data", "op_2007_16",  "ROC_data.RData"))
+load(file = here::here("data", "op_2007_16",  "AUROC_data.RData"))
+load(file = here::here("data", "op_2007_16",  "PlotROC.RData"))
 
-mod_list <-  list(
-                  ROC_data[["88_10_12_rainrh"]],
+mod_list <-  list(ROC_data[["88_10_12_rainrh"]],
                   ROC_data[["90_10_10_rainrh"]],
                   ROC_data[["90_12_12_rainrh"]],
                   ROC_data[["90_10_12_rain"]],
@@ -480,38 +534,41 @@ mod_list <-  list(
                   ROC_data[["88_10_10_rainrh"]])
 
 pl <- map2(mod_list, c(1:length(mod_list)), PlotROC)
-plot_grid(pl[[1]], 
+plot_grid(pl[[1]],
           pl[[2]],
           pl[[3]],
           pl[[4]],
-          pl[[5]], 
+          pl[[5]],
           pl[[6]],
-          ncol=3)
+          ncol = 3)
 ```
 
 
 
 ```{r plot-ROC-figures, fig.align='center', fig.width=7, fig.height=7, warning=FALSE,fig.path='figures/', dev=c('png', 'pdf')}
 
+
 ls_roc <- lapply(mod_list[4:6], function(x) {
-  df <- x[rev(x$cut_point),]
+  df <- x[rev(x$cut_point), ]
   #append rows for plotting
   x <- rep(NA, ncol(df))
   df <- rbind(x, df)
-  df[nrow(df) + 1,] <- NA
+  df[nrow(df) + 1, ] <- NA
   df$model <- unique(df$model[!is.na(df$model)])
-  df[1,c("sens","one_min_spec")] <- 0
-  df[nrow(df),c("sens","one_min_spec")] <- 1
+  df[1, c("sens", "one_min_spec")] <- 0
+  df[nrow(df), c("sens", "one_min_spec")] <- 1
   #Condense labels for a single cutoff point
- df <- 
-  df %>% 
-  group_by(one_min_spec, sens, model) %>% 
-  summarise(cut_point = ifelse(all(is.na(cut_point)),
-                               "",
-                               range(cut_point, na.rm = TRUE) %>%
-                                 unique() %>%
-                                 paste(collapse = "-"))) %>%
-  ungroup()
+  df <-
+    df %>%
+    group_by(one_min_spec, sens, model) %>%
+    summarise(cut_point = ifelse(
+      all(is.na(cut_point)),
+      "",
+      range(cut_point, na.rm = TRUE) %>%
+        unique() %>%
+        paste(collapse = "-")
+    )) %>%
+    ungroup()
   return(df)
 })
 df <- bind_rows(ls_roc)
@@ -550,7 +607,7 @@ rename(df, Model = model) %>%
     legend.justification = c("right", "bottom"),
     # legend.box.just = "right",
     legend.margin = margin(6, 6, 6, 6)
-  )+
+  ) +
   ggtitle("ROC for selected models")
 ```
 
