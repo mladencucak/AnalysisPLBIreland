@@ -1,4 +1,10 @@
-% Evaluation of Irish Rules model
+---
+title: "Evaluation of Irish Rules Model"
+output:
+  html_document:
+    code_folding: hide
+---
+
 
 # Libraries
 
@@ -41,11 +47,11 @@ list.of.packages <-
 new.packages <-
   list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 
-#Download packages that are not already present
+#Download packages that are not already present in the library
 if (length(new.packages))
-  install.packages(new.packages)
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
-if ("gt" %in% installed.packages() == FALSE)
+if (!"gt" %in% installed.packages())
   remotes::install_github("rstudio/gt")
 
 list.of.packages <- c(list.of.packages, "gt")
@@ -54,15 +60,16 @@ packages_load <-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+  warning("Package/s", list.of.packages[!(packages_load)], "not loaded!")
 } else {
   print("All packages were successfully loaded.")
 }
 rm(list.of.packages, new.packages, packages_load)
 ```
+
 # The Rationale  
-The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.   
-Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. 
+The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labour. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.   
+Two alternative model parameterisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. 
 The performance is evaluated in two ways, as a reduction of: 
 1. Number of treatments:
   + With minimum window of 5 days between treatments 
