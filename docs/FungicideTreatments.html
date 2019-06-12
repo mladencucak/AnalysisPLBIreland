@@ -564,8 +564,8 @@ dates_cut &lt;-
     pl_date &lt;- x[match(3, criteria_sum) + 1, &quot;date&quot;]
     data.frame(&quot;year&quot; = unique(year(x$date)),
                date = pl_date[1, 1])
-    
-  }) %&gt;% bind_rows() %&gt;%
+    }) %&gt;% 
+  bind_rows() %&gt;%
   rename(&quot;plant_date&quot;  = date)
 rm(soildf, dfls)</code></pre>
 <p>The data for 2007 is missing so we shall use the mean date from other years.</p>
@@ -582,13 +582,13 @@ dates_cut &lt;-
     )
   ))</code></pre>
 <p>We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows.</p>
-<pre class="r"><code>meet_in_rows &lt;- 5*7
+<pre class="r"><code>meet_in_rows &lt;- 5 * 7
 dates_cut$prot_start &lt;- with(dates_cut, plant_doy + meet_in_rows)
 dates_cut$prot_start &lt;- paste(dates_cut$year,
                               dates_cut$prot_start,
-                              sep = &quot;-&quot;) %&gt;% 
-                              strptime(format=&quot;%Y-%j&quot;) %&gt;% 
-                              as.Date()</code></pre>
+                              sep = &quot;-&quot;) %&gt;%
+  strptime(format = &quot;%Y-%j&quot;) %&gt;%
+  as.Date()</code></pre>
 <p>For the purposes of this study we will assume that the growing season lasts 120 days. However, the pesticide protection lasts for at least another three weeks to allow the tuber growth.</p>
 <pre class="r"><code>duration_of_season &lt;- 120 + 21
 dates_cut$season_end &lt;-
@@ -600,90 +600,12 @@ dates_cut$season_end &lt;-
                 strptime(format = &quot;%Y-%j&quot;) %&gt;%
   as.Date()
 
-dates_cut %&gt;% kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="right">year</th>
-<th align="left">plant_date</th>
-<th align="right">plant_doy</th>
-<th align="left">prot_start</th>
-<th align="left">season_end</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">2008</td>
-<td align="left">2008-04-04</td>
-<td align="right">95.00000</td>
-<td align="left">2008-05-09</td>
-<td align="left">2008-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2009</td>
-<td align="left">2009-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2009-05-09</td>
-<td align="left">2009-08-23</td>
-</tr>
-<tr class="odd">
-<td align="right">2010</td>
-<td align="left">2010-04-08</td>
-<td align="right">98.00000</td>
-<td align="left">2010-05-13</td>
-<td align="left">2010-08-27</td>
-</tr>
-<tr class="even">
-<td align="right">2011</td>
-<td align="left">2011-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2011-05-09</td>
-<td align="left">2011-08-23</td>
-</tr>
-<tr class="odd">
-<td align="right">2012</td>
-<td align="left">2012-04-04</td>
-<td align="right">95.00000</td>
-<td align="left">2012-05-09</td>
-<td align="left">2012-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2013</td>
-<td align="left">2013-04-12</td>
-<td align="right">102.00000</td>
-<td align="left">2013-05-17</td>
-<td align="left">2013-08-31</td>
-</tr>
-<tr class="odd">
-<td align="right">2014</td>
-<td align="left">2014-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2014-05-09</td>
-<td align="left">2014-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2015</td>
-<td align="left">2015-04-05</td>
-<td align="right">95.00000</td>
-<td align="left">2015-05-10</td>
-<td align="left">2015-08-24</td>
-</tr>
-<tr class="odd">
-<td align="right">2016</td>
-<td align="left">2016-04-07</td>
-<td align="right">98.00000</td>
-<td align="left">2016-05-12</td>
-<td align="left">2016-08-26</td>
-</tr>
-<tr class="even">
-<td align="right">2007</td>
-<td align="left">2007-04-06</td>
-<td align="right">96.11111</td>
-<td align="left">2007-05-11</td>
-<td align="left">2007-08-25</td>
-</tr>
-</tbody>
-</table>
+dates_cut</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["plant_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["plant_doy"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["prot_start"],"name":[4],"type":["date"],"align":["right"]},{"label":["season_end"],"name":[5],"type":["date"],"align":["right"]}],"data":[{"1":"2008","2":"2008-04-04","3":"95.00000","4":"2008-05-09","5":"2008-08-23"},{"1":"2009","2":"2009-04-04","3":"94.00000","4":"2009-05-09","5":"2009-08-23"},{"1":"2010","2":"2010-04-08","3":"98.00000","4":"2010-05-13","5":"2010-08-27"},{"1":"2011","2":"2011-04-04","3":"94.00000","4":"2011-05-09","5":"2011-08-23"},{"1":"2012","2":"2012-04-04","3":"95.00000","4":"2012-05-09","5":"2012-08-23"},{"1":"2013","2":"2013-04-12","3":"102.00000","4":"2013-05-17","5":"2013-08-31"},{"1":"2014","2":"2014-04-04","3":"94.00000","4":"2014-05-09","5":"2014-08-23"},{"1":"2015","2":"2015-04-05","3":"95.00000","4":"2015-05-10","5":"2015-08-24"},{"1":"2016","2":"2016-04-07","3":"98.00000","4":"2016-05-12","5":"2016-08-26"},{"1":"2007","2":"2007-04-06","3":"96.11111","4":"2007-05-11","5":"2007-08-25"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 <p>Load the weather data with model outputs.</p>
 <pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_for_analysis.RData&quot;))
 
@@ -704,7 +626,7 @@ df &lt;-
     &quot;90_10_12_rain_ebh&quot;,
     &quot;88_12_10_rainrh_ebh&quot;,
     &quot;88_10_10_rainrh_ebh&quot;
-  )]  
+  )]
 
 #Keep only  columns needed for faster code execution
 df &lt;-  dplyr::rename(df,
@@ -717,7 +639,7 @@ df &lt;-  dplyr::rename(df,
 <p>Calculate the number of calendar treatments, assuming they would start 5 weeks and end 141 days after the planting</p>
 <pre class="r"><code>(calendar_five &lt;- round(c(duration_of_season - 5 * 7) / 5, 0))</code></pre>
 <pre><code>## [1] 21</code></pre>
-<pre class="r"><code>(calendar_seven &lt;- round(c(duration_of_season - 5 * 7)/7, 0))</code></pre>
+<pre class="r"><code>(calendar_seven &lt;- round(c(duration_of_season - 5 * 7) / 7, 0))</code></pre>
 <pre><code>## [1] 15</code></pre>
 <p>We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Minimum period until the next treatment is 5 days. Cumulative sum of recommended treatments is calculated per season.</p>
 <pre class="r"><code>ControlFreqFun &lt;-
@@ -936,7 +858,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 },
 cl = cl)
 begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -6.45458 secs</code></pre>
+<pre><code>## Time difference of -2.823589 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;-
@@ -1081,7 +1003,7 @@ control_eval_long %&gt;%
               se = FALSE,
               color = gray.colors(2)[1],
               aes(group = 1)) +
-  facet_wrap( ~ programme, ncol = 3) +
+  facet_wrap(~ programme, ncol = 3) +
   ggtitle(&quot;Cost effectiveness of model versions&quot;) +
   
   xlab(&quot;Warning thresholds (EBH)&quot;) +
@@ -1163,7 +1085,7 @@ control_eval_long %&gt;%
     label.size = NA,
     size = 3
   ) +
-  facet_wrap(~ Years, ncol = 5) +
+  facet_wrap( ~ Years, ncol = 5) +
   ggtitle(&quot;Treatment Frequency as a Factor the Decision Threshold&quot;) +
   theme(strip.text.y = element_blank()) +
   xlab(&quot;Warning thresholds (EBH)&quot;) +
@@ -1374,7 +1296,7 @@ dosedf %&gt;%
 ## [10] rsm_2.10          egg_0.4.2         gridExtra_2.3    
 ## [13] ggthemes_4.2.0    ggrepel_0.8.1     pbapply_1.4-0    
 ## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
-## [19] devtools_2.0.2    padr_0.5.0        knitr_1.23       
+## [19] devtools_2.0.2    padr_0.4.2        knitr_1.23       
 ## [22] lubridate_1.7.4   data.table_1.12.2 readxl_1.3.1     
 ## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.1      
 ## [28] purrr_0.3.2       readr_1.3.1       tidyr_0.8.3      
@@ -1398,19 +1320,19 @@ dosedf %&gt;%
 ## [43] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
 ## [46] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
 ## [49] memoise_1.1.0      sass_0.1.0.9000    EMT_1.1           
-## [52] reshape_0.8.8      stringi_1.4.3      highr_0.8         
-## [55] desc_1.2.0         nortest_1.0-4      checkmate_1.9.3   
-## [58] boot_1.3-22        pkgbuild_1.0.3     commonmark_1.7    
-## [61] rlang_0.3.4        pkgconfig_2.0.2    matrixStats_0.54.0
-## [64] evaluate_0.14      lattice_0.20-38    labeling_0.3      
-## [67] processx_3.3.1     tidyselect_0.2.5   plyr_1.8.4        
-## [70] magrittr_1.5       R6_2.4.0           multcompView_0.1-7
-## [73] DescTools_0.99.28  generics_0.0.2     multcomp_1.4-10   
-## [76] pillar_1.4.1       haven_2.1.0        foreign_0.8-71    
-## [79] withr_2.1.2        survival_2.44-1.1  modelr_0.1.4      
-## [82] crayon_1.3.4       rmarkdown_1.13     grid_3.6.0        
-## [85] callr_3.2.0        digest_0.6.19      xtable_1.8-4      
-## [88] stats4_3.6.0       munsell_0.5.0      sessioninfo_1.1.1</code></pre>
+## [52] reshape_0.8.8      stringi_1.4.3      desc_1.2.0        
+## [55] nortest_1.0-4      checkmate_1.9.3    boot_1.3-22       
+## [58] pkgbuild_1.0.3     commonmark_1.7     rlang_0.3.4       
+## [61] pkgconfig_2.0.2    matrixStats_0.54.0 evaluate_0.14     
+## [64] lattice_0.20-38    labeling_0.3       processx_3.3.1    
+## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
+## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
+## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.1      
+## [76] haven_2.1.0        foreign_0.8-71     withr_2.1.2       
+## [79] survival_2.44-1.1  modelr_0.1.4       crayon_1.3.4      
+## [82] rmarkdown_1.13     grid_3.6.0         callr_3.2.0       
+## [85] digest_0.6.19      xtable_1.8-4       stats4_3.6.0      
+## [88] munsell_0.5.0      sessioninfo_1.1.1</code></pre>
 </div>
 
 
