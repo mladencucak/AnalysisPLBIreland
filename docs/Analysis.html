@@ -28,6 +28,7 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -671,28 +672,252 @@ dates_cut &lt;-
     here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;plantingdates.csv&quot;),
     col_types = cols(
       disease_observed = col_date(format = &quot;%d/%m/%Y&quot;),
-      last_assessment = col_date(format = &quot;%d/%m/%Y&quot;)
+      planting_date =  col_date(format = &quot;%d/%m/%Y&quot;)
     )
-  )</code></pre>
-<pre><code>## Warning: Missing column names filled in: &#39;X4&#39; [4]</code></pre>
-<pre><code>## Warning: The following named parsers don&#39;t match the column names:
-## last_assessment</code></pre>
-<pre class="r"><code>dates_cut$planting_date &lt;-
-  as.Date(dates_cut$planting_date, format = &quot;%d/%m/%Y&quot;)
-dates_cut$emergence &lt;- as.Date(dates_cut$planting_date) + 21
-#st warnning period to 14 days before disease onset
+  )
+
+
+dates_cut &lt;-
+  add_column(dates_cut,
+             emergence = as.Date(dates_cut$planting_date) + 21,
+             .before = &quot;planting_date&quot;)
+#set warnning period to 14 days before disease onset
 dates_cut &lt;- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
                         .before = &quot;disease_observed&quot;)
 
 dates_cut &lt;- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = &quot;disease_onset&quot; )
 rownames(dates_cut) &lt;- NULL
 
-dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["date"],"align":["right"]},{"label":["Warning"],"name":[3],"type":["date"],"align":["right"]},{"label":["Disease onset"],"name":[4],"type":["date"],"align":["right"]},{"label":["Disease observed"],"name":[5],"type":["date"],"align":["right"]},{"label":["X4"],"name":[6],"type":["chr"],"align":["left"]},{"label":["Emergence"],"name":[7],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"2007-04-03","3":"2007-06-16","4":"2007-06-26","5":"2007-06-30","6":"23/8/2007","7":"2007-04-24"},{"1":"2008","2":"2008-04-07","3":"2008-06-18","4":"2008-06-28","5":"2008-07-02","6":"13/8/2008","7":"2008-04-28"},{"1":"2009","2":"2009-04-21","3":"2009-06-22","4":"2009-07-02","5":"2009-07-06","6":"8/8/2009","7":"2009-05-12"},{"1":"2010","2":"2010-05-04","3":"2010-07-05","4":"2010-07-15","5":"2010-07-19","6":"30/8/2010","7":"2010-05-25"},{"1":"2011","2":"2011-05-06","3":"2011-07-14","4":"2011-07-24","5":"2011-07-28","6":"25/8/2011","7":"2011-05-27"},{"1":"2012","2":"2012-05-28","3":"2012-06-29","4":"2012-07-09","5":"2012-07-13","6":"28/8/2012","7":"2012-06-18"},{"1":"2013","2":"2013-06-03","3":"2013-08-09","4":"2013-08-19","5":"2013-08-23","6":"20/9/2013","7":"2013-06-24"},{"1":"2014","2":"2014-05-23","3":"2014-07-18","4":"2014-07-28","5":"2014-08-01","6":"11/9/2014","7":"2014-06-13"},{"1":"2015","2":"2015-05-22","3":"2015-07-17","4":"2015-07-27","5":"2015-07-31","6":"18/9/2015","7":"2015-06-12"},{"1":"2016","2":"2016-05-31","3":"2016-07-08","4":"2016-07-18","5":"2016-07-22","6":"16/9/2016","7":"2016-06-21"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+dates_cut %&gt;% 
+  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .)) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Year
+</th>
+<th style="text-align:left;">
+Emergence
+</th>
+<th style="text-align:left;">
+Planting date
+</th>
+<th style="text-align:left;">
+Warning
+</th>
+<th style="text-align:left;">
+Disease onset
+</th>
+<th style="text-align:left;">
+Disease observed
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:left;">
+2007-04-24
+</td>
+<td style="text-align:left;">
+2007-04-03
+</td>
+<td style="text-align:left;">
+2007-06-16
+</td>
+<td style="text-align:left;">
+2007-06-26
+</td>
+<td style="text-align:left;">
+2007-06-30
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2008
+</td>
+<td style="text-align:left;">
+2008-04-28
+</td>
+<td style="text-align:left;">
+2008-04-07
+</td>
+<td style="text-align:left;">
+2008-06-18
+</td>
+<td style="text-align:left;">
+2008-06-28
+</td>
+<td style="text-align:left;">
+2008-07-02
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:left;">
+2009-05-12
+</td>
+<td style="text-align:left;">
+2009-04-21
+</td>
+<td style="text-align:left;">
+2009-06-22
+</td>
+<td style="text-align:left;">
+2009-07-02
+</td>
+<td style="text-align:left;">
+2009-07-06
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:left;">
+2010-05-25
+</td>
+<td style="text-align:left;">
+2010-05-04
+</td>
+<td style="text-align:left;">
+2010-07-05
+</td>
+<td style="text-align:left;">
+2010-07-15
+</td>
+<td style="text-align:left;">
+2010-07-19
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:left;">
+2011-05-27
+</td>
+<td style="text-align:left;">
+2011-05-06
+</td>
+<td style="text-align:left;">
+2011-07-14
+</td>
+<td style="text-align:left;">
+2011-07-24
+</td>
+<td style="text-align:left;">
+2011-07-28
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:left;">
+2012-06-18
+</td>
+<td style="text-align:left;">
+2012-05-28
+</td>
+<td style="text-align:left;">
+2012-06-29
+</td>
+<td style="text-align:left;">
+2012-07-09
+</td>
+<td style="text-align:left;">
+2012-07-13
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:left;">
+2013-06-24
+</td>
+<td style="text-align:left;">
+2013-06-03
+</td>
+<td style="text-align:left;">
+2013-08-09
+</td>
+<td style="text-align:left;">
+2013-08-19
+</td>
+<td style="text-align:left;">
+2013-08-23
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+2014-06-13
+</td>
+<td style="text-align:left;">
+2014-05-23
+</td>
+<td style="text-align:left;">
+2014-07-18
+</td>
+<td style="text-align:left;">
+2014-07-28
+</td>
+<td style="text-align:left;">
+2014-08-01
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:left;">
+2015-06-12
+</td>
+<td style="text-align:left;">
+2015-05-22
+</td>
+<td style="text-align:left;">
+2015-07-17
+</td>
+<td style="text-align:left;">
+2015-07-27
+</td>
+<td style="text-align:left;">
+2015-07-31
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:left;">
+2016-06-21
+</td>
+<td style="text-align:left;">
+2016-05-31
+</td>
+<td style="text-align:left;">
+2016-07-08
+</td>
+<td style="text-align:left;">
+2016-07-18
+</td>
+<td style="text-align:left;">
+2016-07-22
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="the-analysis" class="section level1">
@@ -702,57 +927,121 @@ dates_cut %&gt;% rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &qu
 parameters &lt;-
   read_excel(here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;par.xlsx&quot;), sheet = &quot;par&quot;)
 parameters %&gt;% kable() %&gt;% kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
-<table>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">rh_thresh</th>
-<th align="right">temp_thresh</th>
-<th align="right">hours</th>
-<th align="left">lw_rh</th>
+<tr>
+<th style="text-align:right;">
+rh_thresh
+</th>
+<th style="text-align:right;">
+temp_thresh
+</th>
+<th style="text-align:right;">
+hours
+</th>
+<th style="text-align:left;">
+lw_rh
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">93</td>
-<td align="right">13</td>
-<td align="right">15</td>
-<td align="left">rain</td>
+<tr>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+rain
+</td>
 </tr>
-<tr class="even">
-<td align="right">92</td>
-<td align="right">12</td>
-<td align="right">14</td>
-<td align="left">rainrh</td>
+<tr>
+<td style="text-align:right;">
+92
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
 </tr>
-<tr class="odd">
-<td align="right">91</td>
-<td align="right">11</td>
-<td align="right">13</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="even">
-<td align="right">90</td>
-<td align="right">10</td>
-<td align="right">12</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+90
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="odd">
-<td align="right">89</td>
-<td align="right">9</td>
-<td align="right">11</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+89
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="even">
-<td align="right">88</td>
-<td align="right">8</td>
-<td align="right">10</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="right">7</td>
-<td align="right">9</td>
-<td align="left">NA</td>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+NA
+</td>
 </tr>
 </tbody>
 </table>
@@ -809,12 +1098,242 @@ rm( nn)</code></pre>
 <p>Instead, just load the output from a prior model run to save time.</p>
 <pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_for_analysis.RData&quot;))
 # Sample of outputs
-head(OP[, c(1, 7, 9, 15, 24:30)], 5)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["doy"],"name":[2],"type":["int"],"align":["right"]},{"label":["rain"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[5],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["93_13_15_rain_ebh"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["92_13_15_rain_ebh"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["91_13_15_rain_ebh"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["90_13_15_rain_ebh"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["89_13_15_rain_ebh"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"2007-04-01 00:00:00","2":"91","3":"0","4":"8.0","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401162"},{"1":"2007-04-01 01:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401163"},{"1":"2007-04-01 02:00:00","2":"91","3":"0","4":"7.9","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401164"},{"1":"2007-04-01 03:00:00","2":"91","3":"0","4":"7.6","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401165"},{"1":"2007-04-01 04:00:00","2":"91","3":"0","4":"7.2","5":"Oak_Park","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","_rn_":"2401166"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+head(OP[, c(1, 7, 9, 15, 24:30)], 5) %&gt;% 
+  kable() %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:right;">
+doy
+</th>
+<th style="text-align:right;">
+rain
+</th>
+<th style="text-align:right;">
+vappr
+</th>
+<th style="text-align:left;">
+stna
+</th>
+<th style="text-align:right;">
+sol_rad
+</th>
+<th style="text-align:right;">
+93_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+92_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+91_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+90_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+89_13_15_rain_ebh
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2401162
+</td>
+<td style="text-align:left;">
+2007-04-01 00:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+8.0
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401163
+</td>
+<td style="text-align:left;">
+2007-04-01 01:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.9
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401164
+</td>
+<td style="text-align:left;">
+2007-04-01 02:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.9
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401165
+</td>
+<td style="text-align:left;">
+2007-04-01 03:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.6
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401166
+</td>
+<td style="text-align:left;">
+2007-04-01 04:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.2
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="evaluation-procedure" class="section level2">
 <h2>Evaluation procedure</h2>
@@ -983,361 +1502,338 @@ rownames(ROC_data) &lt;- NULL
 # rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data &lt;-
   base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
-ROC_data[[1]] %&gt;% gt()</code></pre>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#baireizbfp .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #000000;
-  font-size: 16px;
-  background-color: #FFFFFF;
-  /* table.background.color */
-  width: auto;
-  /* table.width */
-  border-top-style: solid;
-  /* table.border.top.style */
-  border-top-width: 2px;
-  /* table.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table.border.top.color */
-}
-
-#baireizbfp .gt_heading {
-  background-color: #FFFFFF;
-  /* heading.background.color */
-  border-bottom-color: #FFFFFF;
-}
-
-#baireizbfp .gt_title {
-  color: #000000;
-  font-size: 125%;
-  /* heading.title.font.size */
-  padding-top: 4px;
-  /* heading.top.padding */
-  padding-bottom: 1px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#baireizbfp .gt_subtitle {
-  color: #000000;
-  font-size: 85%;
-  /* heading.subtitle.font.size */
-  padding-top: 1px;
-  padding-bottom: 4px;
-  /* heading.bottom.padding */
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#baireizbfp .gt_bottom_border {
-  border-bottom-style: solid;
-  /* heading.border.bottom.style */
-  border-bottom-width: 2px;
-  /* heading.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* heading.border.bottom.color */
-}
-
-#baireizbfp .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#baireizbfp .gt_col_heading {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* column_labels.background.color */
-  font-size: 16px;
-  /* column_labels.font.size */
-  font-weight: initial;
-  /* column_labels.font.weight */
-  vertical-align: middle;
-  padding: 10px;
-  margin: 10px;
-}
-
-#baireizbfp .gt_sep_right {
-  border-right: 5px solid #FFFFFF;
-}
-
-#baireizbfp .gt_group_heading {
-  padding: 8px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#baireizbfp .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#baireizbfp .gt_striped {
-  background-color: #f2f2f2;
-}
-
-#baireizbfp .gt_row {
-  padding: 10px;
-  /* row.padding */
-  margin: 10px;
-  vertical-align: middle;
-}
-
-#baireizbfp .gt_stub {
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #A8A8A8;
-  padding-left: 12px;
-}
-
-#baireizbfp .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#baireizbfp .gt_summary_row {
-  background-color: #FFFFFF;
-  /* summary_row.background.color */
-  padding: 6px;
-  /* summary_row.padding */
-  text-transform: inherit;
-  /* summary_row.text_transform */
-}
-
-#baireizbfp .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-}
-
-#baireizbfp .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
-  border-top-color: #A8A8A8;
-  /* field.border.top.color */
-  border-bottom-style: solid;
-  /* field.border.bottom.style */
-  border-bottom-width: 2px;
-  /* field.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
-}
-
-#baireizbfp .gt_footnote {
-  font-size: 90%;
-  /* footnote.font.size */
-  padding: 4px;
-  /* footnote.padding */
-}
-
-#baireizbfp .gt_sourcenote {
-  font-size: 90%;
-  /* sourcenote.font.size */
-  padding: 4px;
-  /* sourcenote.padding */
-}
-
-#baireizbfp .gt_center {
-  text-align: center;
-}
-
-#baireizbfp .gt_left {
-  text-align: left;
-}
-
-#baireizbfp .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#baireizbfp .gt_font_normal {
-  font-weight: normal;
-}
-
-#baireizbfp .gt_font_bold {
-  font-weight: bold;
-}
-
-#baireizbfp .gt_font_italic {
-  font-style: italic;
-}
-
-#baireizbfp .gt_super {
-  font-size: 65%;
-}
-
-#baireizbfp .gt_footnote_glyph {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="baireizbfp" style="overflow-x:auto;"><!--gt table start-->
-<table class='gt_table'>
+ROC_data[[1]] %&gt;% 
+  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .)) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
 <tr>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>model</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>sens</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>one_min_spec</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>cut_point</th>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:right;">
+Sens
+</th>
+<th style="text-align:right;">
+One min spec
+</th>
+<th style="text-align:right;">
+Cut point
+</th>
 </tr>
-<tbody class='gt_table_body'>
+</thead>
+<tbody>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>1.0</td>
-<td class='gt_row gt_right'>0.6443299</td>
-<td class='gt_row gt_right'>1</td>
+<td style="text-align:left;">
+273
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.6443299
+</td>
+<td style="text-align:right;">
+1
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>1.0</td>
-<td class='gt_row gt_right gt_striped'>0.6005155</td>
-<td class='gt_row gt_right gt_striped'>2</td>
+<td style="text-align:left;">
+959
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.6005155
+</td>
+<td style="text-align:right;">
+2
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>1.0</td>
-<td class='gt_row gt_right'>0.5773196</td>
-<td class='gt_row gt_right'>3</td>
+<td style="text-align:left;">
+1645
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.5773196
+</td>
+<td style="text-align:right;">
+3
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>1.0</td>
-<td class='gt_row gt_right gt_striped'>0.4484536</td>
-<td class='gt_row gt_right gt_striped'>4</td>
+<td style="text-align:left;">
+2331
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.4484536
+</td>
+<td style="text-align:right;">
+4
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.4201031</td>
-<td class='gt_row gt_right'>5</td>
+<td style="text-align:left;">
+3017
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.4201031
+</td>
+<td style="text-align:right;">
+5
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.3891753</td>
-<td class='gt_row gt_right gt_striped'>6</td>
+<td style="text-align:left;">
+3703
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3891753
+</td>
+<td style="text-align:right;">
+6
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.3685567</td>
-<td class='gt_row gt_right'>7</td>
+<td style="text-align:left;">
+4389
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3685567
+</td>
+<td style="text-align:right;">
+7
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.3556701</td>
-<td class='gt_row gt_right gt_striped'>8</td>
+<td style="text-align:left;">
+5075
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3556701
+</td>
+<td style="text-align:right;">
+8
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.3376289</td>
-<td class='gt_row gt_right'>9</td>
+<td style="text-align:left;">
+5761
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3376289
+</td>
+<td style="text-align:right;">
+9
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.3247423</td>
-<td class='gt_row gt_right gt_striped'>10</td>
+<td style="text-align:left;">
+6447
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3247423
+</td>
+<td style="text-align:right;">
+10
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.3247423</td>
-<td class='gt_row gt_right'>11</td>
+<td style="text-align:left;">
+7133
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3247423
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.3015464</td>
-<td class='gt_row gt_right gt_striped'>12</td>
+<td style="text-align:left;">
+7819
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3015464
+</td>
+<td style="text-align:right;">
+12
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.2835052</td>
-<td class='gt_row gt_right'>13</td>
+<td style="text-align:left;">
+8505
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2835052
+</td>
+<td style="text-align:right;">
+13
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.2628866</td>
-<td class='gt_row gt_right gt_striped'>14</td>
+<td style="text-align:left;">
+9191
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2628866
+</td>
+<td style="text-align:right;">
+14
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.8</td>
-<td class='gt_row gt_right'>0.2525773</td>
-<td class='gt_row gt_right'>15</td>
+<td style="text-align:left;">
+9877
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2525773
+</td>
+<td style="text-align:right;">
+15
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.8</td>
-<td class='gt_row gt_right gt_striped'>0.2319588</td>
-<td class='gt_row gt_right gt_striped'>16</td>
+<td style="text-align:left;">
+10563
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2319588
+</td>
+<td style="text-align:right;">
+16
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>87_10_10_rain</td>
-<td class='gt_row gt_right'>0.7</td>
-<td class='gt_row gt_right'>0.2113402</td>
-<td class='gt_row gt_right'>17</td>
+<td style="text-align:left;">
+11249
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.7
+</td>
+<td style="text-align:right;">
+0.2113402
+</td>
+<td style="text-align:right;">
+17
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>87_10_10_rain</td>
-<td class='gt_row gt_right gt_striped'>0.6</td>
-<td class='gt_row gt_right gt_striped'>0.2113402</td>
-<td class='gt_row gt_right gt_striped'>18</td>
+<td style="text-align:left;">
+11935
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.6
+</td>
+<td style="text-align:right;">
+0.2113402
+</td>
+<td style="text-align:right;">
+18
+</td>
 </tr>
 </tbody>
 </table>
-<!--gt table end-->
-</div>
 <pre class="r"><code>save(ROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))</code></pre>
 </div>
 <div id="roc" class="section level2">
@@ -1465,7 +1961,7 @@ head(data) %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#mvebceviac .gt_table {
+#hhycxtrovb .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1484,13 +1980,13 @@ head(data) %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#mvebceviac .gt_heading {
+#hhycxtrovb .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#mvebceviac .gt_title {
+#hhycxtrovb .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1501,7 +1997,7 @@ head(data) %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#mvebceviac .gt_subtitle {
+#hhycxtrovb .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -1512,7 +2008,7 @@ head(data) %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#mvebceviac .gt_bottom_border {
+#hhycxtrovb .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -1521,7 +2017,7 @@ head(data) %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#mvebceviac .gt_column_spanner {
+#hhycxtrovb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -1529,7 +2025,7 @@ head(data) %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#mvebceviac .gt_col_heading {
+#hhycxtrovb .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -1542,11 +2038,11 @@ head(data) %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#mvebceviac .gt_sep_right {
+#hhycxtrovb .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#mvebceviac .gt_group_heading {
+#hhycxtrovb .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1570,7 +2066,7 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#mvebceviac .gt_empty_group_heading {
+#hhycxtrovb .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1594,29 +2090,29 @@ head(data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#mvebceviac .gt_striped {
+#hhycxtrovb .gt_striped {
   background-color: #f2f2f2;
 }
 
-#mvebceviac .gt_row {
+#hhycxtrovb .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#mvebceviac .gt_stub {
+#hhycxtrovb .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#mvebceviac .gt_stub.gt_row {
+#hhycxtrovb .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#mvebceviac .gt_summary_row {
+#hhycxtrovb .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -1625,13 +2121,13 @@ head(data) %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#mvebceviac .gt_first_summary_row {
+#hhycxtrovb .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#mvebceviac .gt_table_body {
+#hhycxtrovb .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -1646,55 +2142,55 @@ head(data) %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#mvebceviac .gt_footnote {
+#hhycxtrovb .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#mvebceviac .gt_sourcenote {
+#hhycxtrovb .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#mvebceviac .gt_center {
+#hhycxtrovb .gt_center {
   text-align: center;
 }
 
-#mvebceviac .gt_left {
+#hhycxtrovb .gt_left {
   text-align: left;
 }
 
-#mvebceviac .gt_right {
+#hhycxtrovb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mvebceviac .gt_font_normal {
+#hhycxtrovb .gt_font_normal {
   font-weight: normal;
 }
 
-#mvebceviac .gt_font_bold {
+#hhycxtrovb .gt_font_bold {
   font-weight: bold;
 }
 
-#mvebceviac .gt_font_italic {
+#hhycxtrovb .gt_font_italic {
   font-style: italic;
 }
 
-#mvebceviac .gt_super {
+#hhycxtrovb .gt_super {
   font-size: 65%;
 }
 
-#mvebceviac .gt_footnote_glyph {
+#hhycxtrovb .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="mvebceviac" style="overflow-x:auto;"><!--gt table start-->
+<div id="hhycxtrovb" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>

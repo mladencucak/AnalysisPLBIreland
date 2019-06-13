@@ -221,20 +221,26 @@ dates_cut <-
     here::here("data", "op_2007_16", "raw", "plantingdates.csv"),
     col_types = cols(
       disease_observed = col_date(format = "%d/%m/%Y"),
-      last_assessment = col_date(format = "%d/%m/%Y")
+      planting_date =  col_date(format = "%d/%m/%Y")
     )
   )
-dates_cut$planting_date <-
-  as.Date(dates_cut$planting_date, format = "%d/%m/%Y")
-dates_cut$emergence <- as.Date(dates_cut$planting_date) + 21
-#st warnning period to 14 days before disease onset
+
+
+dates_cut <-
+  add_column(dates_cut,
+             emergence = as.Date(dates_cut$planting_date) + 21,
+             .before = "planting_date")
+#set warnning period to 14 days before disease onset
 dates_cut <- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
                         .before = "disease_observed")
 
 dates_cut <- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = "disease_onset" )
 rownames(dates_cut) <- NULL
 
-dates_cut %>% rename_all(. %>% capitalize() %>% gsub("_", " ", .))
+dates_cut %>% 
+  rename_all(. %>% capitalize() %>% gsub("_", " ", .)) %>% 
+  kable(format = "html") %>% 
+  kableExtra::kable_styling( latex_options = "striped",full_width = FALSE)
 ```
 # The Analysis 
 
@@ -304,7 +310,10 @@ Instead, just load the output from a prior model run to save time.
 ```{r load-model-run, fig.align='center'}
 load(file = here::here("data", "op_2007_16", "OP_for_analysis.RData"))
 # Sample of outputs
-head(OP[, c(1, 7, 9, 15, 24:30)], 5)
+head(OP[, c(1, 7, 9, 15, 24:30)], 5) %>% 
+  kable() %>% 
+  kableExtra::kable_styling(latex_options = "striped",full_width = FALSE)
+
 ```
 
 ## Evaluation procedure
@@ -487,7 +496,10 @@ rownames(ROC_data) <- NULL
 # rm(ROC) #Outputs stored for each warning threshold/cutoffs
 ROC_data <-
   base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
-ROC_data[[1]] %>% gt()
+ROC_data[[1]] %>% 
+  rename_all(. %>% capitalize() %>% gsub("_", " ", .)) %>% 
+  kable(format = "html") %>% 
+  kableExtra::kable_styling( latex_options = "striped",full_width = FALSE)
 ```
 
 ```{r}

@@ -27,6 +27,7 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -501,10 +502,10 @@ if (any(as.numeric(packages_load) == 0)) {
 <h2>Leaf wetness estimation</h2>
 <p>Differences between pairs of models with same parameters, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
 <pre class="r"><code># load the data
-load( file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;data.RData&quot;))
+load( file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;auc_data.RData&quot;))
 
 t_data &lt;-
-  data %&gt;%
+  auc_data %&gt;%
   group_by(rh_thresh, temp_thresh, hours) %&gt;%
   unite(var, rh_thresh, temp_thresh, hours) %&gt;%
   spread(key = lw_rh, value = auc) %&gt;%
@@ -519,270 +520,62 @@ ggplot(t_data, aes(x = difference)) +
   theme_article()</code></pre>
 <p><img src="images/leaf-wet-graphs-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Compute summary statistics by groups.</p>
-<pre class="r"><code>group_by(data, lw_rh) %&gt;%
+<pre class="r"><code>group_by(auc_data, lw_rh) %&gt;%
   summarise(
     count = n(),
     median = median(auc, na.rm = TRUE),
     IQR = IQR(auc, na.rm = TRUE)
-  ) %&gt;% gt()</code></pre>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#xvblydschm .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #000000;
-  font-size: 16px;
-  background-color: #FFFFFF;
-  /* table.background.color */
-  width: auto;
-  /* table.width */
-  border-top-style: solid;
-  /* table.border.top.style */
-  border-top-width: 2px;
-  /* table.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table.border.top.color */
-}
-
-#xvblydschm .gt_heading {
-  background-color: #FFFFFF;
-  /* heading.background.color */
-  border-bottom-color: #FFFFFF;
-}
-
-#xvblydschm .gt_title {
-  color: #000000;
-  font-size: 125%;
-  /* heading.title.font.size */
-  padding-top: 4px;
-  /* heading.top.padding */
-  padding-bottom: 1px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#xvblydschm .gt_subtitle {
-  color: #000000;
-  font-size: 85%;
-  /* heading.subtitle.font.size */
-  padding-top: 1px;
-  padding-bottom: 4px;
-  /* heading.bottom.padding */
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#xvblydschm .gt_bottom_border {
-  border-bottom-style: solid;
-  /* heading.border.bottom.style */
-  border-bottom-width: 2px;
-  /* heading.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* heading.border.bottom.color */
-}
-
-#xvblydschm .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#xvblydschm .gt_col_heading {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* column_labels.background.color */
-  font-size: 16px;
-  /* column_labels.font.size */
-  font-weight: initial;
-  /* column_labels.font.weight */
-  vertical-align: middle;
-  padding: 10px;
-  margin: 10px;
-}
-
-#xvblydschm .gt_sep_right {
-  border-right: 5px solid #FFFFFF;
-}
-
-#xvblydschm .gt_group_heading {
-  padding: 8px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#xvblydschm .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#xvblydschm .gt_striped {
-  background-color: #f2f2f2;
-}
-
-#xvblydschm .gt_row {
-  padding: 10px;
-  /* row.padding */
-  margin: 10px;
-  vertical-align: middle;
-}
-
-#xvblydschm .gt_stub {
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #A8A8A8;
-  padding-left: 12px;
-}
-
-#xvblydschm .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#xvblydschm .gt_summary_row {
-  background-color: #FFFFFF;
-  /* summary_row.background.color */
-  padding: 6px;
-  /* summary_row.padding */
-  text-transform: inherit;
-  /* summary_row.text_transform */
-}
-
-#xvblydschm .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-}
-
-#xvblydschm .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
-  border-top-color: #A8A8A8;
-  /* field.border.top.color */
-  border-bottom-style: solid;
-  /* field.border.bottom.style */
-  border-bottom-width: 2px;
-  /* field.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
-}
-
-#xvblydschm .gt_footnote {
-  font-size: 90%;
-  /* footnote.font.size */
-  padding: 4px;
-  /* footnote.padding */
-}
-
-#xvblydschm .gt_sourcenote {
-  font-size: 90%;
-  /* sourcenote.font.size */
-  padding: 4px;
-  /* sourcenote.padding */
-}
-
-#xvblydschm .gt_center {
-  text-align: center;
-}
-
-#xvblydschm .gt_left {
-  text-align: left;
-}
-
-#xvblydschm .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#xvblydschm .gt_font_normal {
-  font-weight: normal;
-}
-
-#xvblydschm .gt_font_bold {
-  font-weight: bold;
-}
-
-#xvblydschm .gt_font_italic {
-  font-style: italic;
-}
-
-#xvblydschm .gt_super {
-  font-size: 65%;
-}
-
-#xvblydschm .gt_footnote_glyph {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="xvblydschm" style="overflow-x:auto;"><!--gt table start-->
-<table class='gt_table'>
+  ) %&gt;%
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
 <tr>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>lw_rh</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>count</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>median</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>IQR</th>
+<th style="text-align:left;">
+lw_rh
+</th>
+<th style="text-align:right;">
+count
+</th>
+<th style="text-align:right;">
+median
+</th>
+<th style="text-align:right;">
+IQR
+</th>
 </tr>
-<tbody class='gt_table_body'>
+</thead>
+<tbody>
 <tr>
-<td class='gt_row gt_left'>rain</td>
-<td class='gt_row gt_right'>343</td>
-<td class='gt_row gt_right'>0.6953608</td>
-<td class='gt_row gt_right'>0.06018041</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+343
+</td>
+<td style="text-align:right;">
+0.6953608
+</td>
+<td style="text-align:right;">
+0.0601804
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>rainrh</td>
-<td class='gt_row gt_right gt_striped'>343</td>
-<td class='gt_row gt_right gt_striped'>0.7345361</td>
-<td class='gt_row gt_right gt_striped'>0.09027062</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+343
+</td>
+<td style="text-align:right;">
+0.7345361
+</td>
+<td style="text-align:right;">
+0.0902706
+</td>
 </tr>
 </tbody>
 </table>
-<!--gt table end-->
-</div>
 <pre class="r"><code>shapiro.test(t_data$difference)</code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
@@ -807,7 +600,7 @@ w.test</code></pre>
 ## alternative hypothesis: true location shift is less than 0</code></pre>
 <p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p &lt; 0.001. Model outputs with rain as single predictor are removed from further analysis.</p>
 <pre class="r"><code>plot &lt;- 
-data %&gt;%
+auc_data %&gt;%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == &quot;rainrh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;
   ))) %&gt;%
@@ -829,29 +622,22 @@ data %&gt;%
 plot+ggsave(here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;LWswithc.png&quot;), width = 11, height = 11, units = &quot;cm&quot;)</code></pre>
 <p><img src="images/plot_lw_estim-1.png" width="672" /></p>
 <pre class="r"><code>#Remove the data containg only rain as estimator
-# data &lt;- subset(data, lw_rh == &quot;rainrh&quot;)
-# data$lw_rh &lt;- NULL</code></pre>
+# auc_data &lt;- subset(auc_data, lw_rh == &quot;rainrh&quot;)
+# auc_data$lw_rh &lt;- NULL</code></pre>
 </div>
 <div id="t-rh-and-sporulation-duration" class="section level2">
 <h2>T, RH and Sporulation duration</h2>
 <div id="initial-exploration" class="section level3">
 <h3>Initial exploration</h3>
 <p>Scatter plot matrix shows some relationships between y and other variables.</p>
-<pre class="r"><code>GGally::ggpairs(data,
+<pre class="r"><code>GGally::ggpairs(auc_data,
                 lower = list(continuous = &quot;points&quot;),
                 upper = list(continuous = &quot;cor&quot;))</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
-##   method from   
-##   +.gg   ggplot2</code></pre>
-<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="images/interactions-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Increasing temperature threshold had positive, while reducing rh and duration of sporulation threshold had negative correlation with AUROC.</p>
 <p>Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.</p>
 <pre class="r"><code>p1 &lt;-  
-  data[order(data$hours), ] %&gt;%
+  auc_data[order(auc_data$hours), ] %&gt;%
   ggplot(., aes(factor(hours), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
@@ -870,7 +656,7 @@ plot+ggsave(here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&qu
   theme_article()
 
 p2 &lt;- 
-  ggplot(data, aes(factor(rh_thresh), auc)) +
+  ggplot(auc_data, aes(factor(rh_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -888,7 +674,7 @@ p2 &lt;-
   theme_article()
 
 p3 &lt;-  
-  ggplot(data, aes(factor(temp_thresh), auc)) +
+  ggplot(auc_data, aes(factor(temp_thresh), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -920,7 +706,7 @@ dev.off()</code></pre>
 </div>
 <div id="model-fitting" class="section level3">
 <h3>Model fitting</h3>
-<pre class="r"><code>lapply(data[, 1:3], function(x)
+<pre class="r"><code>lapply(auc_data[, 1:3], function(x)
   sort(unique(x)))</code></pre>
 <pre><code>## $rh_thresh
 ## [1] 87 88 89 90 91 92 93
@@ -931,7 +717,7 @@ dev.off()</code></pre>
 ## $hours
 ## [1]  9 10 11 12 13 14 15</code></pre>
 <p>Create coded data set. Seven levels of each variable are used.</p>
-<pre class="r"><code>cd_data &lt;- coded.data(data, Tt ~  (temp_thresh - 10),
+<pre class="r"><code>cd_data &lt;- coded.data(auc_data, Tt ~  (temp_thresh - 10),
                       RHt ~ (rh_thresh - 90),
                       SDt ~ (hours - 12)
                       )
@@ -951,60 +737,130 @@ str(cd_data)</code></pre>
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
 ##  - attr(*, &quot;rsdes&quot;)=List of 2
 ##   ..$ primary: chr  &quot;Tt&quot; &quot;RHt&quot; &quot;SDt&quot;
-##   ..$ call   : language coded.data(data = data, Tt ~ (temp_thresh - 10), RHt ~ (rh_thresh -      90), SDt ~ (hours - 12))</code></pre>
+##   ..$ call   : language coded.data(data = auc_data, Tt ~ (temp_thresh - 10), RHt ~ (rh_thresh -      90), SDt ~ (hours - 12))</code></pre>
 <pre class="r"><code>head(cd_data) %&gt;% kable()</code></pre>
 <table>
 <thead>
-<tr class="header">
-<th align="right">RHt</th>
-<th align="right">Tt</th>
-<th align="right">SDt</th>
-<th align="left">lw_rh</th>
-<th align="right">auc</th>
+<tr>
+<th style="text-align:right;">
+RHt
+</th>
+<th style="text-align:right;">
+Tt
+</th>
+<th style="text-align:right;">
+SDt
+</th>
+<th style="text-align:left;">
+lw_rh
+</th>
+<th style="text-align:right;">
+auc
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">-2</td>
-<td align="left">rain</td>
-<td align="right">0.8064433</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-2
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.8064433
+</td>
 </tr>
-<tr class="even">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">-2</td>
-<td align="left">rainrh</td>
-<td align="right">0.7966495</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-2
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7966495
+</td>
 </tr>
-<tr class="odd">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">-1</td>
-<td align="left">rain</td>
-<td align="right">0.7680412</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-1
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.7680412
+</td>
 </tr>
-<tr class="even">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">-1</td>
-<td align="left">rainrh</td>
-<td align="right">0.7997423</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-1
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7997423
+</td>
 </tr>
-<tr class="odd">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">rain</td>
-<td align="right">0.7128866</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.7128866
+</td>
 </tr>
-<tr class="even">
-<td align="right">-3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">rainrh</td>
-<td align="right">0.7997423</td>
+<tr>
+<td style="text-align:right;">
+-3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7997423
+</td>
 </tr>
 </tbody>
 </table>
@@ -1019,312 +875,189 @@ poly_4_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
 rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
   add_column( Order = 1:4, .before = 1) %&gt;% 
-  gt() </code></pre>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#lhkltlhzov .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #000000;
-  font-size: 16px;
-  background-color: #FFFFFF;
-  /* table.background.color */
-  width: auto;
-  /* table.width */
-  border-top-style: solid;
-  /* table.border.top.style */
-  border-top-width: 2px;
-  /* table.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table.border.top.color */
-}
-
-#lhkltlhzov .gt_heading {
-  background-color: #FFFFFF;
-  /* heading.background.color */
-  border-bottom-color: #FFFFFF;
-}
-
-#lhkltlhzov .gt_title {
-  color: #000000;
-  font-size: 125%;
-  /* heading.title.font.size */
-  padding-top: 4px;
-  /* heading.top.padding */
-  padding-bottom: 1px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#lhkltlhzov .gt_subtitle {
-  color: #000000;
-  font-size: 85%;
-  /* heading.subtitle.font.size */
-  padding-top: 1px;
-  padding-bottom: 4px;
-  /* heading.bottom.padding */
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#lhkltlhzov .gt_bottom_border {
-  border-bottom-style: solid;
-  /* heading.border.bottom.style */
-  border-bottom-width: 2px;
-  /* heading.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* heading.border.bottom.color */
-}
-
-#lhkltlhzov .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#lhkltlhzov .gt_col_heading {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* column_labels.background.color */
-  font-size: 16px;
-  /* column_labels.font.size */
-  font-weight: initial;
-  /* column_labels.font.weight */
-  vertical-align: middle;
-  padding: 10px;
-  margin: 10px;
-}
-
-#lhkltlhzov .gt_sep_right {
-  border-right: 5px solid #FFFFFF;
-}
-
-#lhkltlhzov .gt_group_heading {
-  padding: 8px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#lhkltlhzov .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* stub_group.background.color */
-  font-size: 16px;
-  /* stub_group.font.size */
-  font-weight: initial;
-  /* stub_group.font.weight */
-  border-top-style: solid;
-  /* stub_group.border.top.style */
-  border-top-width: 2px;
-  /* stub_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* stub_group.border.top.color */
-  border-bottom-style: solid;
-  /* stub_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* stub_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* stub_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#lhkltlhzov .gt_striped {
-  background-color: #f2f2f2;
-}
-
-#lhkltlhzov .gt_row {
-  padding: 10px;
-  /* row.padding */
-  margin: 10px;
-  vertical-align: middle;
-}
-
-#lhkltlhzov .gt_stub {
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #A8A8A8;
-  padding-left: 12px;
-}
-
-#lhkltlhzov .gt_stub.gt_row {
-  background-color: #FFFFFF;
-}
-
-#lhkltlhzov .gt_summary_row {
-  background-color: #FFFFFF;
-  /* summary_row.background.color */
-  padding: 6px;
-  /* summary_row.padding */
-  text-transform: inherit;
-  /* summary_row.text_transform */
-}
-
-#lhkltlhzov .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-}
-
-#lhkltlhzov .gt_table_body {
-  border-top-style: solid;
-  /* field.border.top.style */
-  border-top-width: 2px;
-  /* field.border.top.width */
-  border-top-color: #A8A8A8;
-  /* field.border.top.color */
-  border-bottom-style: solid;
-  /* field.border.bottom.style */
-  border-bottom-width: 2px;
-  /* field.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* field.border.bottom.color */
-}
-
-#lhkltlhzov .gt_footnote {
-  font-size: 90%;
-  /* footnote.font.size */
-  padding: 4px;
-  /* footnote.padding */
-}
-
-#lhkltlhzov .gt_sourcenote {
-  font-size: 90%;
-  /* sourcenote.font.size */
-  padding: 4px;
-  /* sourcenote.padding */
-}
-
-#lhkltlhzov .gt_center {
-  text-align: center;
-}
-
-#lhkltlhzov .gt_left {
-  text-align: left;
-}
-
-#lhkltlhzov .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#lhkltlhzov .gt_font_normal {
-  font-weight: normal;
-}
-
-#lhkltlhzov .gt_font_bold {
-  font-weight: bold;
-}
-
-#lhkltlhzov .gt_font_italic {
-  font-style: italic;
-}
-
-#lhkltlhzov .gt_super {
-  font-size: 65%;
-}
-
-#lhkltlhzov .gt_footnote_glyph {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="lhkltlhzov" style="overflow-x:auto;"><!--gt table start-->
-<table class='gt_table'>
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE) </code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
 <tr>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Order</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Rank</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Df.res</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>AIC</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>AICc</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>BIC</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>R.squared</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Adj.R.sq</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>p.value</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Shapiro.W</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Shapiro.p</th>
+<th style="text-align:right;">
+Order
+</th>
+<th style="text-align:right;">
+Rank
+</th>
+<th style="text-align:right;">
+Df.res
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+AICc
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+<th style="text-align:right;">
+R.squared
+</th>
+<th style="text-align:right;">
+Adj.R.sq
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+<th style="text-align:right;">
+Shapiro.W
+</th>
+<th style="text-align:right;">
+Shapiro.p
+</th>
 </tr>
-<tbody class='gt_table_body'>
+</thead>
+<tbody>
 <tr>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>4</td>
-<td class='gt_row gt_right'>682</td>
-<td class='gt_row gt_right'>-2472</td>
-<td class='gt_row gt_right'>-2472</td>
-<td class='gt_row gt_right'>-2449</td>
-<td class='gt_row gt_right'>0.5443</td>
-<td class='gt_row gt_right'>0.5423</td>
-<td class='gt_row gt_right'>6.469e-116</td>
-<td class='gt_row gt_right'>0.9969</td>
-<td class='gt_row gt_right'>0.2010</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+682
+</td>
+<td style="text-align:right;">
+-2472
+</td>
+<td style="text-align:right;">
+-2472
+</td>
+<td style="text-align:right;">
+-2449
+</td>
+<td style="text-align:right;">
+0.5443
+</td>
+<td style="text-align:right;">
+0.5423
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9969
+</td>
+<td style="text-align:right;">
+0.2010
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_right gt_striped'>2</td>
-<td class='gt_row gt_right gt_striped'>10</td>
-<td class='gt_row gt_right gt_striped'>676</td>
-<td class='gt_row gt_right gt_striped'>-2683</td>
-<td class='gt_row gt_right gt_striped'>-2682</td>
-<td class='gt_row gt_right gt_striped'>-2633</td>
-<td class='gt_row gt_right gt_striped'>0.6707</td>
-<td class='gt_row gt_right gt_striped'>0.6663</td>
-<td class='gt_row gt_right gt_striped'>1.423e-156</td>
-<td class='gt_row gt_right gt_striped'>0.9963</td>
-<td class='gt_row gt_right gt_striped'>0.1034</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+676
+</td>
+<td style="text-align:right;">
+-2683
+</td>
+<td style="text-align:right;">
+-2682
+</td>
+<td style="text-align:right;">
+-2633
+</td>
+<td style="text-align:right;">
+0.6707
+</td>
+<td style="text-align:right;">
+0.6663
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9963
+</td>
+<td style="text-align:right;">
+0.1034
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_right'>3</td>
-<td class='gt_row gt_right'>20</td>
-<td class='gt_row gt_right'>666</td>
-<td class='gt_row gt_right'>-2771</td>
-<td class='gt_row gt_right'>-2770</td>
-<td class='gt_row gt_right'>-2676</td>
-<td class='gt_row gt_right'>0.7188</td>
-<td class='gt_row gt_right'>0.7107</td>
-<td class='gt_row gt_right'>5.516e-169</td>
-<td class='gt_row gt_right'>0.9987</td>
-<td class='gt_row gt_right'>0.8944</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+666
+</td>
+<td style="text-align:right;">
+-2771
+</td>
+<td style="text-align:right;">
+-2770
+</td>
+<td style="text-align:right;">
+-2676
+</td>
+<td style="text-align:right;">
+0.7188
+</td>
+<td style="text-align:right;">
+0.7107
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9987
+</td>
+<td style="text-align:right;">
+0.8944
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_right gt_striped'>4</td>
-<td class='gt_row gt_right gt_striped'>35</td>
-<td class='gt_row gt_right gt_striped'>651</td>
-<td class='gt_row gt_right gt_striped'>-2784</td>
-<td class='gt_row gt_right gt_striped'>-2780</td>
-<td class='gt_row gt_right gt_striped'>-2621</td>
-<td class='gt_row gt_right gt_striped'>0.7358</td>
-<td class='gt_row gt_right gt_striped'>0.7220</td>
-<td class='gt_row gt_right gt_striped'>5.768e-164</td>
-<td class='gt_row gt_right gt_striped'>0.9973</td>
-<td class='gt_row gt_right gt_striped'>0.3237</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+651
+</td>
+<td style="text-align:right;">
+-2784
+</td>
+<td style="text-align:right;">
+-2780
+</td>
+<td style="text-align:right;">
+-2621
+</td>
+<td style="text-align:right;">
+0.7358
+</td>
+<td style="text-align:right;">
+0.7220
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9973
+</td>
+<td style="text-align:right;">
+0.3237
+</td>
 </tr>
 </tbody>
 </table>
-<!--gt table end-->
-</div>
 <p>Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R<sup>2</sup>, while the distriburion of residuals is still fulfilling the assumption of normality. Model of 4<sup>th</sup> order seems to provide very little gain in terms of fit Adj. R<sup>2</sup> comparing to 3<sup>rd</sup> order, and most importantly is not overfitting indicated by Wilks-Shapiro test for model of 4<sup>th</sup> order. Information crterions are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data.</p>
 <p>Looking at the concordance between local regression (loess) and polynomial models, we have:</p>
 <pre class="r"><code>library(DescTools)</code></pre>
@@ -1591,8 +1324,8 @@ cat(prettyModel);rm(processPolyNames,coefs,prettyNames)</code></pre>
 <div id="surface-plot-of-model-fits" class="section level3">
 <h3>Surface plot of model fits</h3>
 <p>Visualise fitted response surface.</p>
-<pre class="r"><code>z_min &lt;- min(data$auc) - c(min(data$auc) * 0.02)
-z_max &lt;- max(data$auc) + c(max(data$auc) * 0.02)
+<pre class="r"><code>z_min &lt;- min(auc_data$auc) - c(min(auc_data$auc) * 0.02)
+z_max &lt;- max(auc_data$auc) + c(max(auc_data$auc) * 0.02)
 
 # use a viridis palette for usability
 library(viridis)
@@ -1639,10 +1372,10 @@ for (i in seq(nrow(par_cut))) {
     cex.axis = 1.06,
     cex.lab = 1.8,
     main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;, 
-                  &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C;&quot;,
+                  &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C, &quot;,
                    &quot;\n&quot;,
-                  &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%; &quot;,
-                  &quot;SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
+                  &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%, &quot;,
+                  &quot;and SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
                   )
   )
 }</code></pre>
@@ -1651,24 +1384,45 @@ for (i in seq(nrow(par_cut))) {
 <p>Another way to present this data is with countour plots. We will plot contour plots corresponding to the above 3D surfaces</p>
 <pre class="r"><code>par(
   mar = c(3, 4, 4, 2),
-    mfrow = c(3, 1),
+    mfrow = c(3, 3),
     cex.main = 1.2,
     cex.axis = 1.06,
     cex.lab = 1.1)
 # c(5, 4, 4, 2)
 
-contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = -3 ))
-# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0))
-# contour(poly_3_fit, ~ Tt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
 
-contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = -3, SDt = 0 ))
-# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
-# contour(poly_3_fit, ~ Tt + SDt, image=TRUE, at = data.frame(Tt = 0, RHt = 3, SDt = 0 ))
-
-# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = -3, RHt = 0, SDt = 0 ))
-# contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 0, RHt = 0, SDt = 0 ))
-contour(poly_3_fit, ~ SDt + RHt, image=TRUE, at = data.frame(Tt = 3, RHt = 0, SDt = 0 ))</code></pre>
-<p><img src="figures/countour-1.png" width="480" /></p>
+for (i in seq(nrow(par_cut))) {
+  contour(poly_3_fit,
+        if (i &lt;= 3) {
+          ~ RHt + Tt
+        } else if (i %in% 4:6) {
+          ~ SDt + Tt
+        } else if (i &gt;= 7) {
+          ~ SDt + RHt
+        }
+        ,
+         image=TRUE,
+        at = data.frame(par_cut[i,]),
+    zlab = &quot;\nAUROC&quot;,
+    xlab = if (i &lt;= 3) {
+          c(&quot;RHt (%)&quot;,&quot;Tt (°C)&quot;)
+        } else if (i %in% 4:6) {
+          c(&quot;SDt (hours)&quot;, &quot;Tt (°C)&quot;)
+        } else if (i &gt;= 7) {
+          c(&quot;SDt (hours)&quot;, &quot;RHt (%)&quot;)
+        },
+    cex.main = 1.1,
+    cex.axis = 1,
+    cex.lab = 1,
+    main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;, 
+                  &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C,&quot;,
+                   &quot;\n&quot;,
+                  &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%, &quot;,
+                  &quot;and SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
+                  )
+  )
+}</code></pre>
+<p><img src="figures/countour-1.png" width="960" /></p>
 </div>
 <div id="further-investigation" class="section level3">
 <h3>Further investigation</h3>
