@@ -102,7 +102,7 @@ Historical weather data from Met Éireann synoptic weather station at Oak Park w
 ```{r weather-data, message=FALSE, warning=FALSE,fig.align='center'}
 #Weather data, parameters and cut off dates
 load(file = here::here("data", "op_2007_16", "raw", "OP_2007-2016.RData"))
-
+ 
 OP[1:5, 1:20] %>% gt()
 ```
 
@@ -229,18 +229,23 @@ OP_rain <-
   kable(caption = "10 Year Averages Weather at Oak Park")
 
 ```
-
+Night-time temperatures remain low April and May.
 ```{r}
  OP %>%
-    filter(month %in% c(4:10)) %>%
+  mutate(hour = hour(date)) %>%
+  group_by(month) %>% 
+    filter(month %in% c(4:10) & hour %in% c(0:6, 20:23)) %>%
+  mutate(month_abb = month(month, label = T)) %>%
     summarize(temp = round(mean(temp),1),
               rhum = round(mean(rhum),1)
               ) %>% 
-   bind_cols(., OP_rain) %>% 
-  kable(caption = "10 Year Averages Weather at Oak Park")
+  kable(caption = "Night-time Averages 8PM:6AM")
 ```
-  
-  The 
+
+
+
+    
+The average temperature and relative humidity are ideal for disease development over the course of the season as well.  
 ```{r temps_perhour_monthly}
 OP %>% 
   mutate(hour = hour(date)) %>% 

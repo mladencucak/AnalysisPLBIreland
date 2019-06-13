@@ -11,7 +11,7 @@
 
 
 
-<title>FungicideTreatments.utf8.md</title>
+<title>Evaluation of Irish Rules Model</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +23,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -265,6 +266,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -407,21 +416,21 @@ div.tocify {
 </li>
 <li>
   <a href="Analysis.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-file-code-o"></span>
      
     Analysis
   </a>
 </li>
 <li>
   <a href="Results1.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-bar-chart"></span>
      
     Results
   </a>
 </li>
 <li>
   <a href="FungicideTreatments.html">
-    <span class="fa fa fa fa-table"></span>
+    <span class="fa fa fa fa-lightbulb-o"></span>
      
     Usefulness
   </a>
@@ -442,9 +451,17 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Evaluation of Irish Rules model</h1>
+
+<h1 class="title toc-ignore">Evaluation of Irish Rules Model</h1>
 
 </div>
 
@@ -458,7 +475,7 @@ div.tocify {
     &quot;readxl&quot;,
     &quot;data.table&quot;,
     &quot;lubridate&quot;,
-    &quot;knitr&quot;,
+    &quot;knitr&quot;, 
     &quot;padr&quot;,
     &quot;readr&quot;,
     &quot;devtools&quot;,
@@ -482,11 +499,11 @@ div.tocify {
 new.packages &lt;-
   list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
 
-#Download packages that are not already present
+#Download packages that are not already present in the library
 if (length(new.packages))
-  install.packages(new.packages)
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
-if (&quot;gt&quot; %in% installed.packages() == FALSE)
+if (!&quot;gt&quot; %in% installed.packages())
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
@@ -495,7 +512,7 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
+  warning(&quot;Package/s&quot;, list.of.packages[!(packages_load)], &quot;not loaded!&quot;)
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -504,169 +521,125 @@ if (any(as.numeric(packages_load) == 0)) {
 </div>
 <div id="the-rationale" class="section level1">
 <h1>The Rationale</h1>
-<p>The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labor. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.<br />
-Two alternative model parametrisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. The performance is evaluated in two ways, as a reduction of: 1. Number of treatments: + With minimum window of 5 days between treatments + With minimum of 5 and maximum of 10 days between treatments 2. Dose reduction based on 7 day calendar treatment</p>
+<p>The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labour. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.<br />
+Two alternative model parameterisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. The performance is evaluated in two ways, as a reduction of:</p>
+<ol style="list-style-type: decimal">
+<li>Number of treatments:</li>
+</ol>
+<ul>
+<li><p>With minimum window of 5 days between treatments</p></li>
+<li><p>With minimum of 5 and maximum of 10 days between treatments</p></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Dose reduction based on 7 day calendar treatment</li>
+</ol>
 </div>
 <div id="cut-off-dates" class="section level1">
 <h1>Cut-off Dates</h1>
 <p>Soil temperature data.</p>
-<pre class="r"><code>soildf&lt;- read_csv(here::here(&quot;tmp&quot;, &quot;agridata_375.csv&quot;),col_types = cols(X1 = col_skip(), X10 = col_skip()), 
-    skip = 7)
-soildf$date = as.Date(soildf$date,format=&quot;%d-%b-%Y&quot;,  tz = &quot;UTC&quot;)
-soildf &lt;- tidyr::separate(soildf, &quot;date&quot;, c(&quot;year_var&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;, remove = F )
+<pre class="r"><code>soildf &lt;-
+  read_csv(
+    here::here(&quot;tmp&quot;, &quot;agridata_375.csv&quot;),
+    col_types = cols(X1 = col_skip(), X10 = col_skip()),
+    skip = 7
+  )
+soildf$date = as.Date(soildf$date, format = &quot;%d-%b-%Y&quot;,  tz = &quot;UTC&quot;)
+soildf &lt;-
+  tidyr::separate(soildf,
+                  &quot;date&quot;,
+                  c(&quot;year_var&quot;, &quot;month&quot;, &quot;day&quot;),
+                  sep = &quot;-&quot;,
+                  remove = F)
 soildf$doy &lt;-  yday(soildf$date)
-soildf[,2:5] &lt;- lapply(soildf[,2:5], as.numeric)</code></pre>
+soildf[, 2:5] &lt;- lapply(soildf[, 2:5], as.numeric)</code></pre>
 <p>We assume that the planting starts day after the daily average soil temperature becomes higher than 8°C for three consecutive days in the beginning of April. This is common practice in Ireland, recommended by Teagasc.</p>
-<pre class="r"><code>soildf &lt;- soildf[with(soildf, month &gt;= 4),]
+<pre class="r"><code>soildf &lt;- soildf[with(soildf, month &gt;= 4), ]
 dfls &lt;- base::split(soildf, soildf$year_var)
-dates_cut &lt;- 
-lapply(dfls, function(x) {
-  criteria &lt;- as.numeric(x$soil&gt;8)
-  #cumulative sum days matching the criteria
-  criteria_sum &lt;- stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
-  pl_date &lt;- x[match(3, criteria_sum)+1, &quot;date&quot;]
-  data.frame( &quot;year&quot; = unique(year(x$date)),
-              date = pl_date[1,1])
-  
-}
-) %&gt;% bind_rows() %&gt;% 
-rename( &quot;plant_date&quot;  = date)
+dates_cut &lt;-
+  lapply(dfls, function(x) {
+    criteria &lt;- as.numeric(x$soil &gt; 8)
+    #cumulative sum days matching the criteria
+    criteria_sum &lt;-
+      stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+    pl_date &lt;- x[match(3, criteria_sum) + 1, &quot;date&quot;]
+    data.frame(&quot;year&quot; = unique(year(x$date)),
+               date = pl_date[1, 1])
+    }) %&gt;% 
+  bind_rows() %&gt;%
+  rename(&quot;plant_date&quot;  = date)
 rm(soildf, dfls)</code></pre>
 <p>The data for 2007 is missing so we shall use the mean date from other years.</p>
-<pre class="r"><code>dates_cut$plant_doy &lt;-yday(dates_cut$plant_date)
-dates_cut &lt;- 
-bind_rows(
-  list(
+<pre class="r"><code>dates_cut$plant_doy &lt;- yday(dates_cut$plant_date)
+dates_cut &lt;-
+  bind_rows(list(
     dates_cut,
     data.frame(
       year = 2007,
-      plant_date = as.Date(strptime(paste(&quot;2007&quot;, mean(dates_cut$plant_doy, na.rm = T )), format=&quot;%Y %j&quot;)),
+      plant_date = as.Date(strptime(paste(
+        &quot;2007&quot;, mean(dates_cut$plant_doy, na.rm = TRUE)
+      ), format = &quot;%Y %j&quot;)),
       plant_doy = mean(dates_cut$plant_doy)
     )
-  )
-)</code></pre>
+  ))</code></pre>
 <p>We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows.</p>
-<pre class="r"><code>meet_in_rows &lt;- 5*7
+<pre class="r"><code>meet_in_rows &lt;- 5 * 7
 dates_cut$prot_start &lt;- with(dates_cut, plant_doy + meet_in_rows)
-dates_cut$prot_start &lt;- paste(dates_cut$year, dates_cut$prot_start, sep = &quot;-&quot;) %&gt;% strptime(format=&quot;%Y-%j&quot;) %&gt;% as.Date()</code></pre>
+dates_cut$prot_start &lt;- paste(dates_cut$year,
+                              dates_cut$prot_start,
+                              sep = &quot;-&quot;) %&gt;%
+  strptime(format = &quot;%Y-%j&quot;) %&gt;%
+  as.Date()</code></pre>
 <p>For the purposes of this study we will assume that the growing season lasts 120 days. However, the pesticide protection lasts for at least another three weeks to allow the tuber growth.</p>
-<pre class="r"><code>duration_of_season &lt;- 120 + 21 
-dates_cut$season_end &lt;- with(dates_cut, plant_doy + duration_of_season)
-dates_cut$season_end &lt;- paste(dates_cut$year, dates_cut$season_end, sep = &quot;-&quot;) %&gt;% strptime(format=&quot;%Y-%j&quot;) %&gt;% as.Date()
-dates_cut %&gt;% kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="right">year</th>
-<th align="left">plant_date</th>
-<th align="right">plant_doy</th>
-<th align="left">prot_start</th>
-<th align="left">season_end</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">2008</td>
-<td align="left">2008-04-04</td>
-<td align="right">95.00000</td>
-<td align="left">2008-05-09</td>
-<td align="left">2008-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2009</td>
-<td align="left">2009-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2009-05-09</td>
-<td align="left">2009-08-23</td>
-</tr>
-<tr class="odd">
-<td align="right">2010</td>
-<td align="left">2010-04-08</td>
-<td align="right">98.00000</td>
-<td align="left">2010-05-13</td>
-<td align="left">2010-08-27</td>
-</tr>
-<tr class="even">
-<td align="right">2011</td>
-<td align="left">2011-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2011-05-09</td>
-<td align="left">2011-08-23</td>
-</tr>
-<tr class="odd">
-<td align="right">2012</td>
-<td align="left">2012-04-04</td>
-<td align="right">95.00000</td>
-<td align="left">2012-05-09</td>
-<td align="left">2012-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2013</td>
-<td align="left">2013-04-12</td>
-<td align="right">102.00000</td>
-<td align="left">2013-05-17</td>
-<td align="left">2013-08-31</td>
-</tr>
-<tr class="odd">
-<td align="right">2014</td>
-<td align="left">2014-04-04</td>
-<td align="right">94.00000</td>
-<td align="left">2014-05-09</td>
-<td align="left">2014-08-23</td>
-</tr>
-<tr class="even">
-<td align="right">2015</td>
-<td align="left">2015-04-05</td>
-<td align="right">95.00000</td>
-<td align="left">2015-05-10</td>
-<td align="left">2015-08-24</td>
-</tr>
-<tr class="odd">
-<td align="right">2016</td>
-<td align="left">2016-04-07</td>
-<td align="right">98.00000</td>
-<td align="left">2016-05-12</td>
-<td align="left">2016-08-26</td>
-</tr>
-<tr class="even">
-<td align="right">2007</td>
-<td align="left">2007-04-06</td>
-<td align="right">96.11111</td>
-<td align="left">2007-05-11</td>
-<td align="left">2007-08-25</td>
-</tr>
-</tbody>
-</table>
+<pre class="r"><code>duration_of_season &lt;- 120 + 21
+dates_cut$season_end &lt;-
+  with(dates_cut, plant_doy + duration_of_season)
+dates_cut$season_end &lt;-
+  paste(dates_cut$year,
+        dates_cut$season_end,
+        sep = &quot;-&quot;) %&gt;%
+                strptime(format = &quot;%Y-%j&quot;) %&gt;%
+  as.Date()
+
+dates_cut</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["plant_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["plant_doy"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["prot_start"],"name":[4],"type":["date"],"align":["right"]},{"label":["season_end"],"name":[5],"type":["date"],"align":["right"]}],"data":[{"1":"2008","2":"2008-04-04","3":"95.00000","4":"2008-05-09","5":"2008-08-23"},{"1":"2009","2":"2009-04-04","3":"94.00000","4":"2009-05-09","5":"2009-08-23"},{"1":"2010","2":"2010-04-08","3":"98.00000","4":"2010-05-13","5":"2010-08-27"},{"1":"2011","2":"2011-04-04","3":"94.00000","4":"2011-05-09","5":"2011-08-23"},{"1":"2012","2":"2012-04-04","3":"95.00000","4":"2012-05-09","5":"2012-08-23"},{"1":"2013","2":"2013-04-12","3":"102.00000","4":"2013-05-17","5":"2013-08-31"},{"1":"2014","2":"2014-04-04","3":"94.00000","4":"2014-05-09","5":"2014-08-23"},{"1":"2015","2":"2015-04-05","3":"95.00000","4":"2015-05-10","5":"2015-08-24"},{"1":"2016","2":"2016-04-07","3":"98.00000","4":"2016-05-12","5":"2016-08-26"},{"1":"2007","2":"2007-04-06","3":"96.11111","4":"2007-05-11","5":"2007-08-25"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 <p>Load the weather data with model outputs.</p>
 <pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_for_analysis.RData&quot;))
 
 years &lt;-  unique(OP$year_var)
 
-df &lt;- filter(OP, month&gt;=2 &amp; month &lt;=9 );rm(OP)
+df &lt;- filter(OP, month &gt;= 2 &amp; month &lt;= 9)
+rm(OP)
 df &lt;-
-  df[, c(&quot;date&quot;,
-              &quot;year_var&quot;,
-              &quot;short_date&quot;,
-              &quot;week_var&quot;,
-              &quot;doy&quot;,
-              &quot;rain&quot;,
-              &quot;temp&quot;,
-              &quot;rhum&quot;,
-              &quot;90_10_12_rain_ebh&quot;,
-              &quot;88_12_10_rainrh_ebh&quot;,
-              &quot;88_10_10_rainrh_ebh&quot;)]  #Keep only  columns needed for faster code execution
-df &lt;-  dplyr::rename(df, 
-             ir = &quot;90_10_12_rain_ebh&quot;,
-            ir_opt = &quot;88_12_10_rainrh_ebh&quot;,
-            ir_low_risk =  &quot;88_10_10_rainrh_ebh&quot;
-       )</code></pre>
+  df[, c(
+    &quot;date&quot;,
+    &quot;year_var&quot;,
+    &quot;short_date&quot;,
+    &quot;week_var&quot;,
+    &quot;doy&quot;,
+    &quot;rain&quot;,
+    &quot;temp&quot;,
+    &quot;rhum&quot;,
+    &quot;90_10_12_rain_ebh&quot;,
+    &quot;88_12_10_rainrh_ebh&quot;,
+    &quot;88_10_10_rainrh_ebh&quot;
+  )]
+
+#Keep only  columns needed for faster code execution
+df &lt;-  dplyr::rename(df,
+                     ir = &quot;90_10_12_rain_ebh&quot;,
+                     ir_opt = &quot;88_12_10_rainrh_ebh&quot;,
+                     ir_low_risk =  &quot;88_10_10_rainrh_ebh&quot;)</code></pre>
 </div>
 <div id="treatment-frequency-model-vs.-calendar" class="section level1">
 <h1>Treatment Frequency: Model vs. Calendar</h1>
 <p>Calculate the number of calendar treatments, assuming they would start 5 weeks and end 141 days after the planting</p>
-<pre class="r"><code>(calendar_five &lt;- round( c(duration_of_season-5*7)/5,0))</code></pre>
+<pre class="r"><code>(calendar_five &lt;- round(c(duration_of_season - 5 * 7) / 5, 0))</code></pre>
 <pre><code>## [1] 21</code></pre>
-<pre class="r"><code>(calendar_seven &lt;- round( c(duration_of_season-5*7)/7,0))</code></pre>
+<pre class="r"><code>(calendar_seven &lt;- round(c(duration_of_season - 5 * 7) / 7, 0))</code></pre>
 <pre><code>## [1] 15</code></pre>
 <p>We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Minimum period until the next treatment is 5 days. Cumulative sum of recommended treatments is calculated per season.</p>
 <pre class="r"><code>ControlFreqFun &lt;-
@@ -695,12 +668,14 @@ df &lt;-  dplyr::rename(df,
     }
     
     #Subset the of the data for the duration of &#39;protection&#39; period for each year
-     trt_df &lt;-
+    trt_df &lt;-
       fun_df  %&gt;%
-      filter(test.overlap(short_date, 
-                          dates_cut$prot_start, 
-                          dates_cut$season_end + max_prot_dur #Additional days for risk estimation and timing of treatments
-                          )
+      filter(
+        test.overlap(
+          short_date,
+          dates_cut$prot_start,
+          dates_cut$season_end + max_prot_dur #Additional days for risk estimation and timing of treatments
+        )
       ) %&gt;%
       dplyr::select(
         ends_with(&quot;year_var&quot;),
@@ -726,104 +701,118 @@ df &lt;-  dplyr::rename(df,
                 funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
       group_by(year_var, week_var, doy) %&gt;%
       summarise_at(., .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]), .funs = sum)
-     
     
-     #####################################################################
-     #Calculate the number of treatments with with minimum protection duration of 5 days
-     TreatmentWindowOne &lt;- function(model_output, min_prot_dur ,max_prot_dur ) {
-       # model_output &lt;- trt_df_one[[1]]$ir
-       
-       y &lt;- model_output
-       
-       for (i in seq_along( 1: c(length(y) - max_prot_dur))) {
-         
-         #Following treatment will be implemented on day 5 if there is 1 in the next five days
-         if (y[i] == 1 &amp; sum(y[c(i+1):c(i+min_prot_dur)])&gt;0 ) {
-           y[i+min_prot_dur] &lt;- 1
-           y[c(i+1):c(i+ c(min_prot_dur-1))] &lt;- 0
-         }
-       }
-       #Add zeros for the duration of added period
-       y[c(length(y) - max_prot_dur) : length(y)] &lt;- 0
-       y
-     }
-     
-     #Apply function on yearly subsets
-     trt_df_one &lt;- 
-       split(trt_df, trt_df$year_var)
-     
-     for (year in seq_along(trt_df_one)) {
-       x &lt;- trt_df_one[[year]]
-       trt_df_one[[year]] &lt;- 
-         
-         lapply(x[grep(&quot;ir&quot;, colnames(x))], function(x)
-           TreatmentWindowOne(x, min_prot_dur ,max_prot_dur)) %&gt;%
-         bind_cols()
-     }
-     
-     trt_df_one &lt;-  bind_rows(trt_df_one)
-     trt_df_one &lt;-  bind_cols(trt_df[&quot;year_var&quot;],trt_df_one )
-     
+    
     #####################################################################
-    #Calculate the number of treatments with 5-10 day sliding treatment interval
-    TreatmentWindow &lt;- function(model_output, min_prot_dur ,max_prot_dur ) {
-      
-      
-      x &lt;- model_output
-      #attach vector, 10 days of 0
-      y &lt;- vector(mode = &quot;numeric&quot;, length = length(x) )
-      # find the first treatment
-      y[which(x == 1)[1]] &lt;- 1
-      
-      
-      for (i in seq_along( 1: c(length(y) - max_prot_dur))) {
+    #Calculate the number of treatments with with minimum protection duration of 5 days
+    TreatmentWindowOne &lt;-
+      function(model_output,
+               min_prot_dur ,
+               max_prot_dur) {
+        # model_output &lt;- trt_df_one[[1]]$ir
         
-        #Following treatment will be implemented on day 5 if there is 1 in the next five days
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+5)])&gt;0 ) {y[i+5] &lt;- 1}
-        #Or on any following day with risk threshold reached
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+5)])==0 &amp; x[i+6]==1 ) {y[i+6] &lt;- 1}
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+6)])==0 &amp; x[i+7]==1 ) {y[i+7] &lt;- 1}
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+7)])==0 &amp; x[i+8]==1 ) {y[i+8] &lt;- 1}
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+8)])==0 &amp; x[i+9]==1 ) {y[i+9] &lt;- 1}
-        #If warning threshold was not reached at all or 10th day, then spray on 10th day 
-        if (y[i] == 1 &amp; sum(x[c(i+1):c(i+9)])==0 ) {y[i+10] &lt;- 1}
-        #if there was no treatment 
-        if(i== c(length(y) - max_prot_dur)) break
+        y &lt;- model_output
+        
+        for (i in seq_along(1:c(length(y) - max_prot_dur))) {
+          #Following treatment will be implemented on day 5 if there is 1 in the next five days
+          if (y[i] == 1 &amp; sum(y[c(i + 1):c(i + min_prot_dur)]) &gt; 0) {
+            y[i + min_prot_dur] &lt;- 1
+            y[c(i + 1):c(i + c(min_prot_dur - 1))] &lt;- 0
+          }
+        }
+        #Add zeros for the duration of added period
+        y[c(length(y) - max_prot_dur):length(y)] &lt;- 0
+        y
       }
-      #Add zeros for the duration of added period
-      y[c(length(y) - max_prot_dur) : length(y)] &lt;- 0
-      y
-    }
     
-    trt_df_window &lt;- 
+    #Apply function on yearly subsets
+    trt_df_one &lt;-
       split(trt_df, trt_df$year_var)
     
+    for (year in seq_along(trt_df_one)) {
+      x &lt;- trt_df_one[[year]]
+      trt_df_one[[year]] &lt;-
+        
+        lapply(x[grep(&quot;ir&quot;, colnames(x))], function(x)
+          TreatmentWindowOne(x, min_prot_dur , max_prot_dur)) %&gt;%
+        bind_cols()
+    }
+    
+    trt_df_one &lt;-  bind_rows(trt_df_one)
+    trt_df_one &lt;-  bind_cols(trt_df[&quot;year_var&quot;], trt_df_one)
+    
+    #####################################################################
+    #Calculate the number of treatments with 5-10 day sliding treatment interval
+    TreatmentWindow &lt;-
+      function(model_output,
+               min_prot_dur ,
+               max_prot_dur) {
+        x &lt;- model_output
+        #attach vector, 10 days of 0
+        y &lt;- vector(mode = &quot;numeric&quot;, length = length(x))
+        # find the first treatment
+        y[which(x == 1)[1]] &lt;- 1
+        
+        
+        for (i in seq_along(1:c(length(y) - max_prot_dur))) {
+          #Following treatment will be implemented on day 5 if there is 1 in the next five days
+          if (y[i] == 1 &amp; sum(x[c(i + 1):c(i + 5)]) &gt; 0) {
+            y[i + 5] &lt;- 1
+          }
+          #Or on any following day with risk threshold reached
+          if (y[i] == 1 &amp;
+              sum(x[c(i + 1):c(i + 5)]) == 0 &amp; x[i + 6] == 1) {
+            y[i + 6] &lt;- 1
+          }
+          if (y[i] == 1 &amp;
+              sum(x[c(i + 1):c(i + 6)]) == 0 &amp; x[i + 7] == 1) {
+            y[i + 7] &lt;- 1
+          }
+          if (y[i] == 1 &amp;
+              sum(x[c(i + 1):c(i + 7)]) == 0 &amp; x[i + 8] == 1) {
+            y[i + 8] &lt;- 1
+          }
+          if (y[i] == 1 &amp;
+              sum(x[c(i + 1):c(i + 8)]) == 0 &amp; x[i + 9] == 1) {
+            y[i + 9] &lt;- 1
+          }
+          #If warning threshold was not reached at all or 10th day, then spray on 10th day
+          if (y[i] == 1 &amp; sum(x[c(i + 1):c(i + 9)]) == 0) {
+            y[i + 10] &lt;- 1
+          }
+          #if there was no treatment
+          if (i == c(length(y) - max_prot_dur))
+            break
+        }
+        #Add zeros for the duration of added period
+        y[c(length(y) - max_prot_dur):length(y)] &lt;- 0
+        y
+      }
+    
+    trt_df_window &lt;-
+      split(trt_df, trt_df$year_var)
     
     for (year in seq_along(trt_df_window)) {
       x &lt;- trt_df_window[[year]]
-      trt_df_window[[year]] &lt;- 
+      trt_df_window[[year]] &lt;-
         
         lapply(x[grep(&quot;ir&quot;, colnames(x))], function(x)
-          TreatmentWindow(x, min_prot_dur,max_prot_dur)) %&gt;%
-        bind_cols() %&gt;% 
+          TreatmentWindow(x, min_prot_dur, max_prot_dur)) %&gt;%
+        bind_cols() %&gt;%
         rename_all(., .funs = funs(paste0(&quot;w_&quot;, .)))
     }
     
     trt_df_window &lt;-  bind_rows(trt_df_window)
-
     
     #Combine the data for both scenarios
     trt_df &lt;- bind_cols(trt_df_one, trt_df_window)
     
-    
-    
     #Calculate number of treatmetns per year
-    sum_df &lt;- 
-      trt_df %&gt;% 
-      group_by(year_var) %&gt;% 
-      summarise_at(colnames(trt_df[, grep(&quot;ir&quot;, colnames(trt_df))]), .funs = sum) 
-    
-    
+    sum_df &lt;-
+      trt_df %&gt;%
+      group_by(year_var) %&gt;%
+      summarise_at(colnames(trt_df[, grep(&quot;ir&quot;, colnames(trt_df))]),
+                   .funs = sum)
     
     sum_df$warning_thres &lt;-  warning_threshold
     
@@ -835,7 +824,7 @@ df &lt;-  dplyr::rename(df,
 warning_thresholds &lt;- 1:18
 begin &lt;- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
-cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1, 1) 
+cores &lt;- ifelse(detectCores() &gt; 1, detectCores() - 1, 1)
 cl &lt;- makeCluster(cores)
 clusterExport(cl, c(&quot;df&quot;, &quot;dates_cut&quot;, &quot;ControlFreqFun&quot;))
 
@@ -857,31 +846,32 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 ##  [6] &quot;tidyr&quot;     &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;    
 ## [11] &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;  
 ## [16] &quot;base&quot;</code></pre>
-<pre class="r"><code>  control_eval &lt;- pbapply::pblapply(warning_thresholds, function(x)
-  {
-    xx &lt;-
-      ControlFreqFun(x,
-      df,
-      dates_cut,
-      min_prot_dur = 5,
-      max_prot_dur = 10)
-      return(xx)
-  },
-  cl = cl
-  )
-begin- Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -6.286736 secs</code></pre>
+<pre class="r"><code>control_eval &lt;- pbapply::pblapply(warning_thresholds, function(x)
+{
+  xx &lt;-
+    ControlFreqFun(x,
+                   df,
+                   dates_cut,
+                   min_prot_dur = 5,
+                   max_prot_dur = 10)
+  return(xx)
+},
+cl = cl)
+begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
+<pre><code>## Time difference of -6.218324 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
-<pre class="r"><code>control_eval_long &lt;- 
-control_eval %&gt;% 
-  bind_rows() %&gt;% 
+<pre class="r"><code>control_eval_long &lt;-
+  control_eval %&gt;%
+  bind_rows() %&gt;%
   reshape2::melt(
     id.vars = c(&quot;year_var&quot;, &quot;warning_thres&quot;),
     variable.name = &quot;programme&quot;,
     value.name = &quot;no_of_treatments&quot;
   )
-control_eval_long %&gt;% head() %&gt;% pander()</code></pre>
+control_eval_long %&gt;%
+  head() %&gt;%
+  pander()</code></pre>
 <table style="width:81%;">
 <colgroup>
 <col width="15%" />
@@ -936,100 +926,183 @@ control_eval_long %&gt;% head() %&gt;% pander()</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>control_eval_long %&gt;% 
-# control_eval_long%&gt;% 
-  mutate(programme = ifelse(programme== &quot;ir&quot;, &quot;a) Default IR&quot;, 
-                            ifelse(programme== &quot;ir_opt&quot;, &quot;b) Optimised IR&quot;,
-                                   ifelse(programme == &quot;ir_low_risk&quot;, &quot;c) Low Risk IR&quot;,
-                                          ifelse(programme== &quot;w_ir&quot;, &quot;d) Default IR 5-10d&quot;,
-                                                 ifelse(programme== &quot;w_ir_opt&quot;, &quot;e) Optimised IR 5-10d&quot;,
-                                                        ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;f) Low Risk IR 5-10d&quot;,&quot;&quot;))))))) %&gt;% 
+<pre class="r"><code>control_eval_long %&gt;%
+  # control_eval_long%&gt;%
+  mutate(programme = ifelse(
+    programme == &quot;ir&quot;,
+    &quot;a) Default IR&quot;,
+    ifelse(
+      programme == &quot;ir_opt&quot;,
+      &quot;b) Optimised IR&quot;,
+      ifelse(
+        programme == &quot;ir_low_risk&quot;,
+        &quot;c) Low Risk IR&quot;,
+        ifelse(
+          programme == &quot;w_ir&quot;,
+          &quot;d) Default IR 5-10d&quot;,
+          ifelse(
+            programme == &quot;w_ir_opt&quot;,
+            &quot;e) Optimised IR 5-10d&quot;,
+            ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;f) Low Risk IR 5-10d&quot;, &quot;&quot;)
+          )
+        )
+      )
+    )
+  )) %&gt;%
   mutate(programme = factor(
     programme,
     levels = c(
-    &quot;a) Default IR&quot;,
-    &quot;b) Optimised IR&quot;,
-    &quot;c) Low Risk IR&quot;,
-    &quot;d) Default IR 5-10d&quot;,
-    &quot;e) Optimised IR 5-10d&quot;,
-    &quot;f) Low Risk IR 5-10d&quot;
+      &quot;a) Default IR&quot;,
+      &quot;b) Optimised IR&quot;,
+      &quot;c) Low Risk IR&quot;,
+      &quot;d) Default IR 5-10d&quot;,
+      &quot;e) Optimised IR 5-10d&quot;,
+      &quot;f) Low Risk IR 5-10d&quot;
     )
-    )) %&gt;%
-  mutate(Years = factor(year_var)) %&gt;% 
-    ggplot(., aes(factor(warning_thres), no_of_treatments)) +
-  geom_vline(xintercept=seq(1,9,1), size = 0.2, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  geom_vline(xintercept=seq(3,9,3), size = 0.2, color = &quot;gray&quot;, linetype=&quot;solid&quot;)+
-  # geom_boxplot(width = 0.4, show.legend=FALSE) +
-  geom_jitter(aes(color = Years),
-              position = position_jitter(width = 0.1),
-              # colour = &quot;black&quot;,
-              alpha = 0.6,
-              size = 1
+  )) %&gt;%
+  mutate(Years = factor(year_var)) %&gt;%
+  ggplot(., aes(factor(warning_thres), no_of_treatments)) +
+  geom_vline(
+    xintercept = seq(1, 9, 1),
+    size = 0.2,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
   ) +
-  geom_line(aes(warning_thres, calendar_seven),colour = gray.colors(2)[1])+
-  geom_label(aes(14,calendar_seven+0.8 , label= &quot;7-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
-  geom_line(aes(warning_thres, calendar_five),colour = gray.colors(2)[1])+
-  geom_label(aes(14,calendar_five+0.8, label= &quot;5-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 4) +
+  geom_vline(
+    xintercept = seq(3, 9, 3),
+    size = 0.2,
+    color = &quot;gray&quot;,
+    linetype = &quot;solid&quot;
+  ) +
+  # geom_boxplot(width = 0.4, show.legend=FALSE) +
+  geom_jitter(
+    aes(color = Years),
+    position = position_jitter(width = 0.1),
+    # colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 1
+  ) +
+  scale_colour_brewer(palette = &quot;Set3&quot;) +
+  geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_seven + 0.8 , label = &quot;7-day freq.&quot;),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 4
+  ) +
+  geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_five + 0.8, label = &quot;5-day freq.&quot;),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 4
+  ) +
   geom_smooth(method = &quot;loess&quot;,
               se = FALSE,
               color = gray.colors(2)[1],
               aes(group = 1)) +
-  facet_wrap(~programme, ncol = 3) +
+  facet_wrap(~ programme, ncol = 3) +
   ggtitle(&quot;Cost effectiveness of model versions&quot;) +
   
   xlab(&quot;Warning thresholds (EBH)&quot;) +
   ylab(&quot;Number of treatments&quot;) +
-  scale_x_discrete(breaks=seq(0, 18, 3)) +
-  theme(legend.position = &quot;top&quot;)+
+  scale_x_discrete(breaks = seq(0, 18, 3)) +
+  theme(legend.position = &quot;top&quot;) +
   theme_article()</code></pre>
 <p><img src="images/plot_models-1.png" width="1056" style="display: block; margin: auto;" /></p>
 <p>The figure shows how does the frequency of recommended treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.</p>
 <p>There is variation in the data and it would be interesting to see if there is an effect of year.</p>
-<pre class="r"><code>control_eval_long %&gt;% 
-# control_eval_long%&gt;% 
-  mutate(programme = ifelse(programme== &quot;ir&quot;, &quot;Default IR&quot;, 
-                            ifelse(programme== &quot;ir_opt&quot;, &quot;Optimised IR&quot;,
-                                   ifelse(programme == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;,
-                                          ifelse(programme== &quot;w_ir&quot;, &quot;Default IR 5-10d&quot;,
-                                                 ifelse(programme== &quot;w_ir_opt&quot;, &quot;Optimised IR 5-10d&quot;,
-                                                        ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;Low Risk IR 5-10d&quot;,&quot;&quot;))))))) %&gt;% 
+<pre class="r"><code>control_eval_long %&gt;%
+  # control_eval_long%&gt;%
+  mutate(programme = ifelse(
+    programme == &quot;ir&quot;,
+    &quot;Default IR&quot;,
+    ifelse(
+      programme == &quot;ir_opt&quot;,
+      &quot;Optimised IR&quot;,
+      ifelse(
+        programme == &quot;ir_low_risk&quot;,
+        &quot;Low Risk IR&quot;,
+        ifelse(
+          programme == &quot;w_ir&quot;,
+          &quot;Default IR 5-10d&quot;,
+          ifelse(
+            programme == &quot;w_ir_opt&quot;,
+            &quot;Optimised IR 5-10d&quot;,
+            ifelse(programme == &quot;w_ir_low_risk&quot;, &quot;Low Risk IR 5-10d&quot;, &quot;&quot;)
+          )
+        )
+      )
+    )
+  )) %&gt;%
   mutate(programme = factor(
     programme,
     levels = c(
-    &quot;Default IR&quot;,
-    &quot;Optimised IR&quot;,
-    &quot;Low Risk IR&quot;,
-    &quot;Default IR 5-10d&quot;,
-    &quot;Optimised IR 5-10d&quot;,
-    &quot;Low Risk IR 5-10d&quot;
+      &quot;Default IR&quot;,
+      &quot;Optimised IR&quot;,
+      &quot;Low Risk IR&quot;,
+      &quot;Default IR 5-10d&quot;,
+      &quot;Optimised IR 5-10d&quot;,
+      &quot;Low Risk IR 5-10d&quot;
     )
-    )) %&gt;%
-  mutate(Years = factor(year_var)) %&gt;% 
-ggplot(., aes(factor(warning_thres), no_of_treatments, group =programme, colour =programme)) +
-  geom_vline(xintercept=seq(1,9,1), size = 0.2, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  geom_vline(xintercept=seq(3,9,3), size = 0.2, color = &quot;gray&quot;, linetype=&quot;solid&quot;)+
-
-  geom_line(aes())+
-  geom_line(aes(warning_thres, 12),colour = gray.colors(2)[1])+
-  geom_label(aes(14,calendar_seven+0.8 , label= &quot;7-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
-  geom_line(aes(warning_thres, 17),colour = gray.colors(2)[1])+
-  geom_label(aes(14,calendar_five+0.8, label= &quot;5-day freq.&quot;), 
-             colour = gray.colors(2)[1], fill = NA, label.size = NA, size = 3) +
-  facet_wrap(~Years, ncol = 5)+
+  )) %&gt;%
+  mutate(Years = factor(year_var)) %&gt;%
+  ggplot(.,
+         aes(
+           factor(warning_thres),
+           no_of_treatments,
+           group = programme,
+           colour = programme
+         )) +
+  geom_vline(
+    xintercept = seq(1, 9, 1),
+    size = 0.2,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
+  ) +
+  geom_vline(
+    xintercept = seq(3, 9, 3),
+    size = 0.2,
+    color = &quot;gray&quot;,
+    linetype = &quot;solid&quot;
+  ) +
+  geom_line(aes()) +
+  geom_line(aes(warning_thres, 12), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_seven + 0.8 , label = &quot;7-day freq.&quot;),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 3
+  ) +
+  geom_line(aes(warning_thres, 17), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_five + 0.8, label = &quot;5-day freq.&quot;),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 3
+  ) +
+  facet_wrap( ~ Years, ncol = 5) +
   ggtitle(&quot;Treatment Frequency as a Factor the Decision Threshold&quot;) +
-  theme(strip.text.y = element_blank())+
+  theme(strip.text.y = element_blank()) +
   xlab(&quot;Warning thresholds (EBH)&quot;) +
   ylab(&quot;Number of treatments&quot;) +
-  theme_article() + 
-  geom_vline(xintercept=c(2,3,4), size = 0.5, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  scale_x_discrete(breaks=seq(0, 18, 3))+
-  scale_y_continuous(breaks=seq(0, 30, 5))+
-  scale_colour_manual( &quot;Model&quot;,values = c(&quot;#a6cee3&quot;, &quot;#1f78b4&quot;, &quot;#7570b3&quot;,&quot;orange&quot;, &quot;red&quot;, &quot;yellow&quot; ))+
-  theme(legend.position=&quot;top&quot;,
-        text = element_text( size = 11))</code></pre>
+  theme_article() +
+  geom_vline(
+    xintercept = c(2, 3, 4),
+    size = 0.5,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
+  ) +
+  scale_x_discrete(breaks = seq(0, 18, 3)) +
+  scale_y_continuous(breaks = seq(0, 30, 5)) +
+  scale_colour_brewer(&quot;Model&quot;,
+                      palette = &quot;Dark2&quot;) +
+  theme(legend.position = &quot;top&quot;,
+        text = element_text(size = 11))</code></pre>
 <p><img src="images/plot_years-1.png" width="1056" style="display: block; margin: auto;" /></p>
 <p>It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years.</p>
 </div>
@@ -1043,77 +1116,96 @@ Calculate the dose reductions based on the model outputs. Dose is reduced to qua
     start_date, end_date)) &gt; 0
 }
 #Dose calculation function based on the risk output
-Dose &lt;-  function(x){
-  ifelse(x &gt;=0 &amp; x &lt;=3, 0,
-         ifelse(x &gt;3 &amp; x &lt;=6, 0.25,
-                ifelse(x &gt;6 &amp; x &lt;=9, 0.5,
-                       ifelse(x &gt;9 &amp; x &lt;=12, 0.75,
-                              ifelse(x &gt;12,  1,1
-                              )
-                       )
-                )
-         )
-  )
+Dose &lt;-  function(x) {
+  ifelse(x &gt;= 0 &amp; x &lt;= 3, 0,
+         ifelse(x &gt; 3 &amp; x &lt;= 6, 0.25,
+                ifelse(
+                  x &gt; 6 &amp; x &lt;= 9, 0.5,
+                  ifelse(x &gt; 9 &amp; x &lt;= 12, 0.75,
+                         ifelse(x &gt; 12,  1, 1))
+                )))
 }</code></pre>
 <p>The function is applied on the data.</p>
-<pre class="r"><code>dosedf &lt;- 
-  df %&gt;% 
-  filter(test.overlap(short_date, 
-                      dates_cut$prot_start, 
-                      dates_cut$season_end 
-                      )
-  ) %&gt;%
-  dplyr::select(
-    ends_with(&quot;year_var&quot;),
-    ends_with(&quot;week_var&quot;),
-    ends_with(&quot;doy&quot;),
-    starts_with(&quot;ir&quot;)
-  ) %&gt;%
+<pre class="r"><code>dosedf &lt;-
+  df %&gt;%
+  filter(test.overlap(short_date,
+                      dates_cut$prot_start,
+                      dates_cut$season_end)) %&gt;%
+  dplyr::select(ends_with(&quot;year_var&quot;),
+                ends_with(&quot;week_var&quot;),
+                ends_with(&quot;doy&quot;),
+                starts_with(&quot;ir&quot;)) %&gt;%
   group_by(year_var, week_var, doy) %&gt;%
   summarise_at(., .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]), .funs = max) %&gt;%   #get max daily values
-  group_by(year_var) %&gt;% 
-  mutate( treat_week = sort(rep(seq(1, 19, 1),7))[1:n()] ) %&gt;% 
-  group_by(year_var, treat_week) %&gt;% 
-  summarise_at(., .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]), .funs = max) %&gt;% 
-  mutate_at(., 
-            .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]), 
+  group_by(year_var) %&gt;%
+  mutate(treat_week = sort(rep(seq(1, 19, 1), 7))[1:n()]) %&gt;%
+  group_by(year_var, treat_week) %&gt;%
+  summarise_at(., .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]), .funs = max) %&gt;%
+  mutate_at(.,
+            .vars = colnames(.[grep(&quot;ir&quot;, colnames(.))]),
             .funs = Dose)</code></pre>
 <pre class="r"><code>#Get number of treatments per year and the dose reduction
 Summary &lt;- function(x) {
   data.frame(
     n = length(x),
-    treatments = sum(as.numeric(x!=0)),
-    dose = sum(x)/length(x)
+    treatments = sum(as.numeric(x != 0)),
+    dose = sum(x) / length(x)
   )
 }
 
-dosedf %&gt;% 
-  dplyr::select(-(&quot;treat_week&quot;)) %&gt;% 
-  reshape2::melt(id = &quot;year_var&quot;, variable.name = &quot;model&quot;, value.name = &quot;dose&quot;) %&gt;% 
-  mutate(model = ifelse(model== &quot;ir&quot;, &quot;Default IR&quot;, 
-                            ifelse(model== &quot;ir_opt&quot;, &quot;Optimised IR&quot;,
-                                   ifelse(model == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;,&quot;&quot;)))) %&gt;%
-  mutate(model = factor(model, levels = c(&quot;Default IR&quot;, &quot;Optimised IR&quot;, &quot;Low Risk IR&quot;))) %&gt;% 
-  group_by( year_var,model) %&gt;% 
-  do(Summary(.$dose)) %&gt;% 
-  ggplot(aes(x = year_var, y = dose, fill = model, group = model))+
-  geom_bar(color = &quot;black&quot;,stat=&quot;identity&quot;,position=position_dodge(), width = 0.9)+
-  geom_text(aes(label=treatments), vjust=-0.3, color=&quot;black&quot;,
-            position = position_dodge(0.9), size=2.7)+
-  scale_fill_manual(&quot;Model&quot;, values = c(&quot;#f0f0f0&quot;, &quot;#bdbdbd&quot;, &quot;#636363&quot;)) +
-  theme_bw()+
-  facet_grid(~year_var, scales = &quot;free&quot;)+
-  scale_y_continuous(limits = c(0,1))+
-  labs(x = &quot;Year&quot;, 
-       y = &quot;Dose Reduction\n&quot;)+
-  theme( axis.title = element_text(size = 11),
-         panel.grid.major = element_blank(), 
-         panel.grid.minor = element_blank(),
-         axis.text = element_text(size = 11),
-         legend.position = &quot;top&quot;,
-         axis.text.x=element_blank(),
-         axis.ticks.x=element_blank()
-         )</code></pre>
+dosedf %&gt;%
+  dplyr::select(-(&quot;treat_week&quot;)) %&gt;%
+  reshape2::melt(id = &quot;year_var&quot;,
+                 variable.name = &quot;model&quot;,
+                 value.name = &quot;dose&quot;) %&gt;%
+  mutate(model = ifelse(
+    model == &quot;ir&quot;,
+    &quot;Default IR&quot;,
+    ifelse(
+      model == &quot;ir_opt&quot;,
+      &quot;Optimised IR&quot;,
+      ifelse(model == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;, &quot;&quot;)
+    )
+  )) %&gt;%
+  mutate(model = factor(model, levels = c(&quot;Default IR&quot;,
+                                          &quot;Optimised IR&quot;,
+                                          &quot;Low Risk IR&quot;))) %&gt;%
+  group_by(year_var, model) %&gt;%
+  do(Summary(.$dose)) %&gt;%
+  ggplot(aes(
+    x = year_var,
+    y = dose,
+    fill = model,
+    group = model
+  )) +
+  geom_bar(
+    color = &quot;black&quot;,
+    stat = &quot;identity&quot;,
+    position = position_dodge(),
+    width = 0.9
+  ) +
+  geom_text(
+    aes(label = treatments),
+    vjust = -0.3,
+    color = &quot;black&quot;,
+    position = position_dodge(0.9),
+    size = 2.7
+  ) +
+  scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
+  theme_article() +
+  facet_grid( ~ year_var, scales = &quot;free&quot;) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(x = &quot;Year&quot;,
+       y = &quot;Dose Reduction\n&quot;) +
+  theme(
+    axis.title = element_text(size = 11),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 11),
+    legend.position = &quot;top&quot;,
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )</code></pre>
 <p><img src="images/unnamed-chunk-9-1.png" width="672" /></p>
 <p>Now let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.</p>
 <pre class="r"><code>SummaryTwo &lt;- function(x) {
@@ -1127,36 +1219,58 @@ dosedf %&gt;%
   )
 }
 
-dosedf %&gt;% 
-  dplyr::select(-(&quot;treat_week&quot;)) %&gt;% 
-  reshape2::melt(id = &quot;year_var&quot;, variable.name = &quot;model&quot;, value.name = &quot;dose&quot;) %&gt;% 
-  mutate(model = ifelse(model== &quot;ir&quot;, &quot;Default IR&quot;, 
-                            ifelse(model== &quot;ir_opt&quot;, &quot;Optimised IR&quot;,
-                                   ifelse(model == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;,&quot;&quot;)))) %&gt;%    
-  mutate(model = factor(model, levels = c(&quot;Default IR&quot;, &quot;Optimised IR&quot;, &quot;Low Risk IR&quot;))) %&gt;% 
-  group_by( year_var,model) %&gt;% 
-  do(Summary(.$dose)) %&gt;% 
-  dplyr::select(-c( &quot;n&quot;, &quot;treatments&quot;)) %&gt;% 
-  group_by(model) %&gt;% 
-  do(., SummaryTwo(.$dose)) %&gt;% 
-  ggplot(aes(x = model, y = mean, fill = model, group = model))+
-  geom_bar(color = &quot;black&quot;,stat=&quot;identity&quot;,position=position_dodge(), width = 0.7)+
-  geom_errorbar(aes(ymin = mean - sd, 
+dosedf %&gt;%
+  dplyr::select(-(&quot;treat_week&quot;)) %&gt;%
+  reshape2::melt(id = &quot;year_var&quot;,
+                 variable.name = &quot;model&quot;,
+                 value.name = &quot;dose&quot;) %&gt;%
+  mutate(model = ifelse(
+    model == &quot;ir&quot;,
+    &quot;Default IR&quot;,
+    ifelse(
+      model == &quot;ir_opt&quot;,
+      &quot;Optimised IR&quot;,
+      ifelse(model == &quot;ir_low_risk&quot;, &quot;Low Risk IR&quot;, &quot;&quot;)
+    )
+  )) %&gt;%
+  mutate(model = factor(model,
+                        levels = c(&quot;Default IR&quot;,
+                                   &quot;Optimised IR&quot;,
+                                   &quot;Low Risk IR&quot;))) %&gt;%
+  group_by(year_var, model) %&gt;%
+  do(Summary(.$dose)) %&gt;%
+  dplyr::select(-c(&quot;n&quot;, &quot;treatments&quot;)) %&gt;%
+  group_by(model) %&gt;%
+  do(., SummaryTwo(.$dose)) %&gt;%
+  ggplot(aes(
+    x = model,
+    y = mean,
+    fill = model,
+    group = model
+  )) +
+  geom_bar(
+    color = &quot;black&quot;,
+    stat = &quot;identity&quot;,
+    position = position_dodge(),
+    width = 0.7
+  ) +
+  geom_errorbar(aes(ymin = mean - sd,
                     ymax = mean + sd), width = 0.2) +
-  scale_fill_manual(&quot;Model&quot;, values = c(&quot;#f0f0f0&quot;, &quot;#bdbdbd&quot;, &quot;#636363&quot;)) +
-  theme_bw()+
-  scale_y_continuous(limits = c(0,1),breaks = seq(0,1,0.2))+
-  labs(x = &quot;Model&quot;, 
-       y = &quot;Dose Reduction\n&quot;)+
-  theme( axis.title = element_text(size = 11),
-         panel.grid.major = element_blank(), 
-         panel.grid.minor = element_blank(),
-         axis.text = element_text(size = 11),
-         legend.position = c(0.35, 0.85),
-         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank()
+  scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
+  theme_article() +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  labs(x = &quot;Model&quot;,
+       y = &quot;Dose Reduction\n&quot;) +
+  theme(
+    axis.title = element_text(size = 11),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 11),
+    legend.position = c(0.35, 0.85),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
   )  +
-  coord_equal(6/1)</code></pre>
+  coord_equal(6 / 1)</code></pre>
 <p><img src="images/unnamed-chunk-10-1.png" width="672" /></p>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -1186,7 +1300,7 @@ dosedf %&gt;%
 ## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
 ## [19] devtools_2.0.2    padr_0.4.2        knitr_1.22       
 ## [22] lubridate_1.7.4   data.table_1.12.2 readxl_1.3.1     
-## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.0.1    
+## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.1      
 ## [28] purrr_0.3.2       readr_1.3.1       tidyr_0.8.3      
 ## [31] tibble_2.1.1      ggplot2_3.1.1     tidyverse_1.2.1  
 ## 
@@ -1208,19 +1322,19 @@ dosedf %&gt;%
 ## [43] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
 ## [46] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
 ## [49] memoise_1.1.0      sass_0.1.0.9000    EMT_1.1           
-## [52] reshape_0.8.8      stringi_1.4.3      highr_0.8         
-## [55] desc_1.2.0         nortest_1.0-4      checkmate_1.9.3   
-## [58] boot_1.3-20        pkgbuild_1.0.3     commonmark_1.7    
-## [61] rlang_0.3.4        pkgconfig_2.0.2    matrixStats_0.54.0
-## [64] evaluate_0.13      lattice_0.20-35    labeling_0.3      
-## [67] processx_3.3.0     tidyselect_0.2.5   plyr_1.8.4        
-## [70] magrittr_1.5       R6_2.4.0           multcompView_0.1-7
-## [73] DescTools_0.99.28  generics_0.0.2     multcomp_1.4-10   
-## [76] pillar_1.3.1       haven_2.1.0        foreign_0.8-70    
-## [79] withr_2.1.2        survival_2.42-3    modelr_0.1.4      
-## [82] crayon_1.3.4       rmarkdown_1.12.6   grid_3.6.0        
-## [85] callr_3.2.0        digest_0.6.18      xtable_1.8-4      
-## [88] stats4_3.6.0       munsell_0.5.0      sessioninfo_1.1.1</code></pre>
+## [52] reshape_0.8.8      stringi_1.4.3      desc_1.2.0        
+## [55] nortest_1.0-4      checkmate_1.9.3    boot_1.3-20       
+## [58] pkgbuild_1.0.3     commonmark_1.7     rlang_0.3.4       
+## [61] pkgconfig_2.0.2    matrixStats_0.54.0 evaluate_0.13     
+## [64] lattice_0.20-35    labeling_0.3       processx_3.3.0    
+## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
+## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
+## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.0      
+## [76] haven_2.1.0        foreign_0.8-70     withr_2.1.2       
+## [79] survival_2.42-3    modelr_0.1.4       crayon_1.3.4      
+## [82] rmarkdown_1.12.6   grid_3.6.0         callr_3.2.0       
+## [85] digest_0.6.19      xtable_1.8-4       stats4_3.6.0      
+## [88] munsell_0.5.0      sessioninfo_1.1.1</code></pre>
 </div>
 
 

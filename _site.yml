@@ -1,4 +1,4 @@
-name: 'teste'
+name: 'Evaluation of the Irish Rules, a potato late blight forecasting used in Ireland'
 output_dir: docs
 output:
   html_document:
@@ -26,13 +26,13 @@ navbar:
     icon: fa fa-table
     href: data.html
   - text: Analysis
-    icon: fa fa-table
+    icon: fa fa-file-code-o 
     href: Analysis.html
   - text: Results
-    icon: fa fa-table
+    icon: fa fa-bar-chart
     href: Results1.html
   - text: Usefulness
-    icon: fa fa-table
+    icon: fa fa-lightbulb-o
     href: FungicideTreatments.html
  
   right:
