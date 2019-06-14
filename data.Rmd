@@ -1,6 +1,7 @@
 % Data
 
-We present the dataset we are working on in this section. An interseted reader can get a sense of the location, the weather and the blight related weather conditions. This section contains a number of  
+We present the dataset we are working on in this section. An interested reader can get a sense of the location, the weather and the blight related weather conditions and the disease outbreak data.    
+
 # Libraries
 
 ```{r opts, echo = FALSE}

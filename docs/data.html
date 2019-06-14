@@ -458,8 +458,9 @@ div.tocify {
 </div>
 
 
-<p>We present the dataset we are working on in this section. An interseted reader can get a sense of the location, the weather and the blight related weather conditions. This section contains a number of<br />
-# Libraries</p>
+<p>We present the dataset we are working on in this section. An interested reader can get a sense of the location, the weather and the blight related weather conditions and the disease outbreak data.</p>
+<div id="libraries" class="section level1">
+<h1>Libraries</h1>
 <p>Packages needed for the data preparation are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
   c(
@@ -505,6 +506,7 @@ if (any(as.numeric(packages_load) == 0)) {
 }</code></pre>
 <pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
 <pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
+</div>
 <div id="location" class="section level1">
 <h1>Location</h1>
 <p>Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.</p>
@@ -526,8 +528,8 @@ leaflet() %&gt;%
     label = &quot;Oak Park&quot;,
     icon = greenLeafIcon
   )</code></pre>
-<div id="htmlwidget-aecc567fcc78a4847595" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-aecc567fcc78a4847595">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-69034ac10343e32a04ba" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-69034ac10343e32a04ba">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="bio-data" class="section level1">
 <h1>Bio data</h1>
@@ -1837,24 +1839,6 @@ rain
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>OP %&gt;% 
-  mutate(hour = hour(date)) %&gt;% 
-  filter(month %in% c(4:9)) %&gt;% 
-  
-  group_by(year_var,month, hour) %&gt;% 
-  mutate( month_abb = month(month, label = T)) %&gt;% 
-  ggplot(aes(factor(hour), temp))+
-  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
-  geom_boxplot(width = 0.2,outlier.size = 0.2)+
-  geom_line(aes(hour, 10, color = &quot;red&quot;))+
-  facet_grid(~month_abb)+
-  theme_tufte()+
-  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
-  labs(title= &quot;Average temperatures per hour for months April to September&quot;,
-       y = &quot;Temperature&quot;,
-       x = &quot;Hours of the day&quot;,
-       color = &quot;10C Line&quot;)</code></pre>
-<p><img src="images/temps_perhour_monthly-1.png" width="672" /></p>
 <p>Night temperatures are low are low in Months of April and May, and only start to kick off in June.</p>
 <p>Lets take a closer look into variations in different seasons.</p>
 <pre class="r"><code>OP %&gt;% 

@@ -1,17 +1,36 @@
----
-output:
-  html_document:
-    code_folding: hide
----
-% Evaluation of Irish Rules model
+% Analysis
 
-# Analysis 
+Here we present the model and the methodology used in the analysis.  
+*Note*: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).  
 
 ## Libraries
 
 ```{r opts, echo = FALSE}
 knitr::opts_chunk$set(
   fig.path = "images/"
+)
+knitr::knit_hooks$set(
+  source = function(x, options) {
+    hook.r = function(x, options) {
+      fence <- "```"
+      language = tolower(options$engine)
+      if (language == 'node') language = 'javascript'
+      if (!options$highlight) language = 'text'
+      if(!is.null(options$foldcode)) {
+      paste0('\n\n', "<details><summary>The code</summary>\n", fence, language, '\n', x, fence,  '\n\n', "</details>\n")
+      } else {
+              paste0('\n\n', fence, language, '\n', x, fence,  '\n\n')
+      }
+    }
+    x = knitr:::hilight_source(x, 'markdown', options)
+    hook.r(
+      paste(c(
+        x, 
+        ''
+      ), collapse = '\n'), 
+      options
+    )
+  }
 )
 ```
 
@@ -68,12 +87,12 @@ rm(list.of.packages, new.packages, packages_load)
 
 ## The Model
 
-According to original Irish Rules (Bourke, 1953), temperatures ≥ 10℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. Potato late blightThe blight epidemic onset risk is then estimated during periods fulfilling the following criteria:   
--	Sporulation period is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;  
+According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:   
+-	**Sporulation period** is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;  
 -	Infection period starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was  a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).  
 Implementation of the model.
 
-```{r irish-model}
+```{r irish-model, foldcode = TRUE}
 IrishRulesModel <- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
@@ -180,22 +199,22 @@ IrishRulesModel <- function(weather,
         m <- n - 1
         
         s <- criteria[n]
-        if (s == 0 & (criteria[n + 2] == 1)) {
+        if (s == 0 && (criteria[n + 2] == 1)) {
           n = n + 2
           
           s = 1
           
-        } else if (s == 0 & (criteria[n + 3] == 1)) {
+        } else if (s == 0 && (criteria[n + 3] == 1)) {
           n = n + 3
           
           s = 1
           
-        } else if (s == 0 & (criteria[n + 4] == 1)) {
+        } else if (s == 0 && (criteria[n + 4] == 1)) {
           n = n + 4
           
           s = 1
           
-        } else if (s == 0 & (criteria[n + 5] == 1)) {
+        } else if (s == 0 && (criteria[n + 5] == 1)) {
           n = n + 5
           
           s = 1
@@ -319,7 +338,7 @@ head(OP[, c(1, 7, 9, 15, 24:30)], 5) %>%
 
 The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
 
-```{r sens-spec-calc}
+```{r sens-spec-calc, foldcode  = TRUE}
 SensParametersCalc <-
   function(y,
            weather_data,

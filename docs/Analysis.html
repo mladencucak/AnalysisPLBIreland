@@ -23,7 +23,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -267,14 +266,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 
 
@@ -452,23 +443,15 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
-
+<h1 class="title toc-ignore">Analysis</h1>
 
 </div>
 
 
-<p>% Evaluation of Irish Rules model</p>
-<div id="analysis" class="section level1">
-<h1>Analysis</h1>
+<p>Here we present the model and the methodology used in the analysis.<br />
+<em>Note</em>: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).</p>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -522,10 +505,12 @@ if (any(as.numeric(packages_load) == 0)) {
 </div>
 <div id="the-model" class="section level2">
 <h2>The Model</h2>
-<p>According to original Irish Rules (Bourke, 1953), temperatures ≥ 10℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. Potato late blightThe blight epidemic onset risk is then estimated during periods fulfilling the following criteria:<br />
-- Sporulation period is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;<br />
+<p>According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:<br />
+- <strong>Sporulation period</strong> is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;<br />
 - Infection period starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).<br />
 Implementation of the model.</p>
+<details>
+<p><summary>The code</summary></p>
 <pre class="r"><code>IrishRulesModel &lt;- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
@@ -632,22 +617,22 @@ Implementation of the model.</p>
         m &lt;- n - 1
         
         s &lt;- criteria[n]
-        if (s == 0 &amp; (criteria[n + 2] == 1)) {
+        if (s == 0 &amp;&amp; (criteria[n + 2] == 1)) {
           n = n + 2
           
           s = 1
           
-        } else if (s == 0 &amp; (criteria[n + 3] == 1)) {
+        } else if (s == 0 &amp;&amp; (criteria[n + 3] == 1)) {
           n = n + 3
           
           s = 1
           
-        } else if (s == 0 &amp; (criteria[n + 4] == 1)) {
+        } else if (s == 0 &amp;&amp; (criteria[n + 4] == 1)) {
           n = n + 4
           
           s = 1
           
-        } else if (s == 0 &amp; (criteria[n + 5] == 1)) {
+        } else if (s == 0 &amp;&amp; (criteria[n + 5] == 1)) {
           n = n + 5
           
           s = 1
@@ -661,6 +646,7 @@ Implementation of the model.</p>
   }
   
 }</code></pre>
+</details>
 </div>
 <div id="bio-dates" class="section level2">
 <h2>Bio dates</h2>
@@ -917,7 +903,6 @@ Disease observed
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div id="the-analysis" class="section level1">
 <h1>The Analysis</h1>
@@ -1337,6 +1322,8 @@ Oak_Park
 <div id="evaluation-procedure" class="section level2">
 <h2>Evaluation procedure</h2>
 <p>The function <code>SensParametersCalc</code> calculates Sensitivity and Specificity of each variation of the model.</p>
+<details>
+<p><summary>The code</summary></p>
 <pre class="r"><code>SensParametersCalc &lt;-
   function(y,
            weather_data,
@@ -1473,6 +1460,7 @@ Oak_Park
     
     return(return_df)
   }</code></pre>
+</details>
 <p>This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it reduces the run time to 4 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.</p>
 <pre class="r"><code># this chunk not evaluated
 #select max warning threshold
@@ -1960,7 +1948,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#erafsikwbq .gt_table {
+#dymukltiyu .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1979,13 +1967,13 @@ head(auc_data) %&gt;% gt()</code></pre>
   /* table.border.top.color */
 }
 
-#erafsikwbq .gt_heading {
+#dymukltiyu .gt_heading {
   background-color: #FFFFFF;
   /* heading.background.color */
   border-bottom-color: #FFFFFF;
 }
 
-#erafsikwbq .gt_title {
+#dymukltiyu .gt_title {
   color: #000000;
   font-size: 125%;
   /* heading.title.font.size */
@@ -1996,7 +1984,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   border-bottom-width: 0;
 }
 
-#erafsikwbq .gt_subtitle {
+#dymukltiyu .gt_subtitle {
   color: #000000;
   font-size: 85%;
   /* heading.subtitle.font.size */
@@ -2007,7 +1995,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   border-top-width: 0;
 }
 
-#erafsikwbq .gt_bottom_border {
+#dymukltiyu .gt_bottom_border {
   border-bottom-style: solid;
   /* heading.border.bottom.style */
   border-bottom-width: 2px;
@@ -2016,7 +2004,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   /* heading.border.bottom.color */
 }
 
-#erafsikwbq .gt_column_spanner {
+#dymukltiyu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
@@ -2024,7 +2012,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   padding-bottom: 4px;
 }
 
-#erafsikwbq .gt_col_heading {
+#dymukltiyu .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   /* column_labels.background.color */
@@ -2037,11 +2025,11 @@ head(auc_data) %&gt;% gt()</code></pre>
   margin: 10px;
 }
 
-#erafsikwbq .gt_sep_right {
+#dymukltiyu .gt_sep_right {
   border-right: 5px solid #FFFFFF;
 }
 
-#erafsikwbq .gt_group_heading {
+#dymukltiyu .gt_group_heading {
   padding: 8px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2065,7 +2053,7 @@ head(auc_data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#erafsikwbq .gt_empty_group_heading {
+#dymukltiyu .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2089,29 +2077,29 @@ head(auc_data) %&gt;% gt()</code></pre>
   vertical-align: middle;
 }
 
-#erafsikwbq .gt_striped {
+#dymukltiyu .gt_striped {
   background-color: #f2f2f2;
 }
 
-#erafsikwbq .gt_row {
+#dymukltiyu .gt_row {
   padding: 10px;
   /* row.padding */
   margin: 10px;
   vertical-align: middle;
 }
 
-#erafsikwbq .gt_stub {
+#dymukltiyu .gt_stub {
   border-right-style: solid;
   border-right-width: 2px;
   border-right-color: #A8A8A8;
   padding-left: 12px;
 }
 
-#erafsikwbq .gt_stub.gt_row {
+#dymukltiyu .gt_stub.gt_row {
   background-color: #FFFFFF;
 }
 
-#erafsikwbq .gt_summary_row {
+#dymukltiyu .gt_summary_row {
   background-color: #FFFFFF;
   /* summary_row.background.color */
   padding: 6px;
@@ -2120,13 +2108,13 @@ head(auc_data) %&gt;% gt()</code></pre>
   /* summary_row.text_transform */
 }
 
-#erafsikwbq .gt_first_summary_row {
+#dymukltiyu .gt_first_summary_row {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
 }
 
-#erafsikwbq .gt_table_body {
+#dymukltiyu .gt_table_body {
   border-top-style: solid;
   /* field.border.top.style */
   border-top-width: 2px;
@@ -2141,55 +2129,55 @@ head(auc_data) %&gt;% gt()</code></pre>
   /* field.border.bottom.color */
 }
 
-#erafsikwbq .gt_footnote {
+#dymukltiyu .gt_footnote {
   font-size: 90%;
   /* footnote.font.size */
   padding: 4px;
   /* footnote.padding */
 }
 
-#erafsikwbq .gt_sourcenote {
+#dymukltiyu .gt_sourcenote {
   font-size: 90%;
   /* sourcenote.font.size */
   padding: 4px;
   /* sourcenote.padding */
 }
 
-#erafsikwbq .gt_center {
+#dymukltiyu .gt_center {
   text-align: center;
 }
 
-#erafsikwbq .gt_left {
+#dymukltiyu .gt_left {
   text-align: left;
 }
 
-#erafsikwbq .gt_right {
+#dymukltiyu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#erafsikwbq .gt_font_normal {
+#dymukltiyu .gt_font_normal {
   font-weight: normal;
 }
 
-#erafsikwbq .gt_font_bold {
+#dymukltiyu .gt_font_bold {
   font-weight: bold;
 }
 
-#erafsikwbq .gt_font_italic {
+#dymukltiyu .gt_font_italic {
   font-style: italic;
 }
 
-#erafsikwbq .gt_super {
+#dymukltiyu .gt_super {
   font-size: 65%;
 }
 
-#erafsikwbq .gt_footnote_glyph {
+#dymukltiyu .gt_footnote_glyph {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="erafsikwbq" style="overflow-x:auto;"><!--gt table start-->
+<div id="dymukltiyu" style="overflow-x:auto;"><!--gt table start-->
 <table class='gt_table'>
 <tr>
 <th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rh_thresh</th>
