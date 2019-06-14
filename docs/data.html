@@ -11,7 +11,7 @@
 
 
 
-<title>Evaluation of Irish Rules Model</title>
+<title>data.utf8.md</title>
 
 <script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,7 +23,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -36,6 +35,7 @@
 <script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
 <link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
 <script src="site_libs/leaflet-binding-2.0.2/leaflet.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -274,14 +274,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 
 
@@ -459,23 +451,15 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
-
-<h1 class="title toc-ignore">Evaluation of Irish Rules Model</h1>
+<h1 class="title toc-ignore">Data</h1>
 
 </div>
 
 
-<div id="libraries" class="section level1">
-<h1>Libraries</h1>
+<p>We present the dataset we are working on in this section. An interseted reader can get a sense of the location, the weather and the blight related weather conditions. This section contains a number of<br />
+# Libraries</p>
 <p>Packages needed for the data preparation are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
   c(
@@ -506,12 +490,7 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages)
 
-
-#Download packages that are not already present in the library
-if (length(new.packages))
-  install.packages(new.packages, force = TRUE, dependencies = TRUE)
-
-if (!&quot;gt&quot; %in% installed.packages())
+if (&quot;gt&quot; %in% installed.packages() == FALSE)
   remotes::install_github(&quot;rstudio/gt&quot;)
 
 list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
@@ -520,42 +499,35 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(&quot;Package/s&quot;, list.of.packages[!(packages_load)], &quot;not loaded!&quot;)
+  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
 <pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
 <pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
-</div>
 <div id="location" class="section level1">
 <h1>Location</h1>
 <p>Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.</p>
 <pre class="r"><code>greenLeafIcon &lt;- makeIcon(
   iconUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-green.png&quot;,
-  iconWidth = 38,
-  iconHeight = 95,
-  iconAnchorX = 22,
-  iconAnchorY = 94,
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94,
   shadowUrl = &quot;http://leafletjs.com/examples/custom-icons/leaf-shadow.png&quot;,
-  shadowWidth = 50,
-  shadowHeight = 64,
-  shadowAnchorX = 4,
-  shadowAnchorY = 62
+  shadowWidth = 50, shadowHeight = 64,
+  shadowAnchorX = 4, shadowAnchorY = 62
 )
 
 leaflet() %&gt;%
   addTiles(group = &quot;OSM (default)&quot;) %&gt;%
-  setView(-8, 53.5, 6) %&gt;%
+    setView(-8, 53.5, 6) %&gt;%
   addMarkers(
     lng = -6.9121167,
     lat = 52.8560667,
     label = &quot;Oak Park&quot;,
-    # color = &quot;green&quot;,
     icon = greenLeafIcon
-    # radius = 5
   )</code></pre>
-<div id="htmlwidget-0de65a01752ae6dc786c" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0de65a01752ae6dc786c">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-aecc567fcc78a4847595" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-aecc567fcc78a4847595">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="bio-data" class="section level1">
 <h1>Bio data</h1>
@@ -564,418 +536,407 @@ leaflet() %&gt;%
 dates_cut &lt;-
   read_csv(
     here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;plantingdates.csv&quot;),
-    col_types = cols(disease_observed = col_date(format = &quot;%d/%m/%Y&quot;))
+    col_types = cols(
+      disease_observed = col_date(format = &quot;%d/%m/%Y&quot;)
+    )
   )
 
-dates_cut %&gt;%
-  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
+dates_cut %&gt;% 
+  rename_all(. %&gt;% capitalize() %&gt;% 
+               gsub(&quot;_&quot;, &quot; &quot;, .))</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Disease observed"],"name":[3],"type":["date"],"align":["right"]},{"label":["Last assessment"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"2007","2":"3/4/2007","3":"2007-06-30","4":"23/8/2007"},{"1":"2008","2":"7/4/2008","3":"2008-07-02","4":"13/8/2008"},{"1":"2009","2":"21/04/2009","3":"2009-07-06","4":"8/8/2009"},{"1":"2010","2":"4/5/2010","3":"2010-07-19","4":"30/8/2010"},{"1":"2011","2":"6/5/2011","3":"2011-07-28","4":"25/8/2011"},{"1":"2012","2":"28/05/2012","3":"2012-07-13","4":"28/8/2012"},{"1":"2013","2":"3/6/2013","3":"2013-08-23","4":"20/9/2013"},{"1":"2014","2":"23/05/2014","3":"2014-08-01","4":"11/9/2014"},{"1":"2015","2":"22/05/2015","3":"2015-07-31","4":"18/9/2015"},{"1":"2016","2":"31/05/2016","3":"2016-07-22","4":"16/9/2016"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["Year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Planting date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Disease observed"],"name":[3],"type":["date"],"align":["right"]}],"data":[{"1":"2007","2":"3/4/2007","3":"2007-06-30"},{"1":"2008","2":"7/4/2008","3":"2008-07-02"},{"1":"2009","2":"21/04/2009","3":"2009-07-06"},{"1":"2010","2":"4/5/2010","3":"2010-07-19"},{"1":"2011","2":"6/5/2011","3":"2011-07-28"},{"1":"2012","2":"28/05/2012","3":"2012-07-13"},{"1":"2013","2":"3/6/2013","3":"2013-08-23"},{"1":"2014","2":"23/05/2014","3":"2014-08-01"},{"1":"2015","2":"22/05/2015","3":"2015-07-31"},{"1":"2016","2":"31/05/2016","3":"2016-07-22"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Save processed bio data.</p>
 </div>
 <div id="weather-data" class="section level1">
 <h1>Weather Data</h1>
 <p>Historical weather data from Met Éireann synoptic weather station at Oak Park was used for model evaluation. The trial sites were in the radius of up to 500 m from the station in all years.</p>
 <pre class="r"><code>#Weather data, parameters and cut off dates
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;OP_2007-2016.RData&quot;))
-
-OP[1:5, 1:20] %&gt;% gt()</code></pre>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#ngbvkgymxz .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #000000;
-  font-size: 16px;
-  background-color: #FFFFFF;
-  /* table.background.color */
-  width: auto;
-  /* table.width */
-  border-top-style: solid;
-  /* table.border.top.style */
-  border-top-width: 2px;
-  /* table.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table.border.top.color */
-}
-
-#ngbvkgymxz .gt_heading {
-  background-color: #FFFFFF;
-  /* heading.background.color */
-  border-bottom-color: #FFFFFF;
-}
-
-#ngbvkgymxz .gt_title {
-  color: #000000;
-  font-size: 125%;
-  /* heading.title.font.size */
-  padding-top: 4px;
-  /* heading.top.padding */
-  padding-bottom: 1px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#ngbvkgymxz .gt_subtitle {
-  color: #000000;
-  font-size: 85%;
-  /* heading.subtitle.font.size */
-  padding-top: 1px;
-  padding-bottom: 4px;
-  /* heading.bottom.padding */
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#ngbvkgymxz .gt_bottom_border {
-  border-bottom-style: solid;
-  /* heading.border.bottom.style */
-  border-bottom-width: 2px;
-  /* heading.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* heading.border.bottom.color */
-}
-
-#ngbvkgymxz .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#ngbvkgymxz .gt_col_heading {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* column_labels.background.color */
-  font-size: 16px;
-  /* column_labels.font.size */
-  font-weight: initial;
-  /* column_labels.font.weight */
-  vertical-align: middle;
-  padding: 10px;
-  margin: 10px;
-}
-
-#ngbvkgymxz .gt_sep_right {
-  border-right: 5px solid #FFFFFF;
-}
-
-#ngbvkgymxz .gt_group_heading {
-  padding: 8px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* row_group.background.color */
-  font-size: 16px;
-  /* row_group.font.size */
-  font-weight: initial;
-  /* row_group.font.weight */
-  border-top-style: solid;
-  /* row_group.border.top.style */
-  border-top-width: 2px;
-  /* row_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* row_group.border.top.color */
-  border-bottom-style: solid;
-  /* row_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* row_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* row_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#ngbvkgymxz .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #000000;
-  background-color: #FFFFFF;
-  /* row_group.background.color */
-  font-size: 16px;
-  /* row_group.font.size */
-  font-weight: initial;
-  /* row_group.font.weight */
-  border-top-style: solid;
-  /* row_group.border.top.style */
-  border-top-width: 2px;
-  /* row_group.border.top.width */
-  border-top-color: #A8A8A8;
-  /* row_group.border.top.color */
-  border-bottom-style: solid;
-  /* row_group.border.bottom.style */
-  border-bottom-width: 2px;
-  /* row_group.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* row_group.border.bottom.color */
-  vertical-align: middle;
-}
-
-#ngbvkgymxz .gt_striped {
-  background-color: #f2f2f2;
-}
-
-#ngbvkgymxz .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#ngbvkgymxz .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#ngbvkgymxz .gt_row {
-  padding: 8px;
-  /* row.padding */
-  margin: 10px;
-  vertical-align: middle;
-}
-
-#ngbvkgymxz .gt_stub {
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #A8A8A8;
-  padding-left: 12px;
-}
-
-#ngbvkgymxz .gt_summary_row {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* summary_row.background.color */
-  padding: 8px;
-  /* summary_row.padding */
-  text-transform: inherit;
-  /* summary_row.text_transform */
-}
-
-#ngbvkgymxz .gt_grand_summary_row {
-  color: #000000;
-  background-color: #FFFFFF;
-  /* grand_summary_row.background.color */
-  padding: 8px;
-  /* grand_summary_row.padding */
-  text-transform: inherit;
-  /* grand_summary_row.text_transform */
-}
-
-#ngbvkgymxz .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-}
-
-#ngbvkgymxz .gt_first_grand_summary_row {
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #A8A8A8;
-}
-
-#ngbvkgymxz .gt_table_body {
-  border-top-style: solid;
-  /* table_body.border.top.style */
-  border-top-width: 2px;
-  /* table_body.border.top.width */
-  border-top-color: #A8A8A8;
-  /* table_body.border.top.color */
-  border-bottom-style: solid;
-  /* table_body.border.bottom.style */
-  border-bottom-width: 2px;
-  /* table_body.border.bottom.width */
-  border-bottom-color: #A8A8A8;
-  /* table_body.border.bottom.color */
-}
-
-#ngbvkgymxz .gt_footnote {
-  font-size: 90%;
-  /* footnote.font.size */
-  padding: 4px;
-  /* footnote.padding */
-}
-
-#ngbvkgymxz .gt_sourcenote {
-  font-size: 90%;
-  /* sourcenote.font.size */
-  padding: 4px;
-  /* sourcenote.padding */
-}
-
-#ngbvkgymxz .gt_center {
-  text-align: center;
-}
-
-#ngbvkgymxz .gt_left {
-  text-align: left;
-}
-
-#ngbvkgymxz .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#ngbvkgymxz .gt_font_normal {
-  font-weight: normal;
-}
-
-#ngbvkgymxz .gt_font_bold {
-  font-weight: bold;
-}
-
-#ngbvkgymxz .gt_font_italic {
-  font-style: italic;
-}
-
-#ngbvkgymxz .gt_super {
-  font-size: 65%;
-}
-
-#ngbvkgymxz .gt_footnote_glyph {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="ngbvkgymxz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><!--gt table start-->
-<table class='gt_table'>
+rownames(OP) &lt;- NULL
+OP[1:5, 1:20] %&gt;%
+    kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
 <tr>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>date</th>
-<th class='gt_col_heading gt_left' rowspan='1' colspan='1'>short_date</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>year</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>month</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>day</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rain</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rain</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_temp</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>temp</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wetb</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wetb</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>dewpt</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>vappr</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_rhum</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rhum</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>msl</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wdsp</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wdsp</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>i_wddir</th>
-<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>wddir</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+short_date
+</th>
+<th style="text-align:right;">
+year
+</th>
+<th style="text-align:right;">
+month
+</th>
+<th style="text-align:right;">
+day
+</th>
+<th style="text-align:right;">
+i_rain
+</th>
+<th style="text-align:right;">
+rain
+</th>
+<th style="text-align:right;">
+i_temp
+</th>
+<th style="text-align:right;">
+temp
+</th>
+<th style="text-align:right;">
+i_wetb
+</th>
+<th style="text-align:right;">
+wetb
+</th>
+<th style="text-align:right;">
+dewpt
+</th>
+<th style="text-align:right;">
+vappr
+</th>
+<th style="text-align:right;">
+i_rhum
+</th>
+<th style="text-align:right;">
+rhum
+</th>
+<th style="text-align:right;">
+msl
+</th>
+<th style="text-align:right;">
+i_wdsp
+</th>
+<th style="text-align:right;">
+wdsp
+</th>
+<th style="text-align:right;">
+i_wddir
+</th>
+<th style="text-align:right;">
+wddir
+</th>
 </tr>
-<tbody class='gt_table_body'>
+</thead>
+<tbody>
 <tr>
-<td class='gt_row gt_left'>2007-01-01 00:00:00</td>
-<td class='gt_row gt_left'>2007-01-01</td>
-<td class='gt_row gt_right'>2007</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>0.2</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>4.8</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>4.1</td>
-<td class='gt_row gt_right'>3.0</td>
-<td class='gt_row gt_right'>7.6</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>87</td>
-<td class='gt_row gt_right'>1006.9</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>11</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>250</td>
+<td style="text-align:left;">
+2007-01-01 00:00:00
+</td>
+<td style="text-align:left;">
+2007-01-01
+</td>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.1
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+7.6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+1006.9
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+250
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>2007-01-01 01:00:00</td>
-<td class='gt_row gt_left gt_striped'>2007-01-01</td>
-<td class='gt_row gt_right gt_striped'>2007</td>
-<td class='gt_row gt_right gt_striped'>1</td>
-<td class='gt_row gt_right gt_striped'>1</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>0.0</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>5.4</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>4.4</td>
-<td class='gt_row gt_right gt_striped'>3.0</td>
-<td class='gt_row gt_right gt_striped'>7.6</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>84</td>
-<td class='gt_row gt_right gt_striped'>1007.6</td>
-<td class='gt_row gt_right gt_striped'>2</td>
-<td class='gt_row gt_right gt_striped'>7</td>
-<td class='gt_row gt_right gt_striped'>2</td>
-<td class='gt_row gt_right gt_striped'>240</td>
+<td style="text-align:left;">
+2007-01-01 01:00:00
+</td>
+<td style="text-align:left;">
+2007-01-01
+</td>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5.4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.4
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+7.6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+1007.6
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+240
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>2007-01-01 02:00:00</td>
-<td class='gt_row gt_left'>2007-01-01</td>
-<td class='gt_row gt_right'>2007</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>0.0</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>5.8</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>4.7</td>
-<td class='gt_row gt_right'>3.2</td>
-<td class='gt_row gt_right'>7.7</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>83</td>
-<td class='gt_row gt_right'>1008.4</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>6</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>250</td>
+<td style="text-align:left;">
+2007-01-01 02:00:00
+</td>
+<td style="text-align:left;">
+2007-01-01
+</td>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5.8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.7
+</td>
+<td style="text-align:right;">
+3.2
+</td>
+<td style="text-align:right;">
+7.7
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+1008.4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+250
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left gt_striped'>2007-01-01 03:00:00</td>
-<td class='gt_row gt_left gt_striped'>2007-01-01</td>
-<td class='gt_row gt_right gt_striped'>2007</td>
-<td class='gt_row gt_right gt_striped'>1</td>
-<td class='gt_row gt_right gt_striped'>1</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>0.1</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>5.2</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>4.3</td>
-<td class='gt_row gt_right gt_striped'>2.8</td>
-<td class='gt_row gt_right gt_striped'>7.5</td>
-<td class='gt_row gt_right gt_striped'>0</td>
-<td class='gt_row gt_right gt_striped'>84</td>
-<td class='gt_row gt_right gt_striped'>1009.7</td>
-<td class='gt_row gt_right gt_striped'>2</td>
-<td class='gt_row gt_right gt_striped'>15</td>
-<td class='gt_row gt_right gt_striped'>2</td>
-<td class='gt_row gt_right gt_striped'>260</td>
+<td style="text-align:left;">
+2007-01-01 03:00:00
+</td>
+<td style="text-align:left;">
+2007-01-01
+</td>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5.2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.3
+</td>
+<td style="text-align:right;">
+2.8
+</td>
+<td style="text-align:right;">
+7.5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+1009.7
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+260
+</td>
 </tr>
 <tr>
-<td class='gt_row gt_left'>2007-01-01 04:00:00</td>
-<td class='gt_row gt_left'>2007-01-01</td>
-<td class='gt_row gt_right'>2007</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>1</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>0.0</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>5.6</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>4.2</td>
-<td class='gt_row gt_right'>2.3</td>
-<td class='gt_row gt_right'>7.2</td>
-<td class='gt_row gt_right'>0</td>
-<td class='gt_row gt_right'>79</td>
-<td class='gt_row gt_right'>1010.9</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>15</td>
-<td class='gt_row gt_right'>2</td>
-<td class='gt_row gt_right'>260</td>
+<td style="text-align:left;">
+2007-01-01 04:00:00
+</td>
+<td style="text-align:left;">
+2007-01-01
+</td>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5.6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.2
+</td>
+<td style="text-align:right;">
+2.3
+</td>
+<td style="text-align:right;">
+7.2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+79
+</td>
+<td style="text-align:right;">
+1010.9
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+260
+</td>
 </tr>
 </tbody>
 </table>
-<!--gt table end-->
-</div>
 <p>Additional variables needed for the analysis.</p>
 <pre class="r"><code>colnames(OP)[which(names(OP) == &quot;year&quot;)] &lt;- &quot;year_var&quot;
 OP &lt;-
@@ -984,21 +945,179 @@ OP &lt;-
   add_column(OP, doy = data.table::yday(OP$date), .before = &quot;i_rain&quot;)</code></pre>
 <p>Subset the data to exclude the months of the year which we do not need for the analysis.</p>
 <pre class="r"><code>OP &lt;- subset(OP, month &gt; 3 &amp; month &lt; 10)</code></pre>
-<p>Remove the variables we don’t need for the analysis, to make some speed gains.</p>
+<div id="missing-values" class="section level2">
+<h2>Missing values</h2>
 <p>Get a summary of missing values for the variables of interest.</p>
-<pre class="r"><code>OP %&gt;% 
-  group_by(year_var) %&gt;%
+<pre class="r"><code>OP %&gt;% group_by(year_var)  %&gt;%
   summarize(
     NA_rain = sum(is.na(rain)),
     NA_temp = sum(is.na(temp)),
     NA_rhum = sum(is.na(rhum))
-  )</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"6","4":"6"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"1"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<p>Missing value imputation with qbic spline function works very well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case.</p>
+  ) %&gt;% 
+  rename(Year = year_var) %&gt;% 
+  kable(format = &quot;html&quot;, title= &quot;Missing values per year&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Year
+</th>
+<th style="text-align:right;">
+NA_rain
+</th>
+<th style="text-align:right;">
+NA_temp
+</th>
+<th style="text-align:right;">
+NA_rhum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2008
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Missing value imputation with cubic spline function works very well up to 8 consecutive values, for variables that have some seasonal frequency, temperature and relative humidity in our case.</p>
 <pre class="r"><code>infil_gap &lt;- 8 #Maximum length of the infill gap
 OP$temp &lt;-
   round(na.spline(OP$temp, na.rm = FALSE, maxgap = infil_gap), 1)
@@ -1012,32 +1131,347 @@ OP %&gt;% group_by(year_var)  %&gt;%
     NA_rain = sum(is.na(rain)),
     NA_temp = sum(is.na(temp)),
     NA_rhum = sum(is.na(rhum))
-  )</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"6","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there are only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88 % and temperature of 8 C, and these values can then be replaced with 0. Tis way we will know if rain data is missing in areas of interest.</p>
+  )%&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+year_var
+</th>
+<th style="text-align:right;">
+NA_rain
+</th>
+<th style="text-align:right;">
+NA_temp
+</th>
+<th style="text-align:right;">
+NA_rhum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2008
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Rain is somewhat harder to impute but there are ways around this problem, especially when there are only a few values missing. Since rain data is required only in certain rare situations for the model to run, defined within the model, we can use the same conditions to impute missing values outside of that range. We are certain that rain is irrelevant if relative humidity is below 88 % and temperature of 8 C, and these values can then be replaced with 0. This way we will know if rain data is missing in areas of interest.</p>
 <pre class="r"><code>OP[is.na(OP$rain), ]$rain &lt;-
-  with(OP[is.na(OP$rain), ], ifelse(rhum &lt; 88 | temp &lt; 8, 0, rain))
+  with(OP[is.na(OP$rain), ], ifelse(rhum &lt; 87 | temp &lt; 7, 0, rain))
 OP %&gt;% group_by(year_var)  %&gt;%
   summarize(
     NA_rain = sum(is.na(rain)),
     NA_temp = sum(is.na(temp)),
     NA_rhum = sum(is.na(rhum))
-  )</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["year_var"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["NA_rain"],"name":[2],"type":["int"],"align":["right"]},{"label":["NA_temp"],"name":[3],"type":["int"],"align":["right"]},{"label":["NA_rhum"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"2007","2":"0","3":"0","4":"0"},{"1":"2008","2":"0","3":"0","4":"0"},{"1":"2009","2":"0","3":"0","4":"0"},{"1":"2010","2":"0","3":"0","4":"0"},{"1":"2011","2":"0","3":"0","4":"0"},{"1":"2012","2":"0","3":"0","4":"0"},{"1":"2013","2":"0","3":"0","4":"0"},{"1":"2014","2":"0","3":"0","4":"0"},{"1":"2015","2":"0","3":"0","4":"0"},{"1":"2016","2":"0","3":"0","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
+  )%&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+year_var
+</th>
+<th style="text-align:right;">
+NA_rain
+</th>
+<th style="text-align:right;">
+NA_temp
+</th>
+<th style="text-align:right;">
+NA_rhum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2008
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>There are no missing values and it is safe to proceed with the analysis.<br />
+Save the infilled weather data for the analysis for the analysis.</p>
+<pre class="r"><code>save(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;OP_2007-2016_infilled.RData&quot;))</code></pre>
 </div>
-<p>There are missing values and it is safe to proceed with the analysis.<br />
-Save the output for the analysis.</p>
-<pre class="r"><code>save(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_2007-2016_infilled.RData&quot;))</code></pre>
-<div id="weather-summaries" class="section level2">
-<h2>Weather summaries</h2>
-<p>Do some weather data quality checks.</p>
+<div id="weather-qc" class="section level2">
+<h2>Weather QC</h2>
+<p>Do some weather data quality controll.</p>
 <pre class="r"><code># Check if there are dupicated rows
 OP[duplicated(OP),  ]</code></pre>
 <div data-pagedtable="false">
@@ -1052,7 +1486,7 @@ OP[which(OP$rh &lt; 0 | OP$rh &gt; 100), ]</code></pre>
 {"columns":[{"label":["date"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["short_date"],"name":[2],"type":["date"],"align":["right"]},{"label":["year_var"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["month"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["day"],"name":[5],"type":["int"],"align":["right"]},{"label":["week_var"],"name":[6],"type":["int"],"align":["right"]},{"label":["doy"],"name":[7],"type":["int"],"align":["right"]},{"label":["i_rain"],"name":[8],"type":["int"],"align":["right"]},{"label":["rain"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["i_temp"],"name":[10],"type":["int"],"align":["right"]},{"label":["temp"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["i_wetb"],"name":[12],"type":["int"],"align":["right"]},{"label":["wetb"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["dewpt"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["vappr"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["i_rhum"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["rhum"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["msl"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["i_wdsp"],"name":[19],"type":["int"],"align":["right"]},{"label":["wdsp"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["i_wddir"],"name":[21],"type":["int"],"align":["right"]},{"label":["wddir"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["stno"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["stna"],"name":[24],"type":["fctr"],"align":["left"]},{"label":["sol_rad"],"name":[25],"type":["dbl"],"align":["right"]}],"data":[],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<pre class="r"><code># temp greater than 30 is possibly an outlier:
+<pre class="r"><code># Temperature greater than 30 is possibly an outlier:
 OP[which(OP$temp &gt; 30), ]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -1062,134 +1496,370 @@ OP[which(OP$temp &gt; 30), ]</code></pre>
 <p>Histograms of variables used in the analysis.</p>
 <pre class="r"><code>hist(OP$temp,
      col = &quot;peachpuff&quot;,
-     main = &quot;Histogram of Temperatures&quot;,
+     main = &quot;Histogram of Temperatures (Apr. - Sep.)&quot;,
      prob = TRUE) # prob = TRUE to show densities instead of frequencies
 lines(density(OP$temp), lwd = 2, col = &quot;chocolate3&quot;)
-abline(v = mean(OP$temp),
-       col = &quot;royalblue&quot;,
-       lwd = 2)
-abline(v = median(OP$temp),
-       col = &quot;red&quot;,
-       lwd = 2)
-abline(v = quantile(OP$temp, 0.25),
-       col = &quot;darkgreen&quot;,
-       lty = 2)
-abline(v = quantile(OP$temp, 0.75),
-       col = &quot;green&quot;,
-       lty = 2)
+abline(v = mean(OP$temp),col = &quot;royalblue&quot;, lwd = 2)
+abline(v = median(OP$temp),col = &quot;red&quot;, lwd = 2)
+abline(v=quantile(OP$temp,0.25),col=&quot;darkgreen&quot;,lty=2)
+abline(v=quantile(OP$temp,0.75),col=&quot;green&quot;,lty=2)
 
-legend(
-  x = &quot;topleft&quot;,
-  bty = &quot;n&quot;,
-  c(
-    &quot;Density plot&quot;,
-    &quot;Mean&quot;,
-    &quot;Median&quot;,
-    &quot;Lower Quantile&quot;,
-    &quot;Upper Quantile&quot;
-  ),
-  col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;, &quot;green&quot;),
-  lwd = c(2, 2, 2)
-)
+legend(x = &quot;topleft&quot;, 
+       bty = &quot;n&quot;,
+       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;,&quot;Lower Quantile&quot;, &quot;Upper Quantile&quot;),
+       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
+       lwd = c(2, 2, 2))
 
 hist(OP$rhum,
      col = &quot;lightblue&quot;,
-     main = &quot;Histogram of Temperatures&quot;,
+     main = &quot;Histogram of Rel. Humidity (Apr. - Sep.)&quot;,
      prob = TRUE)
 lines(density(OP$rhum), lwd = 2, col = &quot;chocolate3&quot;)
-abline(v = mean(OP$rhum),
-       col = &quot;royalblue&quot;,
-       lwd = 2)
-abline(v = quantile(OP$rhum, 0.25),
-       col = &quot;darkgreen&quot;,
-       lty = 2)
-abline(v = quantile(OP$rhum, 0.75),
-       col = &quot;green&quot;,
-       lty = 2)
-abline(v = median(OP$rhum),
-       col = &quot;red&quot;,
-       lwd = 2)
-legend(
-  x = &quot;topleft&quot;,
-  bty = &quot;n&quot;,
-  c(
-    &quot;Density plot&quot;,
-    &quot;Mean&quot;,
-    &quot;Median&quot;,
-    &quot;Lower Quantile&quot;,
-    &quot;Upper Quantile&quot;
-  ),
-  col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;, &quot;green&quot;),
-  lwd = c(2, 2, 2)
-)
-hist(OP$rain[OP$rain &gt; 0],
-     breaks = 15,
-     main = &quot;Freq. of rain &gt; 0 mm&quot;,
-     xlab = &quot;Rain (mm)/hour&quot;)</code></pre>
-<p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /></p>
-<p>We can see that there is no suspicious values in the data. Rain is often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens.</p>
-<pre class="r"><code>OP_rain &lt;-
+abline(v = mean(OP$rhum),col = &quot;royalblue&quot;, lwd = 2)
+abline(v=quantile(OP$rhum,0.25),col=&quot;darkgreen&quot;,lty=2)
+abline(v=quantile(OP$rhum,0.75),col=&quot;green&quot;,lty=2)
+abline(v = median(OP$rhum),col = &quot;red&quot;, lwd = 2)
+legend(x = &quot;topleft&quot;, 
+       bty = &quot;n&quot;,
+       c(&quot;Density plot&quot;, &quot;Mean&quot;, &quot;Median&quot;,&quot;Lower Quantile&quot;, &quot;Upper Quantile&quot;),
+       col = c(&quot;chocolate3&quot;, &quot;royalblue&quot;, &quot;red&quot;, &quot;darkgreen&quot;,&quot;green&quot;),
+       lwd = c(2, 2, 2))
+hist(OP$rain[OP$rain&gt;0], 
+     breaks = 40, 
+     col = &quot;blue&quot;,
+     main = &quot;Freq. of rain &gt; 0 mm (Apr. - Sep.)&quot;,
+     xlab = &quot;Rain (mm/hour)&quot;)</code></pre>
+<p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /> We can see that there is no suspicious values in the data. Rain is an often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens.</p>
+</div>
+<div id="weather-summaries" class="section level2">
+<h2>Weather summaries</h2>
+<p>We shall summarise the weather data to get an idea about the general and potato late blight related climate conditions at Oak Park.</p>
+<pre class="r"><code>OP_rain &lt;- 
   OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var) %&gt;%
-  summarize(rain = sum(rain)) %&gt;%
-  ungroup() %&gt;%
-  summarize(rain = mean(rain))
-
-OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  summarize(temp = round(mean(temp), 1),
-            rhum = round(mean(rhum), 1)) %&gt;%
-  bind_cols(., OP_rain) %&gt;%
-  kable(caption = &quot;10 Year Averages Weather at Oak Park&quot;)</code></pre>
-<table>
-<caption>10 Year Averages Weather at Oak Park</caption>
+    filter(month %in% c(4:10)) %&gt;%
+    group_by(year_var) %&gt;%
+    summarize(rain = sum(rain)) %&gt;% 
+   ungroup() %&gt;% 
+    summarize(rain = mean(rain)) 
+ OP %&gt;%
+    filter(month %in% c(4:10)) %&gt;%
+    summarize(temp = round(mean(temp),1),
+              rhum = round(mean(rhum),1)
+              ) %&gt;% 
+   bind_cols(., OP_rain) %&gt;% 
+  kable(caption = &quot;10 Year Averages Weather at Oak Park&quot;,format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+10 Year Averages Weather at Oak Park
+</caption>
 <thead>
-<tr class="header">
-<th align="right">temp</th>
-<th align="right">rhum</th>
-<th align="right">rain</th>
+<tr>
+<th style="text-align:right;">
+temp
+</th>
+<th style="text-align:right;">
+rhum
+</th>
+<th style="text-align:right;">
+rain
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">13</td>
-<td align="right">80.2</td>
-<td align="right">398.31</td>
+<tr>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+80.2
+</td>
+<td style="text-align:right;">
+398.31
+</td>
 </tr>
 </tbody>
 </table>
-<p>The average temperature and relative humidity are ideal for disease development over the course of the season as well.</p>
-<pre class="r"><code>OP %&gt;%
+<p>Night-time temperatures remain low April and May.</p>
+<pre class="r"><code> OP %&gt;%
   mutate(hour = hour(date)) %&gt;%
-  filter(month %in% c(4:9)) %&gt;%
-  
-  group_by(year_var, month, hour) %&gt;%
+  group_by(month) %&gt;% 
+    filter(month %in% c(4:10) &amp; hour %in% c(0:6, 20:23)) %&gt;%
   mutate(month_abb = month(month, label = T)) %&gt;%
-  ggplot(aes(factor(hour), temp)) +
-  geom_vline(
-    xintercept = seq(0, 24, 6),
-    size = 0.1,
-    color = &quot;gray&quot;,
-    linetype = &quot;dotted&quot;
-  ) +
-  geom_boxplot(width = 0.2, outlier.size = 0.2) +
-  geom_line(aes(hour, 10, color = &quot;red&quot;)) +
-  facet_grid( ~ month_abb) +
-  theme_article() +
-  scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
-  labs(
-    title = &quot;Average temperatures per hour for months April to September&quot;,
-    y = &quot;Temperature&quot;,
-    x = &quot;Hours of the day&quot;,
-    color = &quot;10 ˚C Line&quot;
-  )</code></pre>
+    summarize(temp = round(mean(temp),1),
+              rhum = round(mean(rhum),1)
+              ) %&gt;% 
+  kable(caption = &quot;Night-time Averages 8PM:6AM&quot;,format = &quot;html&quot;)%&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Night-time Averages 8PM:6AM
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+month
+</th>
+<th style="text-align:right;">
+temp
+</th>
+<th style="text-align:right;">
+rhum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+6.6
+</td>
+<td style="text-align:right;">
+86.7
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+9.2
+</td>
+<td style="text-align:right;">
+86.5
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+11.7
+</td>
+<td style="text-align:right;">
+88.7
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+13.4
+</td>
+<td style="text-align:right;">
+89.6
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+13.1
+</td>
+<td style="text-align:right;">
+89.8
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11.5
+</td>
+<td style="text-align:right;">
+90.6
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Calculate average minimum daily temeperatures per month
+OP_rain &lt;- 
+OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month) %&gt;% 
+  summarize(rain = sum(rain)) %&gt;% 
+    mutate( month_abb = month(month, label = T)) %&gt;% 
+  group_by(month) %&gt;% 
+  summarize(rain = round(mean(rain), 1))
+
+#Calculate average minimum daily temeperatures per month
+OP_min_temp &lt;- 
+OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;% 
+  summarize(min_temp = round(min(temp),1)) %&gt;% 
+    mutate( month_abb = month(month, label = T)) %&gt;% 
+  group_by(month) %&gt;% 
+  summarize(min_temp = round(mean(min_temp), 1)) %&gt;% 
+  left_join(., OP_rain, &quot;month&quot;)
+
+OP_months &lt;- 
+  OP %&gt;%
+    filter(month %in% c(4:10)) %&gt;%
+    group_by( month) %&gt;%
+    summarize(temp = round(mean(temp),1),
+              rhum = round(mean(rhum),1)
+              ) %&gt;% 
+  left_join(., OP_min_temp, &quot;month&quot;)
+OP_months%&gt;% 
+  kable(caption = &quot;Monthly Averages&quot;,format = &quot;html&quot;)%&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Monthly Averages
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+month
+</th>
+<th style="text-align:right;">
+temp
+</th>
+<th style="text-align:right;">
+rhum
+</th>
+<th style="text-align:right;">
+min_temp
+</th>
+<th style="text-align:right;">
+rain
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+8.8
+</td>
+<td style="text-align:right;">
+78.0
+</td>
+<td style="text-align:right;">
+4.5
+</td>
+<td style="text-align:right;">
+46.3
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+11.3
+</td>
+<td style="text-align:right;">
+78.0
+</td>
+<td style="text-align:right;">
+7.2
+</td>
+<td style="text-align:right;">
+55.9
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+13.9
+</td>
+<td style="text-align:right;">
+79.8
+</td>
+<td style="text-align:right;">
+9.7
+</td>
+<td style="text-align:right;">
+73.0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+15.4
+</td>
+<td style="text-align:right;">
+80.9
+</td>
+<td style="text-align:right;">
+11.6
+</td>
+<td style="text-align:right;">
+80.1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+15.0
+</td>
+<td style="text-align:right;">
+81.3
+</td>
+<td style="text-align:right;">
+11.4
+</td>
+<td style="text-align:right;">
+86.2
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+13.3
+</td>
+<td style="text-align:right;">
+83.3
+</td>
+<td style="text-align:right;">
+9.6
+</td>
+<td style="text-align:right;">
+56.8
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>OP %&gt;% 
+  mutate(hour = hour(date)) %&gt;% 
+  filter(month %in% c(4:9)) %&gt;% 
+  
+  group_by(year_var,month, hour) %&gt;% 
+  mutate( month_abb = month(month, label = T)) %&gt;% 
+  ggplot(aes(factor(hour), temp))+
+  geom_vline(xintercept=seq(0,24,6), size = 0.1, color = &quot;gray&quot;, linetype=&quot;dotted&quot;)+
+  geom_boxplot(width = 0.2,outlier.size = 0.2)+
+  geom_line(aes(hour, 10, color = &quot;red&quot;))+
+  facet_grid(~month_abb)+
+  theme_tufte()+
+  scale_x_discrete( labels = seq(0,24,6), breaks = seq(0,24,6))+
+  labs(title= &quot;Average temperatures per hour for months April to September&quot;,
+       y = &quot;Temperature&quot;,
+       x = &quot;Hours of the day&quot;,
+       color = &quot;10C Line&quot;)</code></pre>
 <p><img src="images/temps_perhour_monthly-1.png" width="672" /></p>
 <p>Night temperatures are low are low in Months of April and May, and only start to kick off in June.</p>
 <p>Lets take a closer look into variations in different seasons.</p>
-<pre class="r"><code>OP %&gt;%
-  mutate(hour = hour(date)) %&gt;%
-  filter(month %in% c(4:7)) %&gt;%
+<pre class="r"><code>OP %&gt;% 
+  mutate(hour = hour(date)) %&gt;% 
+  filter(month %in% c(4:7)) %&gt;% 
   group_by(year_var, month, hour) %&gt;%
   mutate(month_abb = month(month, label = T)) %&gt;%
   ggplot(aes(factor(hour), temp)) +
@@ -1200,10 +1870,12 @@ OP %&gt;%
     linetype = &quot;dotted&quot;
   ) +
   geom_boxplot(width = 0.2, outlier.size = 0.2) +
-  geom_line(aes(hour, 10, color = &quot;red&quot;)) +
-  facet_grid(year_var ~ month_abb) +
-  theme(legend.position = &quot;top&quot;) +
+  geom_line(aes(hour, 10, color = &quot;10 ˚C Line&quot;)) +
+  scale_fill_manual(values = c(&quot;10 ˚C Line&quot; = &quot;red&quot;),
+                    aesthetics = c(&quot;colour&quot;, &quot;fill&quot;)) +
+  facet_grid(~ month_abb) +
   theme_article() +
+  theme(legend.position = &quot;top&quot;) +
   scale_x_discrete(labels = seq(0, 24, 6), breaks = seq(0, 24, 6)) +
   labs(
     title = &quot;Average temperatures per hour for months April to September&quot;,
@@ -1212,247 +1884,160 @@ OP %&gt;%
     color = &quot;10 ˚C Line&quot;
   )</code></pre>
 <p><img src="images/temps_perhour_all_years-1.png" width="960" /></p>
-<p>Let us take a look into sums of hours with blight favourable conditions.</p>
+<pre class="r"><code>OP$month_abb &lt;- month(OP$month, label = T) 
+
+ggplot( OP, aes(x = temp, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+    name = &quot;Temp. (°C)&quot;
+  )+
+  ggtitle( &quot;Temperatures at Oak Park&quot;)+
+  xlab(&quot;Temperature (°C)&quot;)+
+  ylab(&quot;Month&quot;)+
+  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
+<pre><code>## Picking joint bandwidth of 0.512</code></pre>
+<p><img src="images/gens_ridges-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Average temperatures plot
+OP_temp &lt;- 
+OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;% 
+  summarize(temp = round(mean(temp),1)) %&gt;% 
+    mutate( month_abb = month(month, label = T))  
+ggplot(OP_temp,aes(month_abb,temp))+
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
+  geom_boxplot( width = 0.3)+
+ annotate(&quot;text&quot;,x = 1:6, y = 24, 
+          label=as.character(round(OP_months$temp,2)) )+
+  ggtitle(&quot;Average Daily Temperatures Per Month at Oak Park&quot;)+
+  ylab(&quot;Temperature (°C)&quot;)+
+  xlab(&quot;Month&quot;)+
+  labs(color = &quot;Year&quot;)+
+  theme_bw()</code></pre>
+<p><img src="images/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Minimum temperatures are interesting because they are a limiting factor for primary cycles of <em>P. infestans</em> early in the season.</p>
 <pre class="r"><code>OP %&gt;%
-  mutate(hour = hour(date)) %&gt;%
-  mutate(humid = ifelse(rhum &gt;= 90 &amp; temp &gt;= 10, 1, 0)) %&gt;%
-  mutate(cond_night = ifelse(rhum &gt;= 90 &amp;
-                               temp &gt;= 10 &amp; hour %in% c(20:24, 0:6), 1, 0)) %&gt;%
-  filter(month %in% c(4:7)) %&gt;%
-  group_by(year_var, month) %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month, short_date) %&gt;% 
+  summarize(min_temp = round(min(temp),1)) %&gt;% 
+    mutate( month_abb = month(month, label = T)) %&gt;% 
+ggplot(aes(month_abb,min_temp))+
+  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7)+
+  geom_boxplot( width = 0.3)+
+  annotate(&quot;text&quot;,x = 1:6, y = 24, 
+          label=as.character(round(OP_months$min_temp,2)) )+
+  ggtitle(&quot;Minimum Daily Temperatures Per Month at Oak Park&quot;)+
+  ylab(&quot;Temperature (°C)&quot;)+
+  xlab(&quot;Month&quot;)+
+  labs(color = &quot;Year&quot;)+
+  theme_bw()</code></pre>
+<p><img src="images/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggplot( OP, aes(x = rhum, y = factor(month_abb, ordered = T)))+
+  geom_density_ridges_gradient(
+    aes(fill = ..x..), scale = 2, size = 0.2
+  ) +
+  scale_fill_gradientn(
+    colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
+    name = &quot;RH (%)&quot;
+  )+
+  scale_x_continuous(expand = c(0.1, 0)) +
+  ggtitle( &quot;Relative Humidity at Oak Park&quot;)+
+  xlab(&quot;Relative Humidity (%)&quot;)+
+  ylab(&quot;Month&quot;)+
+  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
+<pre><code>## Picking joint bandwidth of 2.11</code></pre>
+<p><img src="images/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>OP %&gt;%
+  filter(month %in% c(4:10)) %&gt;%
+  group_by(year_var, month) %&gt;% 
+  summarize(rain = sum(rain)
+  ) %&gt;% 
+    mutate( month_abb = month(month, label = T)) %&gt;% 
+ggplot(aes(month_abb,rain,fill = factor(year_var)))+
+  geom_bar( position=&quot;dodge&quot;, stat=&quot;identity&quot;, width = 0.7)+
+  scale_fill_manual(values = colorRampPalette(brewer.pal(10, &quot;Blues&quot;))(10))+
+  annotate(&quot;text&quot;,x = 1:6, y = 170, 
+          label=as.character(OP_months$rain))+
+  ggtitle( &quot;Monthly rainfall variation&quot;)+
+  xlab(&quot;Month&quot;)+
+  ylab(&quot;Rainfall (mm/month)&quot;)+
+  labs(fill = &quot;Year&quot;,
+       subtitle = &quot;Monthly averages are presented at the top of bar chart. &quot;)+
+  theme_bw()</code></pre>
+<p><img src="images/rain_monthly-1.png" width="672" /></p>
+<p>Let us take a look into sums of hours with blight favorable conditions.</p>
+<pre class="r"><code>OP %&gt;% 
+  mutate(hour = hour(date)) %&gt;% 
+  mutate(humid = ifelse(rhum &gt;= 90 &amp; temp&gt;= 10, 1,0)) %&gt;% 
+  mutate(cond_night = ifelse(rhum &gt;= 90 &amp; temp&gt;= 10 &amp; hour %in% c(20:24,0:6), 1,0)) %&gt;% 
+  filter(month %in% c(4:8)) %&gt;% 
+  group_by(year_var,month) %&gt;% 
   summarise(cond = sum(humid),
-            cond_night = sum(cond_night)) %&gt;%
-  mutate(month_abb = month(month, label = T)) %&gt;%
-  select(-c(month)) %&gt;%
-  reshape2::melt(
-    id.vars = c(&quot;year_var&quot;, &quot;month_abb&quot;),
-    variable.name = &quot;period_of_day&quot;,
-    value.name = &quot;humid&quot;
-  ) %&gt;%
-  group_by(month_abb, period_of_day) %&gt;%
+            cond_night = sum(cond_night)) %&gt;% 
+  mutate( month_abb = month(month, label = T)) %&gt;% 
+  select(-c(month)) %&gt;% 
+  reshape2::melt(id.vars = c(&quot;year_var&quot;, &quot;month_abb&quot;),
+                 variable.name = &quot;period_of_day&quot;,
+                 value.name = &quot;humid&quot;) %&gt;% 
+  group_by(month_abb,period_of_day ) %&gt;% 
   summarise(humid = mean(humid),
-            sd = sd(humid)) %&gt;%
-  ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
+             sd = sd(humid)) %&gt;% 
+ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
   geom_bar(stat = &quot;identity&quot;,
            color = &quot;black&quot;,
            position = position_dodge()) +
   geom_errorbar(aes(ymin = humid - sd,
-                    ymax = humid + sd),
-                width = 0.2,
-                na.rm = TRUE) +
-  scale_fill_brewer(
-    palette = &quot;Dark2&quot;,
-    name = &quot;Period of the day&quot;,
-    labels = c(&quot;Whole day&quot; , &quot;During night&quot;)
+                    ymax = humid + sd), width = 0.2) +
+  scale_fill_manual(
+    name = &quot;Period of the day:&quot;,
+    labels = c(&quot;Whole day&quot; , &quot;During night (8PM:6AM)&quot;),
+    values = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;)
   ) +
   labs(
-    title = &quot;Blight favourable weather averages.&quot;,
-    subtitle = &quot;Mean monthly sum of hours with T&gt;=10 °C and RH&gt;=90 %.&quot;,
+    title = &quot;Blight favorable weather averages.&quot;,
+    subtitle = &quot;Average monthly sum of hours with T &gt;= 10 °C and RH &gt;= 90 %.&quot;,
     y = &quot;Humid weather (hours)&quot;,
     x = &quot;Month&quot;
   ) +
-  theme_article()</code></pre>
-<p><img src="images/unnamed-chunk-2-1.png" width="672" /></p>
+  theme_article()+
+  theme(legend.position = c(0.15, 0.85),)</code></pre>
+<p><img src="images/montly_risk_average_sums-1.png" width="672" /></p>
+<p>The number of wet hours that are within potato late blight biological range is rising from april to July. Mid- July is when the blight epidemics usually kick off.</p>
 </div>
-<div id="plot-weather-data" class="section level2">
-<h2>Plot weather data</h2>
-<p>Let’s do some work with the data to create summaries of the weather data so we can more easily visualise it.</p>
-<pre class="r"><code>#Calculate average minimum daily temeperatures per month
-OP_rain &lt;-
-  OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month) %&gt;%
-  summarize(rain = sum(rain)) %&gt;%
-  mutate(month_abb = month(month, label = T)) %&gt;%
-  group_by(month) %&gt;%
-  summarize(rain = round(mean(rain), 1))
-
-#Calculate average minimum daily temeperatures per month
-OP_min_temp &lt;-
-  OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;%
-  summarize(min_temp = round(min(temp), 1)) %&gt;%
-  mutate(month_abb = month(month, label = T)) %&gt;%
-  group_by(month) %&gt;%
-  summarize(min_temp = round(mean(min_temp), 1)) %&gt;%
-  left_join(., OP_rain, &quot;month&quot;)
-
-OP_months &lt;-
-  OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(month) %&gt;%
-  summarize(temp = round(mean(temp), 1),
-            rhum = round(mean(rhum), 1)) %&gt;%
-  left_join(., OP_min_temp, &quot;month&quot;)
-OP_months %&gt;% kable(caption = &quot;Monthly Averages&quot;)</code></pre>
-<table>
-<caption>Monthly Averages</caption>
-<thead>
-<tr class="header">
-<th align="right">month</th>
-<th align="right">temp</th>
-<th align="right">rhum</th>
-<th align="right">min_temp</th>
-<th align="right">rain</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">4</td>
-<td align="right">8.8</td>
-<td align="right">78.0</td>
-<td align="right">4.5</td>
-<td align="right">46.3</td>
-</tr>
-<tr class="even">
-<td align="right">5</td>
-<td align="right">11.3</td>
-<td align="right">78.0</td>
-<td align="right">7.2</td>
-<td align="right">55.9</td>
-</tr>
-<tr class="odd">
-<td align="right">6</td>
-<td align="right">13.9</td>
-<td align="right">79.8</td>
-<td align="right">9.7</td>
-<td align="right">73.0</td>
-</tr>
-<tr class="even">
-<td align="right">7</td>
-<td align="right">15.4</td>
-<td align="right">80.9</td>
-<td align="right">11.6</td>
-<td align="right">80.1</td>
-</tr>
-<tr class="odd">
-<td align="right">8</td>
-<td align="right">15.0</td>
-<td align="right">81.3</td>
-<td align="right">11.4</td>
-<td align="right">86.2</td>
-</tr>
-<tr class="even">
-<td align="right">9</td>
-<td align="right">13.3</td>
-<td align="right">83.3</td>
-<td align="right">9.6</td>
-<td align="right">56.8</td>
-</tr>
-</tbody>
-</table>
-<div id="plot-temperature-values" class="section level3">
-<h3>Plot temperature values</h3>
-<p>Plot monthly temperature values.</p>
-<pre class="r"><code>OP$month_abb &lt;- month(OP$month, label = T) 
-
-ggplot(OP, aes(x = temp, y = factor(month_abb, ordered = T))) +
-  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
-  scale_fill_gradientn(colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
-                       name = &quot;Temp. (°C)&quot;) +
-  ggtitle(&quot;Temperatures at Oak Park&quot;) +
-  xlab(&quot;Temperature (°C)&quot;) +
-  ylab(&quot;Month&quot;) +
-  theme_article() +
-  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
-<pre><code>## Picking joint bandwidth of 0.512</code></pre>
-<p><img src="images/gens_ridges-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>Plot average daily temperature values</p>
-<pre class="r"><code>#Average temperatures plot
-OP_temp &lt;-
-  OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;%
-  summarize(temp = round(mean(temp), 1)) %&gt;%
-  mutate(month_abb = month(month, label = T))
-ggplot(OP_temp, aes(month_abb, temp)) +
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
-  geom_boxplot(width = 0.3, outlier.shape = NA) +
-  scale_colour_brewer(&quot;Year&quot;,
-                      palette = &quot;Set3&quot;) +
-  annotate(&quot;text&quot;,
-           x = 1:6,
-           y = 24,
-           label = as.character(round(OP_months$temp, 2))) +
-  ggtitle(&quot;Average Daily Temperatures Per Month at Oak Park&quot;) +
-  ylab(&quot;Temperature (°C)&quot;) +
-  xlab(&quot;Month&quot;) +
-  theme_article()</code></pre>
-<p><img src="images/avg_t-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>Plot daily minimum temperature values.</p>
-<pre class="r"><code>#Minimum temperatures plot
-OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;%
-  summarize(min_temp = round(min(temp), 1)) %&gt;%
-  mutate(month_abb = month(month, label = T)) %&gt;%
-  ggplot(aes(month_abb, min_temp)) +
-  geom_jitter(aes(colour = factor(year_var)), width = 0.2, size = 1.7) +
-  geom_boxplot(width = 0.3, outlier.shape = NA) +
-  scale_colour_brewer(&quot;Year&quot;,
-                      palette = &quot;Set3&quot;) +
-  annotate(&quot;text&quot;,
-           x = 1:6,
-           y = 24,
-           label = as.character(round(OP_months$min_temp, 2))) +
-  ggtitle(&quot;Minimum Daily Temperatures Per Month at Oak Park&quot;) +
-  ylab(&quot;Temperature (°C)&quot;) +
-  xlab(&quot;Month&quot;) +
-  theme_article()
-
-ggplot(OP, aes(x = rhum, y = factor(month_abb, ordered = T))) +
-  geom_density_ridges_gradient(aes(fill = ..x..), scale = 2, size = 0.2) +
-  scale_fill_gradientn(colours = c(&quot;#0D0887FF&quot;, &quot;#CC4678FF&quot;, &quot;#F0F921FF&quot;),
-                       name = &quot;RH (%)&quot;) +
-  scale_x_continuous(expand = c(0.1, 0)) +
-  ggtitle(&quot;Relative Humidity at Oak Park&quot;) +
-  xlab(&quot;Relative Humidity (%)&quot;) +
-  ylab(&quot;Month&quot;) +
-  theme_article() +
-  theme_ridges(font_size = 13, grid = TRUE)</code></pre>
-<pre><code>## Picking joint bandwidth of 2.11</code></pre>
-<p><img src="images/min_t-1.png" width="576" style="display: block; margin: auto;" /><img src="images/min_t-2.png" width="576" style="display: block; margin: auto;" /></p>
-<p>Plot daily rainfall values.</p>
-<pre class="r"><code>#Rain plot
-OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;%
-  summarize(rain = sum(rain)) %&gt;%
-  mutate(month_abb = month(month, label = T)) %&gt;%
-  ggplot(aes(month_abb, rain, fill = factor(year_var))) +
-  geom_bar(position = &quot;dodge&quot;,
-           stat = &quot;identity&quot;,
-           width = 0.7) +
-  scale_fill_brewer(&quot;Year&quot;,
-                    palette = &quot;Set3&quot;) +
-  annotate(&quot;text&quot;,
-           x = 1:6,
-           y = 51,
-           label = as.character(OP_months$rain)) +
-  theme_article()</code></pre>
-<p><img src="images/rain_plots-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div id="full-weather-plot" class="section level2">
+<h2>Full weather plot</h2>
+<p>Finally, the full daily weather data is presented below.</p>
+<details>
+<p><summary>The code</summary></p>
 <pre class="r"><code>OP %&gt;%
-  filter(month %in% c(4:10)) %&gt;%
-  group_by(year_var, month, short_date) %&gt;%
-  summarize(
-    temp = round(mean(temp), 1),
-    rain = sum(rain),
-    wdsp = mean(wdsp),
-    rhum = round(mean(rhum), 1)
-    
-  ) %&gt;% rename(date = short_date) %&gt;%
+    filter(month %in% c(4:10)) %&gt;%
+    group_by(year_var, month, short_date) %&gt;% 
+    summarize(temp = round(mean(temp),1),
+              rain = sum(rain),
+              wdsp = mean(wdsp),
+              rhum = round(mean(rhum),1)
+              
+    ) %&gt;% rename(date = short_date) %&gt;% 
   ggplot() +
-  geom_line(aes(x = date,
-                y = rhum,
-                color = &quot;Relative humidity (%)&quot;,
-                fill = &quot;Relative humidity (%)&quot;),
-            size = 0.1) +
-  geom_line(aes(x = date,
-                y = temp,
-                colour = &quot;Temperature (˚C)&quot;,
-                fill = &quot;Temperature (˚C)&quot;,),
-            size = 0.1) +
+  geom_line(
+    aes(
+      x = date,
+      y = rhum,
+      color = &quot;Relative humidity (%)&quot;,
+      fill = &quot;Relative humidity (%)&quot;
+    ),
+    size = 0.1
+  ) +
+  geom_line(aes(
+    x = date,
+    y = temp,
+    colour = &quot;Temperature (˚C)&quot;,
+    fill = &quot;Temperature (˚C)&quot;,
+  ),
+  size = 0.1) +
   geom_col(
     aes(date,
         rain,
@@ -1502,8 +2087,8 @@ OP %&gt;%
   ) +
   facet_wrap(. ~ year_var, scales = &quot;free_x&quot;, ncol = 1) +
   ggtitle(&quot;Hourly weather data for Oak Park&quot;)</code></pre>
+</details>
 <p><img src="images/wth_daily-1.png" width="1056" /></p>
-</div>
 </div>
 </div>
 

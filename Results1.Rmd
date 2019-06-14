@@ -1,9 +1,3 @@
----
-title: "Evaluation of Irish Rules Model"
-output:
-  html_document:
-    code_folding: hide
----
 
 # Parameter evaluation
 
@@ -70,17 +64,10 @@ Differences between pairs of models with same parameters, differing only in leaf
 
 ```{r leaf-wet-graphs, fig.align='center'}
 # load the data
-<<<<<<< HEAD
 load( file = here::here("data", "op_2007_16",  "auc_data.RData"))
 
 t_data <-
   auc_data %>%
-=======
-load(file = here::here("data", "op_2007_16",  "data_for_analysis.RData"))
-
-t_data <-
-  data_for_analysis %>%
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   group_by(rh_thresh, temp_thresh, hours) %>%
   unite(var, rh_thresh, temp_thresh, hours) %>%
   spread(key = lw_rh, value = auc) %>%
@@ -98,11 +85,7 @@ ggplot(t_data, aes(x = difference)) +
 
 Compute summary statistics by groups.
 ```{r leaf-wet summary}
-<<<<<<< HEAD
 group_by(auc_data, lw_rh) %>%
-=======
-group_by(data_for_analysis, lw_rh) %>%
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   summarise(
     count = n(),
     median = median(auc, na.rm = TRUE),
@@ -136,19 +119,12 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs with rain as single predictor are removed from further analysis.
 
 ```{r plot_lw_estim}
-<<<<<<< HEAD
 plot <- 
 auc_data %>%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == "rainrh", "rain and rh", "only rain"
   ))) %>%
-=======
-p <-
-  data_for_analysis  %>%
-  mutate(Leaf_Wetness = factor(ifelse(lw_rh == "rainrh",
-                                      "rain and rh",
-                                      "only rain"))) %>%
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
+
   ggplot(aes(
     x = factor(lw_rh),
     y = auc,
@@ -168,7 +144,7 @@ p <-
   theme_article() +
   coord_equal(10 / 1)
 
-p + ggsave(
+plot + ggsave(
   here::here("data", "op_2007_16", "results", "LWswithc.png"),
   width = 11,
   height = 11,
@@ -177,17 +153,14 @@ p + ggsave(
 ```
 
 ```{r remove-single-rain}
-<<<<<<< HEAD
-#Remove the data containg only rain as estimator
-# auc_data <- subset(auc_data, lw_rh == "rainrh")
-# auc_data$lw_rh <- NULL
-=======
-#remove the data containg only rain as estimator
-data_for_analysis <- 
-  data_for_analysis %>% 
-  filter(lw_rh == "rainrh") %>% 
-  select(-lw_rh)
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
+# #Remove the data containg only rain as estimator
+# # auc_data <- subset(auc_data, lw_rh == "rainrh")
+# # auc_data$lw_rh <- NULL
+# #remove the data containg only rain as estimator
+# auc_data <- 
+#   auc_data %>% 
+#   filter(lw_rh == "rainrh") %>% 
+#   select(-lw_rh)
 ```
 
 ## T, RH and sporulation duration
@@ -196,13 +169,8 @@ data_for_analysis <-
 
 Scatter plot matrix shows some relationships between y and other variables.
 
-<<<<<<< HEAD
-```{r interactions, fig.align='center', warning= FALSE, message=FALSE}
-GGally::ggpairs(auc_data,
-=======
 ```{r interactions, fig.align='center', message=FALSE}
-GGally::ggpairs(data_for_analysis,
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
+GGally::ggpairs(auc_data,
                 lower = list(continuous = "points"),
                 upper = list(continuous = "cor"))
 ```
@@ -213,11 +181,7 @@ Take initial look at descriptive statistics and trend of AUROC response as a fac
 
 ```{r desc_stat, fig.align='center', fig.show = "hold",fig.width=6, fig.height=4, message=FALSE, warning=FALSE}
 p1 <-  
-<<<<<<< HEAD
   auc_data[order(auc_data$hours), ] %>%
-=======
-  data_for_analysis[order(data_for_analysis$hours), ] %>%
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   ggplot(., aes(factor(hours), auc)) +
   geom_boxplot(width = 0.4) +
   geom_jitter(
@@ -236,11 +200,7 @@ p1 <-
   theme_article()
 
 p2 <- 
-<<<<<<< HEAD
   ggplot(auc_data, aes(factor(rh_thresh), auc)) +
-=======
-  ggplot(data_for_analysis, aes(factor(rh_thresh), auc)) +
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -258,11 +218,7 @@ p2 <-
   theme_article()
 
 p3 <-  
-<<<<<<< HEAD
   ggplot(auc_data, aes(factor(temp_thresh), auc)) +
-=======
-  ggplot(data_for_analysis, aes(factor(temp_thresh), auc)) +
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   geom_boxplot(width = 0.4) +
   geom_jitter(
     position = position_jitter(width = 0.2),
@@ -294,22 +250,14 @@ p1;p2;p3
 ### Model fitting 
 
 ```{r mod_fit_data}
-<<<<<<< HEAD
 lapply(auc_data[, 1:3], function(x)
-=======
-lapply(data_for_analysis[, 1:3], function(x)
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
   sort(unique(x)))
 ```
 Create coded data set. Seven levels of each variable are used. 
 
 ```{r code_data}
-<<<<<<< HEAD
 cd_data <- coded.data(auc_data, Tt ~  (temp_thresh - 10),
-=======
-cd_data <- coded.data(data_for_analysis,
                       Tt ~  (temp_thresh - 10),
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
                       RHt ~ (rh_thresh - 90),
                       SDt ~ (hours - 12))
 str(cd_data)
@@ -326,7 +274,6 @@ lo_pred <- predict(lo_fit1)
 Fit models of first to fourth order, and evaluate fits.
 
 ```{r model_fit}
-<<<<<<< HEAD
 poly_1_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
 poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
@@ -336,20 +283,6 @@ rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>%
   add_column( Order = 1:4, .before = 1) %>% 
   kable(format = "html") %>% 
   kableExtra::kable_styling( latex_options = "striped",full_width = FALSE) 
-=======
-poly_1_fit <-
-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
-poly_2_fit <-
-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
-poly_3_fit <-
-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
-poly_4_fit <-
-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
-
-rcompanion::compareLM(poly_1_fit, poly_2_fit, poly_3_fit, poly_4_fit)[[2]] %>%
-  add_column(Order = 1:4, .before = 1) %>%
-  gt() 
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
 ```
 
 The cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data to understand underlying relationships between variable thresholds of our model. Hence, our priority is the increase in explanatory power, for which our main guide is adjusted R^2^, while the distribution of residuals is still fulfilling the assumption of normality. The model of 4^th^ order seems to provide very little gain in terms of fit  using Adj. R^2^ comparing to 3^rd^ order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4^th^ order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data. 
@@ -477,13 +410,8 @@ rm(prettyModel)
 Visualise fitted response surface. 
 
 ```{r persp, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
-<<<<<<< HEAD
 z_min <- min(auc_data$auc) - c(min(auc_data$auc) * 0.02)
 z_max <- max(auc_data$auc) + c(max(auc_data$auc) * 0.02)
-=======
-z_min <- min(data_for_analysis$auc) - c(min(data_for_analysis$auc) * 0.02)
-z_max <- max(data_for_analysis$auc) + c(max(data_for_analysis$auc) * 0.02)
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
 
 # use a viridis palette for usability
 library(viridis)
@@ -530,31 +458,13 @@ for (i in seq(nrow(par_cut))) {
     cex.main = 1.8,
     cex.axis = 1.06,
     cex.lab = 1.8,
-<<<<<<< HEAD
     main = paste0("\n",letters[i],") ", "Response at ", 
                   "Tt = ", par_cut[i,1] + 10,"°C, ",
                    "\n",
                   "RHt = ", par_cut[i,2] + 90, "%, ",
                   "and SDt = ", par_cut[i,3] +12, " hours."
                   )
-=======
-    main = paste0(
-      "\n",
-      letters[i],
-      ") ",
-      "Response at ",
-      "Tt = ",
-      par_cut[i, 1] + 10,
-      "°C;",
-      "\n",
-      "RHt = ",
-      par_cut[i, 2] + 90,
-      "%; ",
-      "SDt = ",
-      par_cut[i, 3] + 12,
-      " hours."
-    )
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
+    
   )
 }
 ```
@@ -567,7 +477,6 @@ Another way to present this data is with contour plots. We will plot contour plo
 
 par(
   mar = c(3, 4, 4, 2),
-<<<<<<< HEAD
     mfrow = c(3, 3),
     cex.main = 1.2,
     cex.axis = 1.06,
@@ -606,67 +515,8 @@ for (i in seq(nrow(par_cut))) {
                   )
   )
 }
-=======
-  mfrow = c(3, 1),
-  cex.main = 1.2,
-  cex.axis = 1.06,
-  cex.lab = 1.1
-)
 
-contour(poly_3_fit,
-        ~ Tt + RHt,
-        image = TRUE,
-        img.col = color_var,
-        at = data.frame(Tt = 0, RHt = 0, SDt = -3))
 
-# contour(poly_3_fit,
-#         ~ Tt + RHt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
-# 
-# contour(poly_3_fit,
-#         ~ Tt + RHt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = 0, RHt = 0, SDt =  +3))
-
-contour(poly_3_fit,
-        ~ Tt + SDt,
-        image = TRUE,
-        img.col = color_var,
-        at = data.frame(Tt = 0, RHt = -3, SDt = 0))
-
-# contour(poly_3_fit,
-#         ~ Tt + SDt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
-# 
-# contour(poly_3_fit,
-#         ~ Tt + SDt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = 0, RHt = 3, SDt = 0))
-
-# contour(poly_3_fit,
-#         ~ SDt + RHt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = -3, RHt = 0, SDt = 0))
-# 
-# contour(poly_3_fit,
-#         ~ SDt + RHt,
-#         image = TRUE,
-#         img.col = color_var,
-#         at = data.frame(Tt = 0, RHt = 0, SDt = 0))
-
-contour(poly_3_fit,
-        ~ SDt + RHt,
-        image = TRUE,
-        img.col = color_var,
-        at = data.frame(Tt = 3, RHt = 0, SDt = 0))
->>>>>>> 13882a8c9c022a585cd51ef61fa3a63f68c9c4a9
 ```
 
 ### Further investigation

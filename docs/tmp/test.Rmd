@@ -3,16 +3,41 @@ title: "Bohemian Rhapcodey"
 output: html_document
 ---
 
+```{r}
+knitr::knit_hooks$set(
+  source = function(x, options) {
+    hook.r = function(x, options) {
+      fence <- "```"
+      language = tolower(options$engine)
+      if (language == 'node') language = 'javascript'
+      if (!options$highlight) language = 'text'
+      if(!is.null(options$foldcode)) {
+      paste0('\n\n', "<details><summary>Source</summary>\n", fence, language, '\n', x, fence,  '\n\n', "</details>\n")
+      } else {
+              paste0('\n\n', fence, language, '\n', x, fence,  '\n\n')
+      }
+    }
+    x = knitr:::hilight_source(x, 'markdown', options)
+    hook.r(
+      paste(c(
+        x, 
+        ''
+      ), collapse = '\n'), 
+      options
+    )
+  }
+)
+```
+
 ## Question 1
 
 Are you in love with your car?
 
-<details>
-  <summary>Toggle answer</summary>
-  ```{r cars}
+
+  ```{r cars, foldcode=TRUE}
   summary(cars)
   ```
-</details>
+
 
 ## Question 2
 
