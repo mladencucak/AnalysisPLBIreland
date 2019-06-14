@@ -451,6 +451,8 @@ div.tocify {
 
 <div id="parameter-evaluation" class="section level1">
 <h1>Parameter evaluation</h1>
+<p>Here we present the results of the sensitivity analysis.<br />
+<em>Note</em>: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).</p>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -484,10 +486,6 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
-if (!&quot;gt&quot; %in% installed.packages())
-  remotes::install_github(&quot;rstudio/gt&quot;)
-
-list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
 packages_load &lt;-
   lapply(list.of.packages, require, character.only = TRUE)
 
@@ -635,14 +633,10 @@ plot + ggsave(
   units = &quot;cm&quot;
 )</code></pre>
 <p><img src="images/plot_lw_estim-1.png" width="672" /></p>
-<pre class="r"><code># #Remove the data containg only rain as estimator
-# # auc_data &lt;- subset(auc_data, lw_rh == &quot;rainrh&quot;)
-# # auc_data$lw_rh &lt;- NULL
-# #remove the data containg only rain as estimator
-# auc_data &lt;- 
-#   auc_data %&gt;% 
-#   filter(lw_rh == &quot;rainrh&quot;) %&gt;% 
-#   select(-lw_rh)</code></pre>
+<pre class="r"><code>auc_data &lt;-
+  auc_data %&gt;%
+  filter(lw_rh == &quot;rainrh&quot;) %&gt;%
+  select(-lw_rh)</code></pre>
 </div>
 <div id="t-rh-and-sporulation-duration" class="section level2">
 <h2>T, RH and sporulation duration</h2>
@@ -735,17 +729,16 @@ dev.off()</code></pre>
 ## $hours
 ## [1]  9 10 11 12 13 14 15</code></pre>
 <p>Create coded data set. Seven levels of each variable are used.</p>
-<pre class="r"><code>cd_data &lt;- coded.data(auc_data, Tt ~  (temp_thresh - 10),
+<pre class="r"><code>cd_data &lt;- coded.data(auc_data,
                       Tt ~  (temp_thresh - 10),
                       RHt ~ (rh_thresh - 90),
                       SDt ~ (hours - 12))
 str(cd_data)</code></pre>
-<pre><code>## Classes &#39;coded.data&#39; and &#39;data.frame&#39;:   686 obs. of  5 variables:
-##  $ RHt  : num  -3 -3 -3 -3 -3 -3 -3 -3 -3 -3 ...
-##  $ Tt   : num  -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 ...
-##  $ SDt  : num  -2 -2 -1 -1 0 0 1 1 2 2 ...
-##  $ lw_rh: chr  &quot;rain&quot; &quot;rainrh&quot; &quot;rain&quot; &quot;rainrh&quot; ...
-##  $ auc  : num  0.806 0.797 0.768 0.8 0.713 ...
+<pre><code>## Classes &#39;coded.data&#39; and &#39;data.frame&#39;:   343 obs. of  4 variables:
+##  $ RHt: num  -3 -3 -3 -3 -3 -3 -3 -3 -3 -3 ...
+##  $ Tt : num  0 0 0 0 0 0 0 1 1 1 ...
+##  $ SDt: num  -2 -1 0 1 2 3 -3 -2 -1 0 ...
+##  $ auc: num  0.797 0.8 0.8 0.805 0.761 ...
 ##  - attr(*, &quot;codings&quot;)=List of 3
 ##   ..$ Tt :Class &#39;formula&#39;  language Tt ~ (temp_thresh - 10)
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
@@ -755,11 +748,11 @@ str(cd_data)</code></pre>
 ##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
 ##  - attr(*, &quot;rsdes&quot;)=List of 2
 ##   ..$ primary: chr  &quot;Tt&quot; &quot;RHt&quot; &quot;SDt&quot;
-##   ..$ call   : language coded.data(data = auc_data, Tt ~ (temp_thresh - 10), Tt ~ (temp_thresh -      10), RHt ~ (rh_thresh - 90), SDt ~ (hours - 12))</code></pre>
+##   ..$ call   : language coded.data(data = auc_data, Tt ~ (temp_thresh - 10), RHt ~ (rh_thresh -      90), SDt ~ (hours - 12))</code></pre>
 <pre class="r"><code>head(cd_data)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["RHt"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Tt"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SDt"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["lw_rh"],"name":[4],"type":["chr"],"align":["left"]},{"label":["auc"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"-3","2":"-10","3":"-2","4":"rain","5":"0.8064433","_rn_":"1"},{"1":"-3","2":"-10","3":"-2","4":"rainrh","5":"0.7966495","_rn_":"2"},{"1":"-3","2":"-10","3":"-1","4":"rain","5":"0.7680412","_rn_":"3"},{"1":"-3","2":"-10","3":"-1","4":"rainrh","5":"0.7997423","_rn_":"4"},{"1":"-3","2":"-10","3":"0","4":"rain","5":"0.7128866","_rn_":"5"},{"1":"-3","2":"-10","3":"0","4":"rainrh","5":"0.7997423","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["RHt"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Tt"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SDt"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["auc"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"-3","2":"0","3":"-2","4":"0.7966495","_rn_":"1"},{"1":"-3","2":"0","3":"-1","4":"0.7997423","_rn_":"2"},{"1":"-3","2":"0","3":"0","4":"0.7997423","_rn_":"3"},{"1":"-3","2":"0","3":"1","4":"0.8054124","_rn_":"4"},{"1":"-3","2":"0","3":"2","4":"0.7608247","_rn_":"5"},{"1":"-3","2":"0","3":"3","4":"0.6768041","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>We may use non-parametric local regression (LOESS) to obtain predicted values for the 4-dimensional response surface, using RHt, SDt, and Tt, and all 3- and 2-way iterations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255–268).</p>
@@ -822,31 +815,31 @@ Shapiro.p
 4
 </td>
 <td style="text-align:right;">
-682
+339
 </td>
 <td style="text-align:right;">
--2472
+-1281
 </td>
 <td style="text-align:right;">
--2472
+-1281
 </td>
 <td style="text-align:right;">
--2449
+-1262
 </td>
 <td style="text-align:right;">
-0.5443
+0.6375
 </td>
 <td style="text-align:right;">
-0.5423
+0.6342
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.9969
+0.9934
 </td>
 <td style="text-align:right;">
-0.2010
+0.13760
 </td>
 </tr>
 <tr>
@@ -857,31 +850,31 @@ Shapiro.p
 10
 </td>
 <td style="text-align:right;">
-676
+333
 </td>
 <td style="text-align:right;">
--2683
+-1408
 </td>
 <td style="text-align:right;">
--2682
+-1407
 </td>
 <td style="text-align:right;">
--2633
+-1366
 </td>
 <td style="text-align:right;">
-0.6707
+0.7581
 </td>
 <td style="text-align:right;">
-0.6663
+0.7516
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.9963
+0.9971
 </td>
 <td style="text-align:right;">
-0.1034
+0.81390
 </td>
 </tr>
 <tr>
@@ -892,31 +885,31 @@ Shapiro.p
 20
 </td>
 <td style="text-align:right;">
-666
+323
 </td>
 <td style="text-align:right;">
--2771
+-1580
 </td>
 <td style="text-align:right;">
--2770
+-1577
 </td>
 <td style="text-align:right;">
--2676
+-1499
 </td>
 <td style="text-align:right;">
-0.7188
+0.8617
 </td>
 <td style="text-align:right;">
-0.7107
+0.8535
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.9987
+0.9963
 </td>
 <td style="text-align:right;">
-0.8944
+0.61070
 </td>
 </tr>
 <tr>
@@ -927,31 +920,31 @@ Shapiro.p
 35
 </td>
 <td style="text-align:right;">
-651
+308
 </td>
 <td style="text-align:right;">
--2784
+-1601
 </td>
 <td style="text-align:right;">
--2780
+-1593
 </td>
 <td style="text-align:right;">
--2621
+-1463
 </td>
 <td style="text-align:right;">
-0.7358
+0.8811
 </td>
 <td style="text-align:right;">
-0.7220
+0.8680
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.9973
+0.9908
 </td>
 <td style="text-align:right;">
-0.3237
+0.03029
 </td>
 </tr>
 </tbody>
@@ -1023,161 +1016,161 @@ pander(poly_3_fit, add.significance.stars = TRUE)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="center"><strong>(Intercept)</strong></td>
-<td align="center">0.72</td>
+<td align="center">0.74</td>
 <td align="center">0.00</td>
-<td align="center">600.59</td>
+<td align="center">583.67</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.0</strong></td>
-<td align="center">-0.78</td>
-<td align="center">0.03</td>
-<td align="center">-24.54</td>
+<td align="center">-0.60</td>
+<td align="center">0.02</td>
+<td align="center">-25.78</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.0.0</strong></td>
-<td align="center">-0.23</td>
-<td align="center">0.03</td>
-<td align="center">-7.33</td>
+<td align="center">-0.22</td>
+<td align="center">0.02</td>
+<td align="center">-9.57</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)3.0.0</strong></td>
-<td align="center">0.14</td>
-<td align="center">0.03</td>
-<td align="center">4.44</td>
+<td align="center">0.09</td>
+<td align="center">0.02</td>
+<td align="center">3.69</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.0</strong></td>
-<td align="center">-0.69</td>
-<td align="center">0.03</td>
-<td align="center">-21.97</td>
+<td align="center">-0.60</td>
+<td align="center">0.02</td>
+<td align="center">-25.39</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.1.0</strong></td>
-<td align="center">8.86</td>
-<td align="center">0.83</td>
-<td align="center">10.71</td>
+<td align="center">2.32</td>
+<td align="center">0.43</td>
+<td align="center">5.34</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.1.0</strong></td>
-<td align="center">3.00</td>
-<td align="center">0.83</td>
-<td align="center">3.62</td>
+<td align="center">2.37</td>
+<td align="center">0.43</td>
+<td align="center">5.46</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.2.0</strong></td>
-<td align="center">-0.03</td>
-<td align="center">0.03</td>
-<td align="center">-0.90</td>
-<td align="center">0.37</td>
-<td></td>
+<td align="center">-0.16</td>
+<td align="center">0.02</td>
+<td align="center">-6.65</td>
+<td align="center">0.00</td>
+<td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.2.0</strong></td>
-<td align="center">3.38</td>
-<td align="center">0.83</td>
-<td align="center">4.08</td>
+<td align="center">4.83</td>
+<td align="center">0.43</td>
+<td align="center">11.11</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.3.0</strong></td>
-<td align="center">0.05</td>
-<td align="center">0.03</td>
-<td align="center">1.68</td>
-<td align="center">0.09</td>
+<td align="center">0.04</td>
+<td align="center">0.02</td>
+<td align="center">1.57</td>
+<td align="center">0.12</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.1</strong></td>
-<td align="center">0.45</td>
-<td align="center">0.03</td>
-<td align="center">14.28</td>
+<td align="center">0.31</td>
+<td align="center">0.02</td>
+<td align="center">13.39</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.1</strong></td>
-<td align="center">-6.46</td>
-<td align="center">0.83</td>
-<td align="center">-7.80</td>
+<td align="center">-2.92</td>
+<td align="center">0.43</td>
+<td align="center">-6.73</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.0.1</strong></td>
-<td align="center">3.43</td>
-<td align="center">0.83</td>
-<td align="center">4.14</td>
+<td align="center">2.38</td>
+<td align="center">0.43</td>
+<td align="center">5.47</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.1</strong></td>
-<td align="center">-6.50</td>
-<td align="center">0.83</td>
-<td align="center">-7.85</td>
+<td align="center">-3.60</td>
+<td align="center">0.43</td>
+<td align="center">-8.29</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.1.1</strong></td>
-<td align="center">78.62</td>
-<td align="center">21.68</td>
-<td align="center">3.63</td>
-<td align="center">0.00</td>
-<td>* * *</td>
-</tr>
-<tr class="even">
-<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.2.1</strong></td>
-<td align="center">-0.23</td>
-<td align="center">0.83</td>
-<td align="center">-0.28</td>
-<td align="center">0.78</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.2</strong></td>
-<td align="center">-0.09</td>
-<td align="center">0.03</td>
-<td align="center">-2.76</td>
+<td align="center">21.18</td>
+<td align="center">8.05</td>
+<td align="center">2.63</td>
 <td align="center">0.01</td>
 <td>* *</td>
 </tr>
 <tr class="even">
-<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.2</strong></td>
-<td align="center">0.75</td>
-<td align="center">0.83</td>
-<td align="center">0.90</td>
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.2.1</strong></td>
 <td align="center">0.37</td>
+<td align="center">0.43</td>
+<td align="center">0.86</td>
+<td align="center">0.39</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.2</strong></td>
+<td align="center">-0.04</td>
+<td align="center">0.02</td>
+<td align="center">-1.87</td>
+<td align="center">0.06</td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.2</strong></td>
+<td align="center">0.46</td>
+<td align="center">0.43</td>
+<td align="center">1.07</td>
+<td align="center">0.29</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.2</strong></td>
-<td align="center">-1.59</td>
-<td align="center">0.83</td>
+<td align="center">-0.83</td>
+<td align="center">0.43</td>
 <td align="center">-1.92</td>
 <td align="center">0.06</td>
 <td></td>
 </tr>
 <tr class="even">
 <td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.3</strong></td>
-<td align="center">-0.16</td>
-<td align="center">0.03</td>
-<td align="center">-5.16</td>
+<td align="center">-0.13</td>
+<td align="center">0.02</td>
+<td align="center">-5.47</td>
 <td align="center">0.00</td>
 <td>* * *</td>
 </tr>
@@ -1231,9 +1224,9 @@ for (i in seq_along(coefs)) {
 }
 prettyModel &lt;-  paste(&quot;AUROC =&quot;, gsub(&quot;-&quot;, &quot;- &quot;, prettyModel))
 cat(prettyModel)</code></pre>
-<pre><code>## AUROC = 0.72 - 0.78*RHt - 0.23*RHt^2^ + 0.14*RHt^3^ - 0.69*SDt + 8.86*RHt*SDt + 3*RHt^2^*SDt - 0.03*SDt^2^ + 3.38*RHt*SDt^2^ + 0.05*SDt^3^ + 0.45*Tt - 6.46*RHt*Tt + 3.43*RHt^2^*Tt - 6.5*SDt*Tt + 78.62*RHt*SDt*Tt - 0.23*SDt^2^*Tt - 0.09*Tt^2^ + 0.75*RHt*Tt^2^ - 1.59*SDt*Tt^2^ - 0.16*Tt^3^</code></pre>
+<pre><code>## AUROC = 0.74 - 0.6*RHt - 0.22*RHt^2^ + 0.09*RHt^3^ - 0.6*SDt + 2.32*RHt*SDt + 2.37*RHt^2^*SDt - 0.16*SDt^2^ + 4.83*RHt*SDt^2^ + 0.04*SDt^3^ + 0.31*Tt - 2.92*RHt*Tt + 2.38*RHt^2^*Tt - 3.6*SDt*Tt + 21.18*RHt*SDt*Tt + 0.37*SDt^2^*Tt - 0.04*Tt^2^ + 0.46*RHt*Tt^2^ - 0.83*SDt*Tt^2^ - 0.13*Tt^3^</code></pre>
 <pre class="r"><code>rm(processPolyNames, coefs, prettyNames)</code></pre>
-<p>AUROC = 0.72 - 0.78<em>RHt - 0.23</em>RHt<sup>2</sup> + 0.14<em>RHt<sup>3</sup> - 0.69</em>SDt + 8.86<em>RHt</em>SDt + 3<em>RHt<sup>2</sup></em>SDt - 0.03<em>SDt<sup>2</sup> + 3.38</em>RHt<em>SDt<sup>2</sup> + 0.05</em>SDt<sup>3</sup> + 0.45<em>Tt - 6.46</em>RHt<em>Tt + 3.43</em>RHt<sup>2</sup><em>Tt - 6.5</em>SDt<em>Tt + 78.62</em>RHt<em>SDt</em>Tt - 0.23<em>SDt<sup>2</sup></em>Tt - 0.09<em>Tt<sup>2</sup> + 0.75</em>RHt<em>Tt<sup>2</sup> - 1.59</em>SDt<em>Tt<sup>2</sup> - 0.16</em>Tt<sup>3</sup></p>
+<p>AUROC = 0.74 - 0.6<em>RHt - 0.22</em>RHt<sup>2</sup> + 0.09<em>RHt<sup>3</sup> - 0.6</em>SDt + 2.32<em>RHt</em>SDt + 2.37<em>RHt<sup>2</sup></em>SDt - 0.16<em>SDt<sup>2</sup> + 4.83</em>RHt<em>SDt<sup>2</sup> + 0.04</em>SDt<sup>3</sup> + 0.31<em>Tt - 2.92</em>RHt<em>Tt + 2.38</em>RHt<sup>2</sup><em>Tt - 3.6</em>SDt<em>Tt + 21.18</em>RHt<em>SDt</em>Tt + 0.37<em>SDt<sup>2</sup></em>Tt - 0.04<em>Tt<sup>2</sup> + 0.46</em>RHt<em>Tt<sup>2</sup> - 0.83</em>SDt<em>Tt<sup>2</sup> - 0.13</em>Tt<sup>3</sup></p>
 </div>
 <div id="surface-plot-of-model-fits" class="section level3">
 <h3>Surface plot of model fits</h3>
@@ -1255,8 +1248,8 @@ par_cut &lt;- data.frame(
   SDt = c(-3, 0, +3, rep(0, 6))
 )
 
-plot_ls &lt;- list()
 
+plot_ls &lt;- list()
 for (i in seq(nrow(par_cut))) {
   persp(
     poly_3_fit,
@@ -1279,20 +1272,19 @@ for (i in seq(nrow(par_cut))) {
     },
     col = color_var,
     zlim = c(z_min, z_max),
-    theta = 37,
+    theta = if(i %in% c(1:6)){37}else{ 127},
     phi = 10,
     border = &quot;grey15&quot;,
     lwd = 0.5,
     cex.main = 1.8,
     cex.axis = 1.06,
     cex.lab = 1.8,
-    main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;, 
+    main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;,
                   &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C, &quot;,
                    &quot;\n&quot;,
                   &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%, &quot;,
                   &quot;and SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
                   )
-    
   )
 }</code></pre>
 <p><img src="figures/persp-1.png" width="960" /></p>
