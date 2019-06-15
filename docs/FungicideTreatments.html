@@ -840,7 +840,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 },
 cl = cl)
 begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -4.582812 secs</code></pre>
+<pre><code>## Time difference of -4.547409 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;-
@@ -1130,6 +1130,7 @@ Summary &lt;- function(x) {
   )
 }
 
+p1 &lt;- 
 dosedf %&gt;%
   dplyr::select(-(&quot;treat_week&quot;)) %&gt;%
   reshape2::melt(id = &quot;year_var&quot;,
@@ -1166,7 +1167,7 @@ dosedf %&gt;%
     vjust = -0.3,
     color = &quot;black&quot;,
     position = position_dodge(0.9),
-    size = 2.7
+    size = 2.9
   ) +
   scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
   theme_article() +
@@ -1178,11 +1179,12 @@ dosedf %&gt;%
     axis.title = element_text(size = 11),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.text = element_text(size = 11),
+    axis.text = element_text(size = 9),
     legend.position = &quot;top&quot;,
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
-  )</code></pre>
+  )
+p1</code></pre>
 <p><img src="images/unnamed-chunk-9-1.png" width="672" /></p>
 <p>Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.</p>
 <pre class="r"><code>SummaryTwo &lt;- function(x) {
@@ -1195,7 +1197,7 @@ dosedf %&gt;%
     max = max(x)
   )
 }
-
+p2 &lt;- 
 dosedf %&gt;%
   dplyr::select(-(&quot;treat_week&quot;)) %&gt;%
   reshape2::melt(id = &quot;year_var&quot;,
@@ -1243,12 +1245,21 @@ dosedf %&gt;%
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     axis.text = element_text(size = 11),
-    legend.position = c(0.35, 0.85),
+    legend.position = &quot;none&quot;,
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
   )  +
-  coord_equal(6 / 1)</code></pre>
+  coord_equal(6 / 1)
+  p2 +
+    theme(legend.position = c(0.35, 0.85))</code></pre>
 <p><img src="images/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>p2 &lt;- 
+p2+
+  labs(x = &quot;Overall&quot;, y= &quot;&quot;)+
+  theme(axis.text = element_blank(),
+        axis.ticks.y = element_blank())
+ggarrange(p1, p2, ncol = 2, widths = c(10,1))</code></pre>
+<p><img src="images/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.6.0 (2019-04-26)

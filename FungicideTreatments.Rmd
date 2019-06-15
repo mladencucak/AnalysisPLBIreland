@@ -692,6 +692,7 @@ Summary <- function(x) {
   )
 }
 
+p1 <- 
 dosedf %>%
   dplyr::select(-("treat_week")) %>%
   reshape2::melt(id = "year_var",
@@ -728,7 +729,7 @@ dosedf %>%
     vjust = -0.3,
     color = "black",
     position = position_dodge(0.9),
-    size = 2.7
+    size = 2.9
   ) +
   scale_fill_brewer("Model", palette = "Dark2") +
   theme_article() +
@@ -740,11 +741,12 @@ dosedf %>%
     axis.title = element_text(size = 11),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.text = element_text(size = 11),
+    axis.text = element_text(size = 9),
     legend.position = "top",
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
   )
+p1
 ```
   
 Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.
@@ -760,7 +762,7 @@ SummaryTwo <- function(x) {
     max = max(x)
   )
 }
-
+p2 <- 
 dosedf %>%
   dplyr::select(-("treat_week")) %>%
   reshape2::melt(id = "year_var",
@@ -808,11 +810,22 @@ dosedf %>%
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     axis.text = element_text(size = 11),
-    legend.position = c(0.35, 0.85),
+    legend.position = "none",
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
   )  +
   coord_equal(6 / 1)
+  p2 +
+    theme(legend.position = c(0.35, 0.85))
+```
+
+```{r}
+p2 <- 
+p2+
+  labs(x = "Overall", y= "")+
+  theme(axis.text = element_blank(),
+        axis.ticks.y = element_blank())
+ggarrange(p1, p2, ncol = 2, widths = c(10,1))
 ```
 
 
