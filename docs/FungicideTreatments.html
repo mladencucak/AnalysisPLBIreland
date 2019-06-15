@@ -11,7 +11,7 @@
 
 
 
-<title>Evaluation of Irish Rules Model</title>
+<title>FungicideTreatments.utf8.md</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,7 +23,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -266,14 +265,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 
 
@@ -451,17 +442,8 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
-
-<h1 class="title toc-ignore">Evaluation of Irish Rules Model</h1>
 
 </div>
 
@@ -470,12 +452,12 @@ div.tocify {
 <h1>Libraries</h1>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
-  c(
+  c(   
     &quot;tidyverse&quot;,
     &quot;readxl&quot;,
     &quot;data.table&quot;,
     &quot;lubridate&quot;,
-    &quot;knitr&quot;, 
+    &quot;knitr&quot;,
     &quot;padr&quot;,
     &quot;readr&quot;,
     &quot;devtools&quot;,
@@ -486,13 +468,12 @@ div.tocify {
     &quot;ggrepel&quot;,
     &quot;ggthemes&quot;,
     &quot;egg&quot;,
-    &quot;rsm&quot;,
-    &quot;GGally&quot;,
     &quot;R.utils&quot;,
     &quot;rcompanion&quot;,
     &quot;mgsub&quot;,
     &quot;here&quot;,
     &quot;stringr&quot;,
+    &quot;kableExtra&quot;,
     &quot;pander&quot;
   )
 
@@ -503,16 +484,12 @@ new.packages &lt;-
 if (length(new.packages))
   install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
-if (!&quot;gt&quot; %in% installed.packages())
-  remotes::install_github(&quot;rstudio/gt&quot;)
-
-list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
 packages_load &lt;-
   lapply(list.of.packages, require, character.only = TRUE)
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(&quot;Package/s&quot;, list.of.packages[!(packages_load)], &quot;not loaded!&quot;)
+  warning(paste(&quot;Package/s: &quot;, paste(list.of.packages[packages_load != TRUE], sep = &quot;, &quot;), &quot;not loaded!&quot;))
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -564,23 +541,22 @@ dates_cut &lt;-
     pl_date &lt;- x[match(3, criteria_sum) + 1, &quot;date&quot;]
     data.frame(&quot;year&quot; = unique(year(x$date)),
                date = pl_date[1, 1])
-    }) %&gt;% 
+  }) %&gt;%
   bind_rows() %&gt;%
   rename(&quot;plant_date&quot;  = date)
 rm(soildf, dfls)</code></pre>
 <p>The data for 2007 is missing so we shall use the mean date from other years.</p>
 <pre class="r"><code>dates_cut$plant_doy &lt;- yday(dates_cut$plant_date)
 dates_cut &lt;-
-  bind_rows(list(
-    dates_cut,
-    data.frame(
-      year = 2007,
-      plant_date = as.Date(strptime(paste(
-        &quot;2007&quot;, mean(dates_cut$plant_doy, na.rm = TRUE)
-      ), format = &quot;%Y %j&quot;)),
-      plant_doy = mean(dates_cut$plant_doy)
-    )
-  ))</code></pre>
+  bind_rows(
+    list(
+      dates_cut,
+      data.frame(
+        year = 2007,
+        plant_date = as.Date(strptime(paste(&quot;2007&quot;, mean(dates_cut$plant_doy, na.rm = TRUE)), format = &quot;%Y %j&quot;)),
+        plant_doy = mean(dates_cut$plant_doy)
+      )
+    ))</code></pre>
 <p>We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows.</p>
 <pre class="r"><code>meet_in_rows &lt;- 5 * 7
 dates_cut$prot_start &lt;- with(dates_cut, plant_doy + meet_in_rows)
@@ -740,7 +716,8 @@ df &lt;-  dplyr::rename(df,
     
     trt_df_one &lt;-  bind_rows(trt_df_one)
     trt_df_one &lt;-  bind_cols(trt_df[&quot;year_var&quot;], trt_df_one)
-    
+
+   
     #####################################################################
     #Calculate the number of treatments with 5-10 day sliding treatment interval
     TreatmentWindow &lt;-
@@ -789,13 +766,18 @@ df &lt;-  dplyr::rename(df,
         y
       }
     
+    #If the threshold is reached twive within a single day reset the value to 1 to enable the counter
+    trt_df[, grep(&quot;ir&quot;, colnames(trt_df))] &lt;-
+      lapply(trt_df[, grep(&quot;ir&quot;, colnames(trt_df))], function(x)
+        ifelse(x &gt; 1, 1, x))    
+    
     trt_df_window &lt;-
       split(trt_df, trt_df$year_var)
     
+    # Calculate number of treatments per year
     for (year in seq_along(trt_df_window)) {
       x &lt;- trt_df_window[[year]]
       trt_df_window[[year]] &lt;-
-        
         lapply(x[grep(&quot;ir&quot;, colnames(x))], function(x)
           TreatmentWindow(x, min_prot_dur, max_prot_dur)) %&gt;%
         bind_cols() %&gt;%
@@ -818,10 +800,10 @@ df &lt;-  dplyr::rename(df,
     
     return(sum_df)
   }</code></pre>
-<p>Calculate the number of treatments for each warning threshold (EBH).</p>
-<pre class="r"><code># this chunk not evaluated
-#select max warning threshold
+<p>Calculate the number of treatments for each warning threshold (EBH). Once again, we will use power of paralell processing for this task.</p>
+<pre class="r"><code>#select max warning threshold
 warning_thresholds &lt;- 1:18
+
 begin &lt;- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
 cores &lt;- ifelse(detectCores() &gt; 1, detectCores() - 1, 1)
@@ -858,7 +840,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 },
 cl = cl)
 begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -6.218324 secs</code></pre>
+<pre><code>## Time difference of -4.582812 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;-
@@ -974,11 +956,9 @@ control_eval_long %&gt;%
     color = &quot;gray&quot;,
     linetype = &quot;solid&quot;
   ) +
-  # geom_boxplot(width = 0.4, show.legend=FALSE) +
   geom_jitter(
     aes(color = Years),
     position = position_jitter(width = 0.1),
-    # colour = &quot;black&quot;,
     alpha = 0.6,
     size = 1
   ) +
@@ -988,16 +968,14 @@ control_eval_long %&gt;%
     aes(14, calendar_seven + 0.8 , label = &quot;7-day freq.&quot;),
     colour = gray.colors(2)[1],
     fill = NA,
-    label.size = NA,
-    size = 4
+    label.size = NA
   ) +
   geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_five + 0.8, label = &quot;5-day freq.&quot;),
     colour = gray.colors(2)[1],
     fill = NA,
-    label.size = NA,
-    size = 4
+    label.size = NA
   ) +
   geom_smooth(method = &quot;loess&quot;,
               se = FALSE,
@@ -1015,7 +993,6 @@ control_eval_long %&gt;%
 <p>The figure shows how does the frequency of recommended treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.</p>
 <p>There is variation in the data and it would be interesting to see if there is an effect of year.</p>
 <pre class="r"><code>control_eval_long %&gt;%
-  # control_eval_long%&gt;%
   mutate(programme = ifelse(
     programme == &quot;ir&quot;,
     &quot;Default IR&quot;,
@@ -1047,7 +1024,7 @@ control_eval_long %&gt;%
       &quot;Optimised IR 5-10d&quot;,
       &quot;Low Risk IR 5-10d&quot;
     )
-  )) %&gt;%
+  )) %&gt;% 
   mutate(Years = factor(year_var)) %&gt;%
   ggplot(.,
          aes(
@@ -1069,7 +1046,7 @@ control_eval_long %&gt;%
     linetype = &quot;solid&quot;
   ) +
   geom_line(aes()) +
-  geom_line(aes(warning_thres, 12), colour = gray.colors(2)[1]) +
+  geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_seven + 0.8 , label = &quot;7-day freq.&quot;),
     colour = gray.colors(2)[1],
@@ -1077,7 +1054,7 @@ control_eval_long %&gt;%
     label.size = NA,
     size = 3
   ) +
-  geom_line(aes(warning_thres, 17), colour = gray.colors(2)[1]) +
+  geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_five + 0.8, label = &quot;5-day freq.&quot;),
     colour = gray.colors(2)[1],
@@ -1085,7 +1062,7 @@ control_eval_long %&gt;%
     label.size = NA,
     size = 3
   ) +
-  facet_wrap( ~ Years, ncol = 5) +
+  facet_wrap(~ Years, ncol = 5) +
   ggtitle(&quot;Treatment Frequency as a Factor the Decision Threshold&quot;) +
   theme(strip.text.y = element_blank()) +
   xlab(&quot;Warning thresholds (EBH)&quot;) +
@@ -1193,7 +1170,7 @@ dosedf %&gt;%
   ) +
   scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
   theme_article() +
-  facet_grid( ~ year_var, scales = &quot;free&quot;) +
+  facet_grid(~ year_var, scales = &quot;free&quot;) +
   scale_y_continuous(limits = c(0, 1)) +
   labs(x = &quot;Year&quot;,
        y = &quot;Dose Reduction\n&quot;) +
@@ -1207,7 +1184,7 @@ dosedf %&gt;%
     axis.ticks.x = element_blank()
   )</code></pre>
 <p><img src="images/unnamed-chunk-9-1.png" width="672" /></p>
-<p>Now let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.</p>
+<p>Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.</p>
 <pre class="r"><code>SummaryTwo &lt;- function(x) {
   data.frame(
     n = length(x),
@@ -1292,49 +1269,47 @@ dosedf %&gt;%
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] gt_0.1.0          pander_0.6.3      here_0.1         
+##  [1] pander_0.6.3      kableExtra_1.1.0  here_0.1         
 ##  [4] mgsub_1.7.1       rcompanion_2.1.7  R.utils_2.8.0    
-##  [7] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
-## [10] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-## [13] ggthemes_4.1.1    ggrepel_0.8.0     pbapply_1.4-0    
-## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
-## [19] devtools_2.0.2    padr_0.4.2        knitr_1.22       
-## [22] lubridate_1.7.4   data.table_1.12.2 readxl_1.3.1     
-## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.1      
-## [28] purrr_0.3.2       readr_1.3.1       tidyr_0.8.3      
-## [31] tibble_2.1.1      ggplot2_3.1.1     tidyverse_1.2.1  
+##  [7] R.oo_1.22.0       R.methodsS3_1.7.1 egg_0.4.2        
+## [10] gridExtra_2.3     ggthemes_4.1.1    ggrepel_0.8.0    
+## [13] pbapply_1.4-0     remotes_2.0.4     pracma_2.2.5     
+## [16] usethis_1.5.0     devtools_2.0.2    padr_0.4.2       
+## [19] knitr_1.22        lubridate_1.7.4   data.table_1.12.2
+## [22] readxl_1.3.1      forcats_0.4.0     stringr_1.4.0    
+## [25] dplyr_0.8.1       purrr_0.3.2       readr_1.3.1      
+## [28] tidyr_0.8.3       tibble_2.1.1      ggplot2_3.1.1    
+## [31] tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] TH.data_1.0-10     colorspace_1.4-1   modeltools_0.2-22 
-##  [4] rprojroot_1.3-2    estimability_1.3   fs_1.3.0          
-##  [7] rstudioapi_0.10    manipulate_1.0.1   mvtnorm_1.0-10    
-## [10] coin_1.3-0         xml2_1.2.0         codetools_0.2-15  
-## [13] splines_3.6.0      libcoin_1.0-4      pkgload_1.0.2     
-## [16] jsonlite_1.6       broom_0.5.2        compiler_3.6.0    
-## [19] httr_1.4.0         emmeans_1.3.4      backports_1.1.4   
-## [22] assertthat_0.2.1   Matrix_1.2-14      lazyeval_0.2.2    
-## [25] cli_1.1.0          htmltools_0.3.6    prettyunits_1.0.2 
-## [28] tools_3.6.0        coda_0.19-2        gtable_0.3.0      
-## [31] glue_1.3.1         reshape2_1.4.3     Rcpp_1.0.1        
-## [34] cellranger_1.1.0   nlme_3.1-137       lmtest_0.9-37     
-## [37] xfun_0.6           ps_1.3.0           testthat_2.1.1    
-## [40] rvest_0.3.3        MASS_7.3-50        zoo_1.8-5         
-## [43] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
-## [46] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
-## [49] memoise_1.1.0      sass_0.1.0.9000    EMT_1.1           
-## [52] reshape_0.8.8      stringi_1.4.3      desc_1.2.0        
-## [55] nortest_1.0-4      checkmate_1.9.3    boot_1.3-20       
-## [58] pkgbuild_1.0.3     commonmark_1.7     rlang_0.3.4       
-## [61] pkgconfig_2.0.2    matrixStats_0.54.0 evaluate_0.13     
-## [64] lattice_0.20-35    labeling_0.3       processx_3.3.0    
-## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
-## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
-## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.0      
-## [76] haven_2.1.0        foreign_0.8-70     withr_2.1.2       
-## [79] survival_2.42-3    modelr_0.1.4       crayon_1.3.4      
-## [82] rmarkdown_1.12.6   grid_3.6.0         callr_3.2.0       
-## [85] digest_0.6.19      xtable_1.8-4       stats4_3.6.0      
-## [88] munsell_0.5.0      sessioninfo_1.1.1</code></pre>
+##  [4] rprojroot_1.3-2    fs_1.3.0           rstudioapi_0.10   
+##  [7] manipulate_1.0.1   mvtnorm_1.0-10     coin_1.3-0        
+## [10] xml2_1.2.0         codetools_0.2-15   splines_3.6.0     
+## [13] libcoin_1.0-4      pkgload_1.0.2      jsonlite_1.6      
+## [16] broom_0.5.2        compiler_3.6.0     httr_1.4.0        
+## [19] backports_1.1.4    assertthat_0.2.1   Matrix_1.2-14     
+## [22] lazyeval_0.2.2     cli_1.1.0          htmltools_0.3.6   
+## [25] prettyunits_1.0.2  tools_3.6.0        gtable_0.3.0      
+## [28] glue_1.3.1         reshape2_1.4.3     Rcpp_1.0.1        
+## [31] cellranger_1.1.0   nlme_3.1-137       lmtest_0.9-37     
+## [34] xfun_0.6           ps_1.3.0           testthat_2.1.1    
+## [37] rvest_0.3.3        MASS_7.3-50        zoo_1.8-5         
+## [40] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
+## [43] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
+## [46] memoise_1.1.0      EMT_1.1            stringi_1.4.3     
+## [49] desc_1.2.0         nortest_1.0-4      boot_1.3-20       
+## [52] pkgbuild_1.0.3     rlang_0.3.4        pkgconfig_2.0.2   
+## [55] matrixStats_0.54.0 evaluate_0.13      lattice_0.20-35   
+## [58] labeling_0.3       processx_3.3.0     tidyselect_0.2.5  
+## [61] plyr_1.8.4         magrittr_1.5       R6_2.4.0          
+## [64] DescTools_0.99.28  generics_0.0.2     multcompView_0.1-7
+## [67] multcomp_1.4-10    pillar_1.4.0       haven_2.1.0       
+## [70] foreign_0.8-70     withr_2.1.2        survival_2.42-3   
+## [73] modelr_0.1.4       crayon_1.3.4       rmarkdown_1.12.6  
+## [76] grid_3.6.0         callr_3.2.0        digest_0.6.19     
+## [79] webshot_0.5.1      stats4_3.6.0       munsell_0.5.0     
+## [82] viridisLite_0.3.0  sessioninfo_1.1.1</code></pre>
 </div>
 
 

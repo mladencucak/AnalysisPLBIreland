@@ -1,6 +1,6 @@
 % Data
 
-We present the dataset we are working on in this section. An interested reader can get a sense of the location, the weather and the blight related weather conditions and the disease outbreak data.    
+We present the dataset we are working on in this section. An interested reader can get a sense of the location, the weather and the blight related weather conditions and the disease outbreak data.   
 
 # Libraries
 
@@ -55,6 +55,7 @@ list.of.packages <-
     "ggridges",
     "lubridate",
     "RColorBrewer",
+    "kableExtra",
     "egg"
   )
 
@@ -65,16 +66,12 @@ new.packages <-
 if (length(new.packages))
   install.packages(new.packages)
 
-if ("gt" %in% installed.packages() == FALSE)
-  remotes::install_github("rstudio/gt")
-
-list.of.packages <- c(list.of.packages, "gt")
 packages_load <-
   lapply(list.of.packages, require, character.only = TRUE)
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+  warning(paste("Package/s: ", paste(list.of.packages[packages_load != TRUE], sep = ", "), "not loaded!"))
 } else {
   print("All packages were successfully loaded.")
 }

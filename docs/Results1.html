@@ -451,8 +451,7 @@ div.tocify {
 
 <div id="parameter-evaluation" class="section level1">
 <h1>Parameter evaluation</h1>
-<p>Here we present the results of the sensitivity analysis.<br />
-<em>Note</em>: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).</p>
+<p>Here we present the results of the sensitivity analysis.</p>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -476,7 +475,8 @@ div.tocify {
     &quot;rsm&quot;,
     &quot;ggrepel&quot;,
     &quot;cowplot&quot;,
-    &quot;viridis&quot;
+    &quot;viridis&quot;,
+    &quot;kableExtra&quot;
   )
 
 new.packages &lt;-
@@ -491,7 +491,7 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(&quot;Package/s&quot;, list.of.packages[!(packages_load)], &quot;not loaded!&quot;)
+  warning(paste(&quot;Package/s: &quot;, paste(list.of.packages[packages_load != TRUE], sep = &quot;, &quot;), &quot;not loaded!&quot;))
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
@@ -949,7 +949,7 @@ Shapiro.p
 </tr>
 </tbody>
 </table>
-<p>The cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data to understand underlying relationships between variable thresholds of our model. Hence, our priority is the increase in explanatory power, for which our main guide is adjusted R<sup>2</sup>, while the distribution of residuals is still fulfilling the assumption of normality. The model of 4<sup>th</sup> order seems to provide very little gain in terms of fit using Adj. R<sup>2</sup> comparing to 3<sup>rd</sup> order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4<sup>th</sup> order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data.</p>
+<p>Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R<sup>2</sup>, while the distribution of residuals is still fulfilling the assumption of normality. Model of 4<sup>th</sup> order seems to provide very little gain in terms of fit Adj. R<sup>2</sup> comparing to 3<sup>rd</sup> order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4<sup>th</sup> order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data.</p>
 <p>Looking at the concordance between local regression (LOESS) and polynomial models, we have:</p>
 <pre class="r"><code>pred_cd_data &lt;-
   data.frame(
@@ -1334,12 +1334,8 @@ for (i in seq(nrow(par_cut))) {
 </div>
 <div id="further-investigation" class="section level3">
 <h3>Further investigation</h3>
-<p>Based on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:</p>
-<pre class="r"><code># fig.width=5, fig.height=5,
-# par(
-#     mfrow = c(1, 4)
-#   )
-#Load function and the data
+<p>BaseBased on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:</p>
+<pre class="r"><code>#Load function and the data
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;AUROC_data.RData&quot;))
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;PlotROC.RData&quot;))

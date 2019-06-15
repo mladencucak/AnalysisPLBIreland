@@ -1,9 +1,8 @@
 % Analysis
 
 Here we present the model and the methodology used in the analysis.  
-*Note*: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).  
 
-## Libraries
+# Libraries
 
 ```{r opts, echo = FALSE}
 knitr::opts_chunk$set(
@@ -41,25 +40,18 @@ list.of.packages <-
   c(
     "tidyverse",
     "readxl",
-    "data.table",
-    "knitr",
-    "padr",
-    "devtools",
     "pracma",
     "remotes",
     "parallel",
     "pbapply",
-    "ggrepel",
-    "ggthemes",
-    "egg",
-    "rsm",
-    "GGally",
     "R.utils",
     "rcompanion",
     "mgsub",
     "here",
     "stringr",
-    "pander"
+    "pander",
+    "tools",
+    "kableExtra"
   )
 
 new.packages <-
@@ -78,14 +70,14 @@ packages_load <-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste("Package/s", paste(list.of.packages[packages_load != TRUE]), "not loaded!"))
+  warning(paste("Package/s: ", paste(list.of.packages[packages_load != TRUE], sep = ", "), "not loaded!"))
 } else {
   print("All packages were successfully loaded.")
 }
 rm(list.of.packages, new.packages, packages_load)
 ```
 
-## The Model
+# The Model
 
 According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:   
  * **Sporulation period** is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;  
@@ -96,7 +88,13 @@ Implementation of the model.
 IrishRulesModel <- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
-
+#' Irish Rules
+#'
+#' This function calculates potatolate blight risk using Irish Rules model (Bourke, 1953)
+#' @param weather The weather data in formated as data frame
+#' @param infill_gap Maximum alowed gap for missing value interpolation
+#' @keywords Irish Rules
+#'
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
   wet_before <- 3
@@ -215,11 +213,10 @@ IrishRulesModel <- function(weather,
     }
     head(risk, -20) #remove last 20 values that were added to vectors to prevent "Out of bounds" issue
   }
-  
 }
 ```
   
-## Bio dates  
+# Bio dates  
 Emergence takes around 3 weeks under Irish conditions. Period when healthy host present is considered to last  from emergence until 14 days prior to the first observation of the disease in the field. A 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.  
 ```{r epidemic-initiation, fig.align='center'}
 #Get subsets of data for period before the epidemics were initiated
@@ -245,7 +242,9 @@ dates_cut <- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 
 rownames(dates_cut) <- NULL
 
 dates_cut %>% 
-  rename_all(. %>% capitalize() %>% gsub("_", " ", .)) %>% 
+  rename_all(. %>%
+               gsub("_", " ", .) %>% 
+               tools::toTitleCase()) %>% 
   kable(format = "html") %>% 
   kableExtra::kable_styling( latex_options = "striped",full_width = FALSE)
 ```
@@ -257,7 +256,7 @@ The set of the most important variables of Irish rules model is evaluated. The E
 #read in parameters
 parameters <-
   read_excel(here::here("data", "op_2007_16", "raw", "par.xlsx"), sheet = "par")
-parameters %>% kable() %>% kableExtra::kable_styling(latex_options = "striped",full_width = FALSE)
+parameters 
 ```
 
 
@@ -333,6 +332,15 @@ SensParametersCalc <-
            weather_data,
            dates_cut,
            prot_duration = NULL) {
+#' Sensitivity analysis
+#'
+#' The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
+#' @param y Decision threeshold (EBH). 
+#' @param weather_data The weather data  formated as a data frame, containing outputs of all model runs with different parameters. 
+#' @param dates_cut Dates defining the the periods of evaulation. Specificity is calculated for the period from planting date to warning date. Sensitivity is calculated for the period from -14 to -4 days before the disease is observed in the field. 
+#' @param prot_duration Each time the warning threshold is reached during the period from planting date to warning date, one treatment is assumed, which would provide protedtion for indicated number of days.
+#'
+
     #Set the warning threshold and run the rest of the script
     warning_threshold <- y
     #data
@@ -474,10 +482,10 @@ This function was applied to output of each variation of the model with varying 
 warning_thresholds <- 1:18
 begin <- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
-cores <- ifelse(detectCores() > 1, detectCores()-1, 1) 
-cl <- makeCluster(cores)
-clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
-clusterEvalQ(cl, library("tidyverse"))
+cores <- ifelse(parallel::detectCores() > 1, parallel::detectCores()-1, 1)
+cl <- parallel::makeCluster(cores)
+parallel::clusterExport(cl, c("OP", "dates_cut", "SensParametersCalc"))
+parallel::clusterEvalQ(cl, library("tidyverse"))
   ROC <- pbapply::pblapply(warning_thresholds, function(x)
   {
     xx <- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
@@ -485,8 +493,8 @@ clusterEvalQ(cl, library("tidyverse"))
   },
   cl = cl
   )
-begin- Sys.time() #check the duration of the process in the console
-stopCluster(cl)
+begin - Sys.time() #check the duration of the process in the console
+parallel::stopCluster(cl)
 ```
 
 Rather, the results of calculations from a prior run can be directly loaded.

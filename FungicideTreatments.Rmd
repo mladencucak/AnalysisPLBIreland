@@ -1,9 +1,3 @@
----
-title: "Evaluation of Irish Rules Model"
-output:
-  html_document:
-    code_folding: hide
----
 
 # Libraries
 
@@ -11,18 +5,41 @@ output:
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
+knitr::knit_hooks$set(
+  source = function(x, options) {
+    hook.r = function(x, options) {
+      fence <- "```"
+      language = tolower(options$engine)
+      if (language == 'node') language = 'javascript'
+      if (!options$highlight) language = 'text'
+      if(!is.null(options$foldcode)) {
+      paste0('\n\n', "<details><summary>The code</summary>\n", fence, language, '\n', x, fence,  '\n\n', "</details>\n")
+      } else {
+              paste0('\n\n', fence, language, '\n', x, fence,  '\n\n')
+      }
+    }
+    x = knitr:::hilight_source(x, 'markdown', options)
+    hook.r(
+      paste(c(
+        x, 
+        ''
+      ), collapse = '\n'), 
+      options
+    )
+  }
+)
 ```
 
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
 
 ```{r setup, message=FALSE, warning=FALSE}
 list.of.packages <-
-  c(
+  c(   
     "tidyverse",
     "readxl",
     "data.table",
     "lubridate",
-    "knitr", 
+    "knitr",
     "padr",
     "readr",
     "devtools",
@@ -33,13 +50,12 @@ list.of.packages <-
     "ggrepel",
     "ggthemes",
     "egg",
-    "rsm",
-    "GGally",
     "R.utils",
     "rcompanion",
     "mgsub",
     "here",
     "stringr",
+    "kableExtra",
     "pander"
   )
 
@@ -50,19 +66,16 @@ new.packages <-
 if (length(new.packages))
   install.packages(new.packages, force = TRUE, dependencies = TRUE)
 
-if (!"gt" %in% installed.packages())
-  remotes::install_github("rstudio/gt")
-
-list.of.packages <- c(list.of.packages, "gt")
 packages_load <-
   lapply(list.of.packages, require, character.only = TRUE)
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning("Package/s", list.of.packages[!(packages_load)], "not loaded!")
+  warning(paste("Package/s: ", paste(list.of.packages[packages_load != TRUE], sep = ", "), "not loaded!"))
 } else {
   print("All packages were successfully loaded.")
 }
+
 rm(list.of.packages, new.packages, packages_load)
 ```
 
@@ -116,7 +129,7 @@ dates_cut <-
     pl_date <- x[match(3, criteria_sum) + 1, "date"]
     data.frame("year" = unique(year(x$date)),
                date = pl_date[1, 1])
-    }) %>% 
+  }) %>%
   bind_rows() %>%
   rename("plant_date"  = date)
 rm(soildf, dfls)
@@ -127,16 +140,15 @@ The data for 2007 is missing so we shall use the mean date from other years.
 ```{r missingyear_soiltemp, warning=FALSE}
 dates_cut$plant_doy <- yday(dates_cut$plant_date)
 dates_cut <-
-  bind_rows(list(
-    dates_cut,
-    data.frame(
-      year = 2007,
-      plant_date = as.Date(strptime(paste(
-        "2007", mean(dates_cut$plant_doy, na.rm = TRUE)
-      ), format = "%Y %j")),
-      plant_doy = mean(dates_cut$plant_doy)
-    )
-  ))
+  bind_rows(
+    list(
+      dates_cut,
+      data.frame(
+        year = 2007,
+        plant_date = as.Date(strptime(paste("2007", mean(dates_cut$plant_doy, na.rm = TRUE)), format = "%Y %j")),
+        plant_doy = mean(dates_cut$plant_doy)
+      )
+    ))
 ```
   
 We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows. 
@@ -212,6 +224,7 @@ Calculate the number of calendar treatments, assuming they would start 5 weeks a
 We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Minimum period until the next treatment is 5 days. Cumulative sum of recommended treatments is calculated per season.  
   
 ```{r treatment-calc}
+
 ControlFreqFun <-
   function(y,
            weather_data,
@@ -310,7 +323,8 @@ ControlFreqFun <-
     
     trt_df_one <-  bind_rows(trt_df_one)
     trt_df_one <-  bind_cols(trt_df["year_var"], trt_df_one)
-    
+
+   
     #####################################################################
     #Calculate the number of treatments with 5-10 day sliding treatment interval
     TreatmentWindow <-
@@ -359,13 +373,18 @@ ControlFreqFun <-
         y
       }
     
+    #If the threshold is reached twive within a single day reset the value to 1 to enable the counter
+    trt_df[, grep("ir", colnames(trt_df))] <-
+      lapply(trt_df[, grep("ir", colnames(trt_df))], function(x)
+        ifelse(x > 1, 1, x))    
+    
     trt_df_window <-
       split(trt_df, trt_df$year_var)
     
+    # Calculate number of treatments per year
     for (year in seq_along(trt_df_window)) {
       x <- trt_df_window[[year]]
       trt_df_window[[year]] <-
-        
         lapply(x[grep("ir", colnames(x))], function(x)
           TreatmentWindow(x, min_prot_dur, max_prot_dur)) %>%
         bind_cols() %>%
@@ -390,12 +409,12 @@ ControlFreqFun <-
   }
 ```
 
-Calculate the number of treatments for each warning threshold (EBH).
+Calculate the number of treatments for each warning threshold (EBH). Once again, we will use power of paralell processing for this task. 
 
 ```{r apply-sense-spec-calc}
-# this chunk not evaluated
 #select max warning threshold
 warning_thresholds <- 1:18
+
 begin <- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
 cores <- ifelse(detectCores() > 1, detectCores() - 1, 1)
@@ -485,11 +504,9 @@ control_eval_long %>%
     color = "gray",
     linetype = "solid"
   ) +
-  # geom_boxplot(width = 0.4, show.legend=FALSE) +
   geom_jitter(
     aes(color = Years),
     position = position_jitter(width = 0.1),
-    # colour = "black",
     alpha = 0.6,
     size = 1
   ) +
@@ -499,16 +516,14 @@ control_eval_long %>%
     aes(14, calendar_seven + 0.8 , label = "7-day freq."),
     colour = gray.colors(2)[1],
     fill = NA,
-    label.size = NA,
-    size = 4
+    label.size = NA
   ) +
   geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_five + 0.8, label = "5-day freq."),
     colour = gray.colors(2)[1],
     fill = NA,
-    label.size = NA,
-    size = 4
+    label.size = NA
   ) +
   geom_smooth(method = "loess",
               se = FALSE,
@@ -530,7 +545,6 @@ There is variation in the data and it would be interesting to see if there is an
 
 ```{r plot_years, warning=F, fig.align="center", fig.dim= c(11,9)}
 control_eval_long %>%
-  # control_eval_long%>%
   mutate(programme = ifelse(
     programme == "ir",
     "Default IR",
@@ -562,7 +576,7 @@ control_eval_long %>%
       "Optimised IR 5-10d",
       "Low Risk IR 5-10d"
     )
-  )) %>%
+  )) %>% 
   mutate(Years = factor(year_var)) %>%
   ggplot(.,
          aes(
@@ -584,7 +598,7 @@ control_eval_long %>%
     linetype = "solid"
   ) +
   geom_line(aes()) +
-  geom_line(aes(warning_thres, 12), colour = gray.colors(2)[1]) +
+  geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_seven + 0.8 , label = "7-day freq."),
     colour = gray.colors(2)[1],
@@ -592,7 +606,7 @@ control_eval_long %>%
     label.size = NA,
     size = 3
   ) +
-  geom_line(aes(warning_thres, 17), colour = gray.colors(2)[1]) +
+  geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
   geom_label(
     aes(14, calendar_five + 0.8, label = "5-day freq."),
     colour = gray.colors(2)[1],
@@ -600,7 +614,7 @@ control_eval_long %>%
     label.size = NA,
     size = 3
   ) +
-  facet_wrap( ~ Years, ncol = 5) +
+  facet_wrap(~ Years, ncol = 5) +
   ggtitle("Treatment Frequency as a Factor the Decision Threshold") +
   theme(strip.text.y = element_blank()) +
   xlab("Warning thresholds (EBH)") +
@@ -665,6 +679,7 @@ dosedf <-
   mutate_at(.,
             .vars = colnames(.[grep("ir", colnames(.))]),
             .funs = Dose)
+
 ```
 
 ```{r}
@@ -717,7 +732,7 @@ dosedf %>%
   ) +
   scale_fill_brewer("Model", palette = "Dark2") +
   theme_article() +
-  facet_grid( ~ year_var, scales = "free") +
+  facet_grid(~ year_var, scales = "free") +
   scale_y_continuous(limits = c(0, 1)) +
   labs(x = "Year",
        y = "Dose Reduction\n") +
@@ -732,7 +747,7 @@ dosedf %>%
   )
 ```
   
-Now let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.
+Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.
 
 ```{r}
 SummaryTwo <- function(x) {

@@ -450,10 +450,9 @@ div.tocify {
 </div>
 
 
-<p>Here we present the model and the methodology used in the analysis.<br />
-<em>Note</em>: Some code chunks are folded and they can be accessed by clicking on the arrow (The code).</p>
-<div id="libraries" class="section level2">
-<h2>Libraries</h2>
+<p>Here we present the model and the methodology used in the analysis.</p>
+<div id="libraries" class="section level1">
+<h1>Libraries</h1>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
 <pre class="r"><code>list.of.packages &lt;-
   c(
@@ -477,7 +476,9 @@ div.tocify {
     &quot;mgsub&quot;,
     &quot;here&quot;,
     &quot;stringr&quot;,
-    &quot;pander&quot;
+    &quot;pander&quot;,
+    &quot;tools&quot;,
+    &quot;kableExtra&quot;
   )
 
 new.packages &lt;-
@@ -496,15 +497,15 @@ packages_load &lt;-
 
 #Print warning if there is a problem with installing/loading some of packages
 if (any(as.numeric(packages_load) == 0)) {
-  warning(paste(&quot;Package/s&quot;, paste(list.of.packages[packages_load != TRUE]), &quot;not loaded!&quot;))
+  warning(paste(&quot;Package/s: &quot;, paste(list.of.packages[packages_load != TRUE], sep = &quot;, &quot;), &quot;not loaded!&quot;))
 } else {
   print(&quot;All packages were successfully loaded.&quot;)
 }</code></pre>
 <pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
 <pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
 </div>
-<div id="the-model" class="section level2">
-<h2>The Model</h2>
+<div id="the-model" class="section level1">
+<h1>The Model</h1>
 <p>According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:<br />
 * <strong>Sporulation period</strong> is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;<br />
 * <strong>Infection period</strong> starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).<br />
@@ -514,7 +515,13 @@ Implementation of the model.</p>
 <pre class="r"><code>IrishRulesModel &lt;- function(weather,
                             param = NULL,
                             infill_gap = NULL) {
-
+#&#39; Irish Rules
+#&#39;
+#&#39; This function calculates potatolate blight risk using Irish Rules model (Bourke, 1953)
+#&#39; @param weather The weather data in formated as data frame
+#&#39; @param infill_gap Maximum alowed gap for missing value interpolation
+#&#39; @keywords Irish Rules
+#&#39;
   # wetness requirement prior to infection accumulation start
   # time window of 6 hours, 3 before/after sporulation ends
   wet_before &lt;- 3
@@ -637,8 +644,8 @@ Implementation of the model.</p>
 }</code></pre>
 </details>
 </div>
-<div id="bio-dates" class="section level2">
-<h2>Bio dates</h2>
+<div id="bio-dates" class="section level1">
+<h1>Bio dates</h1>
 <p>Emergence takes around 3 weeks under Irish conditions. Period when healthy host present is considered to last from emergence until 14 days prior to the first observation of the disease in the field. A 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.</p>
 <pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
 dates_cut &lt;-
@@ -663,7 +670,9 @@ dates_cut &lt;- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset)
 rownames(dates_cut) &lt;- NULL
 
 dates_cut %&gt;% 
-  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .)) %&gt;% 
+  rename_all(. %&gt;%
+               gsub(&quot;_&quot;, &quot; &quot;, .) %&gt;% 
+               tools::toTitleCase()) %&gt;% 
   kable(format = &quot;html&quot;) %&gt;% 
   kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -676,16 +685,16 @@ Year
 Emergence
 </th>
 <th style="text-align:left;">
-Planting date
+Planting Date
 </th>
 <th style="text-align:left;">
 Warning
 </th>
 <th style="text-align:left;">
-Disease onset
+Disease Onset
 </th>
 <th style="text-align:left;">
-Disease observed
+Disease Observed
 </th>
 </tr>
 </thead>
@@ -899,125 +908,12 @@ Disease observed
 <pre class="r"><code>#read in parameters
 parameters &lt;-
   read_excel(here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;par.xlsx&quot;), sheet = &quot;par&quot;)
-parameters %&gt;% kable() %&gt;% kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:right;">
-rh_thresh
-</th>
-<th style="text-align:right;">
-temp_thresh
-</th>
-<th style="text-align:right;">
-hours
-</th>
-<th style="text-align:left;">
-lw_rh
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right;">
-93
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:left;">
-rain
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-92
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:left;">
-rainrh
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-91
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-90
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-89
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-88
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-87
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-</tbody>
-</table>
+parameters </code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["rh_thresh"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["temp_thresh"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["hours"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["lw_rh"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"93","2":"13","3":"15","4":"rain"},{"1":"92","2":"12","3":"14","4":"rainrh"},{"1":"91","2":"11","3":"13","4":"NA"},{"1":"90","2":"10","3":"12","4":"NA"},{"1":"89","2":"9","3":"11","4":"NA"},{"1":"88","2":"8","3":"10","4":"NA"},{"1":"87","2":"7","3":"9","4":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 <pre class="r"><code>params &lt;- expand.grid(parameters[, 1:3])
 
 #set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
@@ -1318,6 +1214,15 @@ Oak_Park
            weather_data,
            dates_cut,
            prot_duration = NULL) {
+#&#39; Sensitivity analysis
+#&#39;
+#&#39; The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
+#&#39; @param y Decision threeshold (EBH). 
+#&#39; @param weather_data The weather data  formated as a data frame, containing outputs of all model runs with different parameters. 
+#&#39; @param dates_cut Dates defining the the periods of evaulation. Specificity is calculated for the period from planting date to warning date. Sensitivity is calculated for the period from -14 to -4 days before the disease is observed in the field. 
+#&#39; @param prot_duration Each time the warning threshold is reached during the period from planting date to warning date, one treatment is assumed, which would provide protedtion for indicated number of days.
+#&#39;
+
     #Set the warning threshold and run the rest of the script
     warning_threshold &lt;- y
     #data
@@ -2089,21 +1994,21 @@ rainrh
 ## [5] LC_TIME=English_United States.1252    
 ## 
 ## attached base packages:
-## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
-## [8] base     
+## [1] tools     parallel  stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] gt_0.1.0          pander_0.6.3      here_0.1         
-##  [4] mgsub_1.7.1       rcompanion_2.1.7  R.utils_2.8.0    
-##  [7] R.oo_1.22.0       R.methodsS3_1.7.1 GGally_1.4.0     
-## [10] rsm_2.10          egg_0.4.2         gridExtra_2.3    
-## [13] ggthemes_4.1.1    ggrepel_0.8.0     pbapply_1.4-0    
-## [16] remotes_2.0.4     pracma_2.2.5      usethis_1.5.0    
-## [19] devtools_2.0.2    padr_0.4.2        knitr_1.22       
-## [22] data.table_1.12.2 readxl_1.3.1      forcats_0.4.0    
-## [25] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
-## [28] readr_1.3.1       tidyr_0.8.3       tibble_2.1.1     
-## [31] ggplot2_3.1.1     tidyverse_1.2.1  
+##  [1] gt_0.1.0          kableExtra_1.1.0  pander_0.6.3     
+##  [4] here_0.1          mgsub_1.7.1       rcompanion_2.1.7 
+##  [7] R.utils_2.8.0     R.oo_1.22.0       R.methodsS3_1.7.1
+## [10] GGally_1.4.0      rsm_2.10          egg_0.4.2        
+## [13] gridExtra_2.3     ggthemes_4.1.1    ggrepel_0.8.0    
+## [16] pbapply_1.4-0     remotes_2.0.4     pracma_2.2.5     
+## [19] usethis_1.5.0     devtools_2.0.2    padr_0.4.2       
+## [22] knitr_1.22        data.table_1.12.2 readxl_1.3.1     
+## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.1      
+## [28] purrr_0.3.2       readr_1.3.1       tidyr_0.8.3      
+## [31] tibble_2.1.1      ggplot2_3.1.1     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] TH.data_1.0-10     colorspace_1.4-1   modeltools_0.2-22 
@@ -2115,28 +2020,27 @@ rainrh
 ## [19] compiler_3.6.0     httr_1.4.0         emmeans_1.3.4     
 ## [22] backports_1.1.4    assertthat_0.2.1   Matrix_1.2-14     
 ## [25] lazyeval_0.2.2     cli_1.1.0          htmltools_0.3.6   
-## [28] prettyunits_1.0.2  tools_3.6.0        coda_0.19-2       
-## [31] gtable_0.3.0       glue_1.3.1         Rcpp_1.0.1        
-## [34] cellranger_1.1.0   nlme_3.1-137       lmtest_0.9-37     
-## [37] xfun_0.6           ps_1.3.0           testthat_2.1.1    
-## [40] rvest_0.3.3        MASS_7.3-50        zoo_1.8-5         
-## [43] scales_1.0.0       hms_0.4.2          sandwich_2.5-1    
-## [46] expm_0.999-4       RColorBrewer_1.1-2 yaml_2.2.0        
-## [49] memoise_1.1.0      sass_0.1.0.9000    EMT_1.1           
-## [52] reshape_0.8.8      stringi_1.4.3      highr_0.8         
-## [55] desc_1.2.0         nortest_1.0-4      checkmate_1.9.3   
-## [58] boot_1.3-20        pkgbuild_1.0.3     commonmark_1.7    
-## [61] rlang_0.3.4        pkgconfig_2.0.2    matrixStats_0.54.0
-## [64] evaluate_0.13      lattice_0.20-35    processx_3.3.0    
-## [67] tidyselect_0.2.5   plyr_1.8.4         magrittr_1.5      
-## [70] R6_2.4.0           multcompView_0.1-7 DescTools_0.99.28 
-## [73] generics_0.0.2     multcomp_1.4-10    pillar_1.4.0      
-## [76] haven_2.1.0        foreign_0.8-70     withr_2.1.2       
-## [79] survival_2.42-3    modelr_0.1.4       crayon_1.3.4      
-## [82] rmarkdown_1.12.6   grid_3.6.0         callr_3.2.0       
-## [85] webshot_0.5.1      digest_0.6.19      xtable_1.8-4      
-## [88] stats4_3.6.0       munsell_0.5.0      viridisLite_0.3.0 
-## [91] kableExtra_1.1.0   sessioninfo_1.1.1</code></pre>
+## [28] prettyunits_1.0.2  coda_0.19-2        gtable_0.3.0      
+## [31] glue_1.3.1         Rcpp_1.0.1         cellranger_1.1.0  
+## [34] nlme_3.1-137       lmtest_0.9-37      xfun_0.6          
+## [37] ps_1.3.0           testthat_2.1.1     rvest_0.3.3       
+## [40] MASS_7.3-50        zoo_1.8-5          scales_1.0.0      
+## [43] hms_0.4.2          sandwich_2.5-1     expm_0.999-4      
+## [46] RColorBrewer_1.1-2 yaml_2.2.0         memoise_1.1.0     
+## [49] sass_0.1.0.9000    EMT_1.1            reshape_0.8.8     
+## [52] stringi_1.4.3      highr_0.8          desc_1.2.0        
+## [55] nortest_1.0-4      checkmate_1.9.3    boot_1.3-20       
+## [58] pkgbuild_1.0.3     commonmark_1.7     rlang_0.3.4       
+## [61] pkgconfig_2.0.2    matrixStats_0.54.0 evaluate_0.13     
+## [64] lattice_0.20-35    processx_3.3.0     tidyselect_0.2.5  
+## [67] plyr_1.8.4         magrittr_1.5       R6_2.4.0          
+## [70] multcompView_0.1-7 DescTools_0.99.28  generics_0.0.2    
+## [73] multcomp_1.4-10    pillar_1.4.0       haven_2.1.0       
+## [76] foreign_0.8-70     withr_2.1.2        survival_2.42-3   
+## [79] modelr_0.1.4       crayon_1.3.4       rmarkdown_1.12.6  
+## [82] grid_3.6.0         callr_3.2.0        webshot_0.5.1     
+## [85] digest_0.6.19      xtable_1.8-4       stats4_3.6.0      
+## [88] munsell_0.5.0      viridisLite_0.3.0  sessioninfo_1.1.1</code></pre>
 </div>
 </div>
 

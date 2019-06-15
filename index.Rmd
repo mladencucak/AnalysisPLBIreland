@@ -4,6 +4,12 @@ This repository is part of results of my PhD project. Here I present the evaluat
 
 The funding for this project comes from DAFM (Department of Agriculture, Food and Marine). 
 
+## Notes 
+
+Some code chunks are folded and they can be accessed by clicking on the arrow (The code).  
+Try not to have other R sesions running because it could produce problems installing libraries.  
+If there are any problems reproducing the analysis, please raise an issue on GitHub.  
+
 ## Project team
 
 Maynooth University:
