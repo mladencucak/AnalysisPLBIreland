@@ -840,7 +840,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 },
 cl = cl)
 begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -4.547409 secs</code></pre>
+<pre><code>## Time difference of -4.987236 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;-
@@ -982,7 +982,7 @@ control_eval_long %&gt;%
               color = gray.colors(2)[1],
               aes(group = 1)) +
   facet_wrap(~ programme, ncol = 3) +
-  ggtitle(&quot;Cost effectiveness of model versions&quot;) +
+  # ggtitle(&quot;Cost effectiveness of model versions&quot;) +
   
   xlab(&quot;Warning thresholds (EBH)&quot;) +
   ylab(&quot;Number of treatments&quot;) +
@@ -1169,7 +1169,7 @@ dosedf %&gt;%
     position = position_dodge(0.9),
     size = 2.9
   ) +
-  scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
+  scale_fill_brewer(&quot;Model:&quot;, palette = &quot;Dark2&quot;) +
   theme_article() +
   facet_grid(~ year_var, scales = &quot;free&quot;) +
   scale_y_continuous(limits = c(0, 1)) +
@@ -1185,19 +1185,9 @@ dosedf %&gt;%
     axis.ticks.x = element_blank()
   )
 p1</code></pre>
-<p><img src="images/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="images/dose_reduction_each_year-1.png" width="672" /></p>
 <p>Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.</p>
-<pre class="r"><code>SummaryTwo &lt;- function(x) {
-  data.frame(
-    n = length(x),
-    min = min(x),
-    median = as.numeric(median(x)),
-    mean = mean(x),
-    sd = sd(x),
-    max = max(x)
-  )
-}
-p2 &lt;- 
+<pre class="r"><code>dose_summary &lt;- 
 dosedf %&gt;%
   dplyr::select(-(&quot;treat_week&quot;)) %&gt;%
   reshape2::melt(id = &quot;year_var&quot;,
@@ -1217,16 +1207,20 @@ dosedf %&gt;%
                                    &quot;Optimised IR&quot;,
                                    &quot;Low Risk IR&quot;))) %&gt;%
   group_by(year_var, model) %&gt;%
-  do(Summary(.$dose)) %&gt;%
-  dplyr::select(-c(&quot;n&quot;, &quot;treatments&quot;)) %&gt;%
+  do(Summary(.$dose))
+  
+p2 &lt;- 
+dose_summary %&gt;% 
   group_by(model) %&gt;%
-  do(., SummaryTwo(.$dose)) %&gt;%
-  ggplot(aes(
-    x = model,
-    y = mean,
-    fill = model,
-    group = model
-  )) +
+  summarise(mean_trt = mean(treatments),
+            mean = mean(dose),
+            sd = sd(dose)) %&gt;% 
+ggplot(., aes(
+  x = model,
+  y = mean,
+  fill = model,
+  group = model
+)) +
   geom_bar(
     color = &quot;black&quot;,
     stat = &quot;identity&quot;,
@@ -1234,8 +1228,11 @@ dosedf %&gt;%
     width = 0.7
   ) +
   geom_errorbar(aes(ymin = mean - sd,
-                    ymax = mean + sd), width = 0.2) +
-  scale_fill_brewer(&quot;Model&quot;, palette = &quot;Dark2&quot;) +
+                    ymax = mean + sd), 
+                width = 0.2,
+                color = &quot;gray&quot;) +
+  
+  scale_fill_brewer(&quot;Model:&quot;, palette = &quot;Dark2&quot;) +
   theme_article() +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   labs(x = &quot;Model&quot;,
@@ -1248,18 +1245,35 @@ dosedf %&gt;%
     legend.position = &quot;none&quot;,
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
-  )  +
-  coord_equal(6 / 1)
-  p2 +
-    theme(legend.position = c(0.35, 0.85))</code></pre>
-<p><img src="images/unnamed-chunk-10-1.png" width="672" /></p>
+  ) 
+p2 +
+  theme(legend.position = c(0.35, 0.85))+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = &quot;black&quot;,
+    position = position_dodge(0.9),
+    size = 6
+  ) +
+  coord_equal(6 / 1)</code></pre>
+<p><img src="images/dose_reduction_overall-1.png" width="672" /></p>
 <pre class="r"><code>p2 &lt;- 
 p2+
   labs(x = &quot;Overall&quot;, y= &quot;&quot;)+
   theme(axis.text = element_blank(),
-        axis.ticks.y = element_blank())
+        axis.ticks.y = element_blank())+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = &quot;black&quot;,
+    position = position_dodge(0.9),
+    size = 2.9
+  ) +
+  coord_equal(1 / 1)
 ggarrange(p1, p2, ncol = 2, widths = c(10,1))</code></pre>
-<p><img src="images/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="images/dose_reduction_all-1.png" width="672" /></p>
 <p>Packages used</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.6.0 (2019-04-26)
@@ -1289,7 +1303,7 @@ ggarrange(p1, p2, ncol = 2, widths = c(10,1))</code></pre>
 ## [19] knitr_1.22        lubridate_1.7.4   data.table_1.12.2
 ## [22] readxl_1.3.1      forcats_0.4.0     stringr_1.4.0    
 ## [25] dplyr_0.8.1       purrr_0.3.2       readr_1.3.1      
-## [28] tidyr_0.8.3       tibble_2.1.1      ggplot2_3.1.1    
+## [28] tidyr_0.8.3       tibble_2.1.3      ggplot2_3.1.1    
 ## [31] tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
@@ -1315,7 +1329,7 @@ ggarrange(p1, p2, ncol = 2, widths = c(10,1))</code></pre>
 ## [58] labeling_0.3       processx_3.3.0     tidyselect_0.2.5  
 ## [61] plyr_1.8.4         magrittr_1.5       R6_2.4.0          
 ## [64] DescTools_0.99.28  generics_0.0.2     multcompView_0.1-7
-## [67] multcomp_1.4-10    pillar_1.4.0       haven_2.1.0       
+## [67] multcomp_1.4-10    pillar_1.4.1       haven_2.1.0       
 ## [70] foreign_0.8-70     withr_2.1.2        survival_2.42-3   
 ## [73] modelr_0.1.4       crayon_1.3.4       rmarkdown_1.12.6  
 ## [76] grid_3.6.0         callr_3.2.0        digest_0.6.19     

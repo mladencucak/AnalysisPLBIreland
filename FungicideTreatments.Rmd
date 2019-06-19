@@ -530,7 +530,7 @@ control_eval_long %>%
               color = gray.colors(2)[1],
               aes(group = 1)) +
   facet_wrap(~ programme, ncol = 3) +
-  ggtitle("Cost effectiveness of model versions") +
+  # ggtitle("Cost effectiveness of model versions") +
   
   xlab("Warning thresholds (EBH)") +
   ylab("Number of treatments") +
@@ -682,7 +682,7 @@ dosedf <-
 
 ```
 
-```{r}
+```{r dose_reduction_each_year}
 #Get number of treatments per year and the dose reduction
 Summary <- function(x) {
   data.frame(
@@ -731,7 +731,7 @@ dosedf %>%
     position = position_dodge(0.9),
     size = 2.9
   ) +
-  scale_fill_brewer("Model", palette = "Dark2") +
+  scale_fill_brewer("Model:", palette = "Dark2") +
   theme_article() +
   facet_grid(~ year_var, scales = "free") +
   scale_y_continuous(limits = c(0, 1)) +
@@ -751,18 +751,8 @@ p1
   
 Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.
 
-```{r}
-SummaryTwo <- function(x) {
-  data.frame(
-    n = length(x),
-    min = min(x),
-    median = as.numeric(median(x)),
-    mean = mean(x),
-    sd = sd(x),
-    max = max(x)
-  )
-}
-p2 <- 
+```{r dose_reduction_overall}
+dose_summary <- 
 dosedf %>%
   dplyr::select(-("treat_week")) %>%
   reshape2::melt(id = "year_var",
@@ -782,16 +772,20 @@ dosedf %>%
                                    "Optimised IR",
                                    "Low Risk IR"))) %>%
   group_by(year_var, model) %>%
-  do(Summary(.$dose)) %>%
-  dplyr::select(-c("n", "treatments")) %>%
+  do(Summary(.$dose))
+  
+p2 <- 
+dose_summary %>% 
   group_by(model) %>%
-  do(., SummaryTwo(.$dose)) %>%
-  ggplot(aes(
-    x = model,
-    y = mean,
-    fill = model,
-    group = model
-  )) +
+  summarise(mean_trt = mean(treatments),
+            mean = mean(dose),
+            sd = sd(dose)) %>% 
+ggplot(., aes(
+  x = model,
+  y = mean,
+  fill = model,
+  group = model
+)) +
   geom_bar(
     color = "black",
     stat = "identity",
@@ -799,8 +793,11 @@ dosedf %>%
     width = 0.7
   ) +
   geom_errorbar(aes(ymin = mean - sd,
-                    ymax = mean + sd), width = 0.2) +
-  scale_fill_brewer("Model", palette = "Dark2") +
+                    ymax = mean + sd), 
+                width = 0.2,
+                color = "gray") +
+  
+  scale_fill_brewer("Model:", palette = "Dark2") +
   theme_article() +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   labs(x = "Model",
@@ -813,18 +810,35 @@ dosedf %>%
     legend.position = "none",
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
-  )  +
+  ) 
+p2 +
+  theme(legend.position = c(0.35, 0.85))+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = "black",
+    position = position_dodge(0.9),
+    size = 6
+  ) +
   coord_equal(6 / 1)
-  p2 +
-    theme(legend.position = c(0.35, 0.85))
 ```
 
-```{r}
+```{r dose_reduction_all}
 p2 <- 
 p2+
   labs(x = "Overall", y= "")+
   theme(axis.text = element_blank(),
-        axis.ticks.y = element_blank())
+        axis.ticks.y = element_blank())+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = "black",
+    position = position_dodge(0.9),
+    size = 2.9
+  ) +
+  coord_equal(1 / 1)
 ggarrange(p1, p2, ncol = 2, widths = c(10,1))
 ```
 
