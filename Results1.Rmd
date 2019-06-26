@@ -273,9 +273,22 @@ poly_2_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
 poly_4_fit <-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
+f_stat <- 
+sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(x)$fstatistic[1] %>% as.numeric %>% round(2))
+
 rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %>% 
   add_column( Order = 1:4, .before = 1) %>% 
-  kable(format = "html") %>% 
+  add_column(., F_statistic = f_stat, .before = "p.value") %>% 
+  rename("No. of Parameteres" = Rank,
+         "DF" = "Df.res",
+         "R sq." = "R.squared",
+         "Adj. R sq." = "Adj.R.sq",
+         "F" = "F_statistic",
+         "p" = "p.value",
+         "Shapiro-Wilk" = "Shapiro.W",
+         "Shapiro-Wilk p" = "Shapiro.p") %>% 
+  select(-c("AIC", "AICc", "BIC")) %>% 
+  kable(format = "html") %>%
   kableExtra::kable_styling( latex_options = "striped",full_width = FALSE) 
 ```
 
@@ -323,7 +336,8 @@ arrows(
 )
 ```
 
-This reinforces the choice of the polynomial model of degree 3, which yields predictions that agree the most with the local, non-parametric regression, and hence adequately reproduces the behaviour of the response surface.
+This reinforces the choice of the polynomial model of degree 3, which yields predictions that agree the most with the local, non-parametric regression, and hence adequately reproduces the behaviour of the response surface.  
+
 
 ```{r summary_table2, warning=FALSE }
 panderOptions('round', 2)

@@ -764,9 +764,15 @@ poly_2_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
 poly_3_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
 poly_4_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
+f_stat &lt;- 
+sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(x)$fstatistic[1] %&gt;% as.numeric)
+
 rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
   add_column( Order = 1:4, .before = 1) %&gt;% 
-  kable(format = &quot;html&quot;) %&gt;% 
+  add_column(., F_statistic = f_stat, .before = &quot;p.value&quot;) %&gt;% 
+  rename(&quot;No. of Parameteres&quot; = Rank) %&gt;% 
+  select(-c(&quot;AIC&quot;, &quot;AICc&quot;, &quot;BIC&quot;)) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;%
   kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE) </code></pre>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -775,25 +781,19 @@ rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
 Order
 </th>
 <th style="text-align:right;">
-Rank
+No. of Parameteres
 </th>
 <th style="text-align:right;">
 Df.res
-</th>
-<th style="text-align:right;">
-AIC
-</th>
-<th style="text-align:right;">
-AICc
-</th>
-<th style="text-align:right;">
-BIC
 </th>
 <th style="text-align:right;">
 R.squared
 </th>
 <th style="text-align:right;">
 Adj.R.sq
+</th>
+<th style="text-align:right;">
+F_statistic
 </th>
 <th style="text-align:right;">
 p.value
@@ -818,19 +818,13 @@ Shapiro.p
 339
 </td>
 <td style="text-align:right;">
--1281
-</td>
-<td style="text-align:right;">
--1281
-</td>
-<td style="text-align:right;">
--1262
-</td>
-<td style="text-align:right;">
 0.6375
 </td>
 <td style="text-align:right;">
 0.6342
+</td>
+<td style="text-align:right;">
+198.68198
 </td>
 <td style="text-align:right;">
 0
@@ -853,19 +847,13 @@ Shapiro.p
 333
 </td>
 <td style="text-align:right;">
--1408
-</td>
-<td style="text-align:right;">
--1407
-</td>
-<td style="text-align:right;">
--1366
-</td>
-<td style="text-align:right;">
 0.7581
 </td>
 <td style="text-align:right;">
 0.7516
+</td>
+<td style="text-align:right;">
+115.98491
 </td>
 <td style="text-align:right;">
 0
@@ -888,19 +876,13 @@ Shapiro.p
 323
 </td>
 <td style="text-align:right;">
--1580
-</td>
-<td style="text-align:right;">
--1577
-</td>
-<td style="text-align:right;">
--1499
-</td>
-<td style="text-align:right;">
 0.8617
 </td>
 <td style="text-align:right;">
 0.8535
+</td>
+<td style="text-align:right;">
+105.88873
 </td>
 <td style="text-align:right;">
 0
@@ -923,19 +905,13 @@ Shapiro.p
 308
 </td>
 <td style="text-align:right;">
--1601
-</td>
-<td style="text-align:right;">
--1593
-</td>
-<td style="text-align:right;">
--1463
-</td>
-<td style="text-align:right;">
 0.8811
 </td>
 <td style="text-align:right;">
 0.8680
+</td>
+<td style="text-align:right;">
+67.11653
 </td>
 <td style="text-align:right;">
 0
