@@ -8,6 +8,7 @@ We present the dataset we are working on in this section. An interested reader c
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
+chooseCRANmirror(graphics=FALSE, ind=1)
 knitr::knit_hooks$set(
   source = function(x, options) {
     hook.r = function(x, options) {
@@ -35,7 +36,7 @@ knitr::knit_hooks$set(
 
 Packages needed for the data preparation are loaded. If the libraries do not exist locally, they will be downloaded.
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r pkg, message=FALSE, warning=FALSE}
 list.of.packages <-
   c(
     "tidyverse",
@@ -81,7 +82,7 @@ rm(list.of.packages, new.packages, packages_load)
 
 # Location
 Primary disease outbreak data is acquired from Teagasc breeding program field trial records at Oak Park, Carlow, Ireland.
-```{r}
+```{r map}
 greenLeafIcon <- makeIcon(
   iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
   iconWidth = 38, iconHeight = 95,

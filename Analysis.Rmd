@@ -8,6 +8,7 @@ Here we present the model and the methodology used in the analysis.
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
+chooseCRANmirror(graphics=FALSE, ind=1)
 knitr::knit_hooks$set(
   source = function(x, options) {
     hook.r = function(x, options) {
@@ -40,6 +41,7 @@ list.of.packages <-
   c(
     "tidyverse",
     "readxl",
+    "ggrepel",
     "pracma",
     "remotes",
     "parallel",
@@ -615,14 +617,14 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   ) +
   geom_path(colour = "gray") +
   geom_point(colour = "black") +
-  geom_text_repel(size = 3) +
+  ggrepel::geom_text_repel(size = 3) +
   scale_y_continuous(limits = c(0, 1),
                      expand = c(0, 0),
-                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     breaks = seq(0, 1, 0.1),
                      name = "Sensitivity") +
   scale_x_continuous(limits = c(0, 1),
                      expand = c(0, 0),
-                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     breaks = seq(0, 1, 0.1),
                      name = "1- Specificity") +
   ggtitle(title) +
   annotate(
@@ -637,6 +639,12 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
     text = element_text(size = 10.5),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
+  )+
+geom_hline(
+    yintercept = seq(0 , 1, 0.1),
+    size = 0.5,
+    color = "gray",
+    linetype = "dotted"
   )
 }
 PlotROC(ROC_data[["90_10_12_rain"]])

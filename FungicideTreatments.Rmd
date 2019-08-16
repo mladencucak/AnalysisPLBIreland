@@ -5,6 +5,7 @@
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
+chooseCRANmirror(graphics=FALSE, ind=1)
 knitr::knit_hooks$set(
   source = function(x, options) {
     hook.r = function(x, options) {
@@ -453,9 +454,8 @@ control_eval_long %>%
 ```
   
 
-```{r plot_models, warning=F, fig.align="center", fig.dim= c(11,7)}
-
-
+```{r plot_models, warning=F, fig.align="center", fig.dim= c(11,8)}
+plot_models <- 
 control_eval_long %>%
   # control_eval_long%>%
   mutate(programme = ifelse(
@@ -536,7 +536,19 @@ control_eval_long %>%
   ylab("Number of treatments") +
   scale_x_discrete(breaks = seq(0, 18, 3)) +
   theme(legend.position = "top") +
-  theme_article()
+  theme_article()+
+  theme(text = element_text(size=18))
+
+
+  ggsave(plot = plot_models,
+  file = here::here("images", "pub","plot_models.png"),
+  device = "png",
+  width = 19,
+  height = 13,
+  units = "cm",
+  dpi = 500
+)
+  plot_models
 ```
   
   The figure shows how does the frequency of recommended  treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.  
@@ -631,7 +643,7 @@ control_eval_long %>%
   scale_colour_brewer("Model",
                       palette = "Dark2") +
   theme(legend.position = "top",
-        text = element_text(size = 11))
+        text = element_text(size = 14))
 ```
   
 It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years.   
@@ -732,11 +744,11 @@ dosedf %>%
     size = 2.9
   ) +
   scale_fill_brewer("Model:", palette = "Dark2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   theme_article() +
   facet_grid(~ year_var, scales = "free") +
-  scale_y_continuous(limits = c(0, 1)) +
   labs(x = "Year",
-       y = "Dose Reduction\n") +
+       y = "Dose Reduction") +
   theme(
     axis.title = element_text(size = 11),
     panel.grid.major = element_blank(),
@@ -745,7 +757,8 @@ dosedf %>%
     legend.position = "top",
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank()
-  )
+  )+
+  theme(text = element_text(size=14))
 p1
 ```
   
@@ -774,6 +787,23 @@ dosedf %>%
   group_by(year_var, model) %>%
   do(Summary(.$dose))
   
+dose_summary %>%
+  mutate(Model = model) %>% 
+  group_by(Model) %>%
+  summarise(
+    'Mean Treatments' = mean(treatments),
+    'Mean Dose' = round(mean(dose),3),
+    'sd' = round(sd(dose), 3),
+    'Min \nTreatments' = min(treatments),
+    'Max Treatments'  = max(treatments),
+    'Min Dose' = round(min(dose),3) ,
+    'Max Dose' = round( max(dose),3)
+  ) %>% 
+  kable(format = "html") %>% 
+  kableExtra::kable_styling( latex_options = "striped",full_width = FALSE)
+```
+
+```{r}
 p2 <- 
 dose_summary %>% 
   group_by(model) %>%
@@ -821,8 +851,10 @@ p2 +
     position = position_dodge(0.9),
     size = 6
   ) +
-  coord_equal(6 / 1)
+  coord_equal(6 / 1)+
+  theme(text = element_text(size=14))
 ```
+
 
 ```{r dose_reduction_all}
 p2 <- 

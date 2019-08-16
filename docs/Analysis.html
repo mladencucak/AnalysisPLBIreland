@@ -458,19 +458,11 @@ div.tocify {
   c(
     &quot;tidyverse&quot;,
     &quot;readxl&quot;,
-    &quot;data.table&quot;,
-    &quot;knitr&quot;,
-    &quot;padr&quot;,
-    &quot;devtools&quot;,
+    &quot;ggrepel&quot;,
     &quot;pracma&quot;,
     &quot;remotes&quot;,
     &quot;parallel&quot;,
     &quot;pbapply&quot;,
-    &quot;ggrepel&quot;,
-    &quot;ggthemes&quot;,
-    &quot;egg&quot;,
-    &quot;rsm&quot;,
-    &quot;GGally&quot;,
     &quot;R.utils&quot;,
     &quot;rcompanion&quot;,
     &quot;mgsub&quot;,
@@ -640,7 +632,6 @@ Implementation of the model.</p>
     }
     head(risk, -20) #remove last 20 values that were added to vectors to prevent &quot;Out of bounds&quot; issue
   }
-  
 }</code></pre>
 </details>
 </div>
@@ -1361,10 +1352,10 @@ Oak_Park
 warning_thresholds &lt;- 1:18
 begin &lt;- Sys.time()
 #Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
-cores &lt;- ifelse(detectCores() &gt; 1, detectCores()-1, 1) 
-cl &lt;- makeCluster(cores)
-clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
-clusterEvalQ(cl, library(&quot;tidyverse&quot;))
+cores &lt;- ifelse(parallel::detectCores() &gt; 1, parallel::detectCores()-1, 1)
+cl &lt;- parallel::makeCluster(cores)
+parallel::clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
+parallel::clusterEvalQ(cl, library(&quot;tidyverse&quot;))
   ROC &lt;- pbapply::pblapply(warning_thresholds, function(x)
   {
     xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
@@ -1372,8 +1363,8 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;))
   },
   cl = cl
   )
-begin- Sys.time() #check the duration of the process in the console
-stopCluster(cl)</code></pre>
+begin - Sys.time() #check the duration of the process in the console
+parallel::stopCluster(cl)</code></pre>
 <p>Rather, the results of calculations from a prior run can be directly loaded.</p>
 <pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;ROC_output.Rdata&quot;))</code></pre>
 <p>Sort the outputs for each model variation.</p>
@@ -1804,14 +1795,14 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
   ) +
   geom_path(colour = &quot;gray&quot;) +
   geom_point(colour = &quot;black&quot;) +
-  geom_text_repel(size = 3) +
+  ggrepel::geom_text_repel(size = 3) +
   scale_y_continuous(limits = c(0, 1),
                      expand = c(0, 0),
-                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     breaks = seq(0, 1, 0.1),
                      name = &quot;Sensitivity&quot;) +
   scale_x_continuous(limits = c(0, 1),
                      expand = c(0, 0),
-                     breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                     breaks = seq(0, 1, 0.1),
                      name = &quot;1- Specificity&quot;) +
   ggtitle(title) +
   annotate(
@@ -1826,6 +1817,12 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
     text = element_text(size = 10.5),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
+  )+
+geom_hline(
+    yintercept = seq(0 , 1, 0.1),
+    size = 0.5,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
   )
 }
 PlotROC(ROC_data[[&quot;90_10_12_rain&quot;]])</code></pre>
@@ -1999,48 +1996,40 @@ rainrh
 ## 
 ## other attached packages:
 ##  [1] gt_0.1.0          kableExtra_1.1.0  pander_0.6.3     
-##  [4] here_0.1          mgsub_1.7.1       rcompanion_2.1.7 
-##  [7] R.utils_2.8.0     R.oo_1.22.0       R.methodsS3_1.7.1
-## [10] GGally_1.4.0      rsm_2.10          egg_0.4.2        
-## [13] gridExtra_2.3     ggthemes_4.1.1    ggrepel_0.8.0    
-## [16] pbapply_1.4-0     remotes_2.0.4     pracma_2.2.5     
-## [19] usethis_1.5.0     devtools_2.0.2    padr_0.4.2       
-## [22] knitr_1.22        data.table_1.12.2 readxl_1.3.1     
-## [25] forcats_0.4.0     stringr_1.4.0     dplyr_0.8.1      
-## [28] purrr_0.3.2       readr_1.3.1       tidyr_0.8.3      
-## [31] tibble_2.1.1      ggplot2_3.1.1     tidyverse_1.2.1  
+##  [4] here_0.1          mgsub_1.7.1       rcompanion_2.2.1 
+##  [7] R.utils_2.9.0     R.oo_1.22.0       R.methodsS3_1.7.1
+## [10] pbapply_1.4-0     remotes_2.0.4     pracma_2.2.5     
+## [13] ggrepel_0.8.1     readxl_1.3.1      forcats_0.4.0    
+## [16] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
+## [19] readr_1.3.1       tidyr_0.8.3       tibble_2.1.3     
+## [22] ggplot2_3.2.0     tidyverse_1.2.1  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] TH.data_1.0-10     colorspace_1.4-1   modeltools_0.2-22 
-##  [4] rprojroot_1.3-2    estimability_1.3   fs_1.3.0          
-##  [7] rstudioapi_0.10    manipulate_1.0.1   mvtnorm_1.0-10    
-## [10] lubridate_1.7.4    coin_1.3-0         xml2_1.2.0        
-## [13] codetools_0.2-15   splines_3.6.0      libcoin_1.0-4     
-## [16] pkgload_1.0.2      jsonlite_1.6       broom_0.5.2       
-## [19] compiler_3.6.0     httr_1.4.0         emmeans_1.3.4     
-## [22] backports_1.1.4    assertthat_0.2.1   Matrix_1.2-14     
-## [25] lazyeval_0.2.2     cli_1.1.0          htmltools_0.3.6   
-## [28] prettyunits_1.0.2  coda_0.19-2        gtable_0.3.0      
-## [31] glue_1.3.1         Rcpp_1.0.1         cellranger_1.1.0  
-## [34] nlme_3.1-137       lmtest_0.9-37      xfun_0.6          
-## [37] ps_1.3.0           testthat_2.1.1     rvest_0.3.3       
-## [40] MASS_7.3-50        zoo_1.8-5          scales_1.0.0      
-## [43] hms_0.4.2          sandwich_2.5-1     expm_0.999-4      
-## [46] RColorBrewer_1.1-2 yaml_2.2.0         memoise_1.1.0     
-## [49] sass_0.1.0.9000    EMT_1.1            reshape_0.8.8     
-## [52] stringi_1.4.3      highr_0.8          desc_1.2.0        
-## [55] nortest_1.0-4      checkmate_1.9.3    boot_1.3-20       
-## [58] pkgbuild_1.0.3     commonmark_1.7     rlang_0.3.4       
-## [61] pkgconfig_2.0.2    matrixStats_0.54.0 evaluate_0.13     
-## [64] lattice_0.20-35    processx_3.3.0     tidyselect_0.2.5  
-## [67] plyr_1.8.4         magrittr_1.5       R6_2.4.0          
-## [70] multcompView_0.1-7 DescTools_0.99.28  generics_0.0.2    
-## [73] multcomp_1.4-10    pillar_1.4.0       haven_2.1.0       
-## [76] foreign_0.8-70     withr_2.1.2        survival_2.42-3   
-## [79] modelr_0.1.4       crayon_1.3.4       rmarkdown_1.12.6  
-## [82] grid_3.6.0         callr_3.2.0        webshot_0.5.1     
-## [85] digest_0.6.19      xtable_1.8-4       stats4_3.6.0      
-## [88] munsell_0.5.0      viridisLite_0.3.0  sessioninfo_1.1.1</code></pre>
+##  [1] nlme_3.1-140       matrixStats_0.54.0 lubridate_1.7.4   
+##  [4] webshot_0.5.1      httr_1.4.0         rprojroot_1.3-2   
+##  [7] backports_1.1.4    R6_2.4.0           nortest_1.0-4     
+## [10] lazyeval_0.2.2     colorspace_1.4-1   withr_2.1.2       
+## [13] tidyselect_0.2.5   compiler_3.6.0     cli_1.1.0         
+## [16] rvest_0.3.4        expm_0.999-4       xml2_1.2.0        
+## [19] sandwich_2.5-1     sass_0.1.1         checkmate_1.9.3   
+## [22] scales_1.0.0       lmtest_0.9-37      mvtnorm_1.0-11    
+## [25] multcompView_0.1-7 commonmark_1.7     digest_0.6.19     
+## [28] foreign_0.8-71     rmarkdown_1.13     pkgconfig_2.0.2   
+## [31] htmltools_0.3.6    manipulate_1.0.1   highr_0.8         
+## [34] rlang_0.4.0        rstudioapi_0.10    generics_0.0.2    
+## [37] zoo_1.8-6          jsonlite_1.6       magrittr_1.5      
+## [40] modeltools_0.2-22  Matrix_1.2-17      Rcpp_1.0.1        
+## [43] DescTools_0.99.28  munsell_0.5.0      stringi_1.4.3     
+## [46] multcomp_1.4-10    yaml_2.2.0         MASS_7.3-51.4     
+## [49] plyr_1.8.4         grid_3.6.0         crayon_1.3.4      
+## [52] lattice_0.20-38    haven_2.1.0        splines_3.6.0     
+## [55] hms_0.4.2          knitr_1.23         pillar_1.4.1      
+## [58] EMT_1.1            boot_1.3-22        codetools_0.2-16  
+## [61] stats4_3.6.0       glue_1.3.1         evaluate_0.14     
+## [64] data.table_1.12.2  modelr_0.1.4       cellranger_1.1.0  
+## [67] gtable_0.3.0       assertthat_0.2.1   xfun_0.7          
+## [70] coin_1.3-0         libcoin_1.0-4      broom_0.5.2       
+## [73] survival_2.44-1.1  viridisLite_0.3.0  TH.data_1.0-10</code></pre>
 </div>
 </div>
 

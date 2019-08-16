@@ -8,6 +8,7 @@ Here we present the results of the sensitivity analysis.
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
+chooseCRANmirror(graphics=FALSE, ind=1)
 ```
 
 Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
@@ -142,12 +143,6 @@ auc_data %>%
   theme_article() +
   coord_equal(10 / 1)
 
-plot + ggsave(
-  here::here("data", "op_2007_16", "results", "LWswithc.png"),
-  width = 11,
-  height = 11,
-  units = "cm"
-)
 ```
 
 ```{r remove-single-rain}
@@ -232,7 +227,7 @@ p3 <-
   ylab("AUROC") +
   theme_article()
 
-grDevices::png(filename = here::here("data", "op_2007_16","results","init_vis.png"),
+grDevices::png(filename = here::here("images", "init_vis.png"),
     width = 400, height = 800,bg = "white", res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()
@@ -417,7 +412,7 @@ rm(prettyModel)
 
 Visualise fitted response surface. 
 
-```{r persp, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
+```{r persp, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, dev=c('png', 'pdf')}
 z_min <- min(auc_data$auc) - c(min(auc_data$auc) * 0.02)
 z_max <- max(auc_data$auc) + c(max(auc_data$auc) * 0.02)
 
@@ -480,7 +475,7 @@ Plots show relationship between variation in parameters of two variables with th
 
 Another way to present this data is with contour plots. We will plot contour plots corresponding to the above 3D surfaces.  
 
-```{r countour, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, fig.path='figures/', dev=c('png', 'pdf')}
+```{r countour, fig.show = "hold", warning=FALSE, message=FALSE,fig.width=10, fig.height=10, dev=c('png', 'pdf')}
 
 par(
   mar = c(3, 4, 4, 2),
@@ -529,7 +524,7 @@ for (i in seq(nrow(par_cut))) {
 
 BaseBased on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:  
 
-```{r further_analysis, fig.show = "hold", warning=FALSE, fig.width=12, fig.height=9,message=FALSE, fig.path='figures/', dev=c('png', 'pdf')}
+```{r further_analysis, fig.show = "hold", warning=FALSE, fig.width=12, fig.height=9,message=FALSE,  dev=c('png', 'pdf')}
 #Load function and the data
 load(file = here::here("data", "op_2007_16",  "ROC_data.RData"))
 load(file = here::here("data", "op_2007_16",  "AUROC_data.RData"))

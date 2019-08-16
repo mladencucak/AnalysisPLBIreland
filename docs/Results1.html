@@ -624,15 +624,7 @@ auc_data %&gt;%
   xlab(&quot;Infection period switch&quot;) +
   ylab(&quot;AUROC&quot;) +
   theme_article() +
-  coord_equal(10 / 1)
-
-plot + ggsave(
-  here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;results&quot;, &quot;LWswithc.png&quot;),
-  width = 11,
-  height = 11,
-  units = &quot;cm&quot;
-)</code></pre>
-<p><img src="images/plot_lw_estim-1.png" width="672" /></p>
+  coord_equal(10 / 1)</code></pre>
 <pre class="r"><code>auc_data &lt;-
   auc_data %&gt;%
   filter(lw_rh == &quot;rainrh&quot;) %&gt;%
@@ -707,7 +699,7 @@ p3 &lt;-
   ylab(&quot;AUROC&quot;) +
   theme_article()
 
-grDevices::png(filename = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;init_vis.png&quot;),
+grDevices::png(filename = here::here(&quot;images&quot;, &quot;init_vis.png&quot;),
     width = 400, height = 800,bg = &quot;white&quot;, res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()</code></pre>
@@ -765,12 +757,19 @@ poly_3_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
 poly_4_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
 
 f_stat &lt;- 
-sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(x)$fstatistic[1] %&gt;% as.numeric)
+sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(x)$fstatistic[1] %&gt;% as.numeric %&gt;% round(2))
 
 rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
   add_column( Order = 1:4, .before = 1) %&gt;% 
   add_column(., F_statistic = f_stat, .before = &quot;p.value&quot;) %&gt;% 
-  rename(&quot;No. of Parameteres&quot; = Rank) %&gt;% 
+  rename(&quot;No. of Parameteres&quot; = Rank,
+         &quot;DF&quot; = &quot;Df.res&quot;,
+         &quot;R sq.&quot; = &quot;R.squared&quot;,
+         &quot;Adj. R sq.&quot; = &quot;Adj.R.sq&quot;,
+         &quot;F&quot; = &quot;F_statistic&quot;,
+         &quot;p&quot; = &quot;p.value&quot;,
+         &quot;Shapiro-Wilk&quot; = &quot;Shapiro.W&quot;,
+         &quot;Shapiro-Wilk p&quot; = &quot;Shapiro.p&quot;) %&gt;% 
   select(-c(&quot;AIC&quot;, &quot;AICc&quot;, &quot;BIC&quot;)) %&gt;% 
   kable(format = &quot;html&quot;) %&gt;%
   kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE) </code></pre>
@@ -784,25 +783,25 @@ Order
 No. of Parameteres
 </th>
 <th style="text-align:right;">
-Df.res
+DF
 </th>
 <th style="text-align:right;">
-R.squared
+R sq.
 </th>
 <th style="text-align:right;">
-Adj.R.sq
+Adj. R sq.
 </th>
 <th style="text-align:right;">
-F_statistic
+F
 </th>
 <th style="text-align:right;">
-p.value
+p
 </th>
 <th style="text-align:right;">
-Shapiro.W
+Shapiro-Wilk
 </th>
 <th style="text-align:right;">
-Shapiro.p
+Shapiro-Wilk p
 </th>
 </tr>
 </thead>
@@ -824,7 +823,7 @@ Shapiro.p
 0.6342
 </td>
 <td style="text-align:right;">
-198.68198
+198.68
 </td>
 <td style="text-align:right;">
 0
@@ -853,7 +852,7 @@ Shapiro.p
 0.7516
 </td>
 <td style="text-align:right;">
-115.98491
+115.98
 </td>
 <td style="text-align:right;">
 0
@@ -882,7 +881,7 @@ Shapiro.p
 0.8535
 </td>
 <td style="text-align:right;">
-105.88873
+105.89
 </td>
 <td style="text-align:right;">
 0
@@ -911,7 +910,7 @@ Shapiro.p
 0.8680
 </td>
 <td style="text-align:right;">
-67.11653
+67.12
 </td>
 <td style="text-align:right;">
 0
@@ -1263,7 +1262,7 @@ for (i in seq(nrow(par_cut))) {
                   )
   )
 }</code></pre>
-<p><img src="figures/persp-1.png" width="960" /></p>
+<p><img src="images/persp-1.png" width="960" /></p>
 <p>Plots show relationship between variation in parameters of two variables with third variable fixed at three levels and response as AUROC. 3D surface plots indicate that reduced sporulation duration and relative humidity threshold improves accuracy of the model; while model versions with increased temperature threshold have better diagnostic performance.</p>
 <p>Another way to present this data is with contour plots. We will plot contour plots corresponding to the above 3D surfaces.</p>
 <pre class="r"><code>par(
@@ -1306,7 +1305,7 @@ for (i in seq(nrow(par_cut))) {
                   )
   )
 }</code></pre>
-<p><img src="figures/countour-1.png" width="960" /></p>
+<p><img src="images/countour-1.png" width="960" /></p>
 </div>
 <div id="further-investigation" class="section level3">
 <h3>Further investigation</h3>
@@ -1331,7 +1330,7 @@ plot_grid(pl[[1]],
           pl[[5]],
           pl[[6]],
           ncol = 3)</code></pre>
-<p><img src="figures/further_analysis-1.png" width="1152" /></p>
+<p><img src="images/further_analysis-1.png" width="1152" /></p>
 <pre class="r"><code>ls_roc &lt;- lapply(mod_list[4:6], function(x) {
   df &lt;- x[rev(x$cut_point), ]
   
