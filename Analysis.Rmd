@@ -84,7 +84,11 @@ rm(list.of.packages, new.packages, packages_load)
 According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:   
  * **Sporulation period** is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;  
  * **Infection period** starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was  a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).  
-Implementation of the model.
+Implementation of the model.  
+
+![Irish Rules simplified alghorithm schematics.](figures/Figure2.png)
+
+
 
 ```{r irish-model, foldcode = TRUE}
 IrishRulesModel <- function(weather,
