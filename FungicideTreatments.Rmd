@@ -493,13 +493,13 @@ control_eval_long %>%
   mutate(Years = factor(year_var)) %>%
   ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   geom_vline(
-    xintercept = seq(1, 9, 1),
+    xintercept = seq(1, 18, 1),
     size = 0.2,
     color = "gray",
     linetype = "dotted"
   ) +
   geom_vline(
-    xintercept = seq(3, 9, 3),
+    xintercept = seq(3, 15, 3),
     size = 0.2,
     color = "gray",
     linetype = "solid"
@@ -598,13 +598,13 @@ control_eval_long %>%
            colour = programme
          )) +
   geom_vline(
-    xintercept = seq(1, 9, 1),
+    xintercept = seq(1, 18, 1),
     size = 0.2,
     color = "gray",
     linetype = "dotted"
   ) +
   geom_vline(
-    xintercept = seq(3, 9, 3),
+    xintercept = seq(3, 15, 3),
     size = 0.2,
     color = "gray",
     linetype = "solid"

@@ -841,7 +841,7 @@ clusterEvalQ(cl, library(&quot;tidyverse&quot;, quietly = TRUE, verbose = FALSE)
 },
 cl = cl)
 begin - Sys.time() #check the duration of the pcontrol_evaless in the console</code></pre>
-<pre><code>## Time difference of -10.58182 secs</code></pre>
+<pre><code>## Time difference of -4.947449 secs</code></pre>
 <pre class="r"><code>stopCluster(cl)</code></pre>
 <p>Melt the data frame.</p>
 <pre class="r"><code>control_eval_long &lt;-
@@ -947,13 +947,13 @@ control_eval_long %&gt;%
   mutate(Years = factor(year_var)) %&gt;%
   ggplot(., aes(factor(warning_thres), no_of_treatments)) +
   geom_vline(
-    xintercept = seq(1, 9, 1),
+    xintercept = seq(1, 18, 1),
     size = 0.2,
     color = &quot;gray&quot;,
     linetype = &quot;dotted&quot;
   ) +
   geom_vline(
-    xintercept = seq(3, 9, 3),
+    xintercept = seq(3, 15, 3),
     size = 0.2,
     color = &quot;gray&quot;,
     linetype = &quot;solid&quot;
@@ -1048,13 +1048,13 @@ control_eval_long %&gt;%
            colour = programme
          )) +
   geom_vline(
-    xintercept = seq(1, 9, 1),
+    xintercept = seq(1, 18, 1),
     size = 0.2,
     color = &quot;gray&quot;,
     linetype = &quot;dotted&quot;
   ) +
   geom_vline(
-    xintercept = seq(3, 9, 3),
+    xintercept = seq(3, 15, 3),
     size = 0.2,
     color = &quot;gray&quot;,
     linetype = &quot;solid&quot;
