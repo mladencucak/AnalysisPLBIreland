@@ -118,7 +118,7 @@ Wilcoxon signed rank test showed that median AUROC is greater when using both ra
 Model outputs with rain as single predictor are removed from further analysis.
 
 ```{r plot_lw_estim}
-plot <- 
+
 auc_data %>%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == "rainrh", "rain and rh", "only rain"
@@ -134,13 +134,14 @@ auc_data %>%
   scale_fill_brewer(
     palette = "Dark2",
     name = "Leaf Wetness",
-    labels = c("Rain>0.01", "Rain>0.01 & RH>=90%")
+    labels = c("\nRain>0.01\n", "\nRain>0.01 &\n RH>=90%\n")
   ) +
   scale_x_discrete(breaks = c(0, 90),
                    labels = c("rain", "rh and rain")) +
   xlab("Infection period switch") +
   ylab("AUROC") +
   theme_article() +
+  theme(text = element_text(size=15))+
   coord_equal(10 / 1)
 
 ```

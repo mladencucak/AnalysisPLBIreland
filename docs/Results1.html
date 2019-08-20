@@ -601,8 +601,7 @@ w.test</code></pre>
 ## V = 11211, p-value &lt; 2.2e-16
 ## alternative hypothesis: true location shift is less than 0</code></pre>
 <p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p &lt; 0.001. Model outputs with rain as single predictor are removed from further analysis.</p>
-<pre class="r"><code>plot &lt;- 
-auc_data %&gt;%
+<pre class="r"><code>auc_data %&gt;%
   mutate(Leaf_Wetness = factor(ifelse(
     lw_rh == &quot;rainrh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;
   ))) %&gt;%
@@ -617,14 +616,16 @@ auc_data %&gt;%
   scale_fill_brewer(
     palette = &quot;Dark2&quot;,
     name = &quot;Leaf Wetness&quot;,
-    labels = c(&quot;Rain&gt;0.01&quot;, &quot;Rain&gt;0.01 &amp; RH&gt;=90%&quot;)
+    labels = c(&quot;\nRain&gt;0.01\n&quot;, &quot;\nRain&gt;0.01 &amp;\n RH&gt;=90%\n&quot;)
   ) +
   scale_x_discrete(breaks = c(0, 90),
                    labels = c(&quot;rain&quot;, &quot;rh and rain&quot;)) +
   xlab(&quot;Infection period switch&quot;) +
   ylab(&quot;AUROC&quot;) +
   theme_article() +
+  theme(text = element_text(size=15))+
   coord_equal(10 / 1)</code></pre>
+<p><img src="images/plot_lw_estim-1.png" width="672" /></p>
 <pre class="r"><code>auc_data &lt;-
   auc_data %&gt;%
   filter(lw_rh == &quot;rainrh&quot;) %&gt;%
