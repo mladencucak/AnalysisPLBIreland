@@ -141,8 +141,8 @@ auc_data %>%
   xlab("Infection period switch") +
   ylab("AUROC") +
   theme_article() +
-  theme(text = element_text(size=15))+
-  coord_equal(10 / 1)
+  theme(text = element_text(size=17))+
+  coord_equal(13 / 1)
 
 ```
 
