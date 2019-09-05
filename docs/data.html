@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -261,48 +262,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = false;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -525,11 +487,11 @@ leaflet() %&gt;%
     label = &quot;Oak Park&quot;,
     icon = greenLeafIcon
   )</code></pre>
-<div id="htmlwidget-4ac0f3e1bc8ec6a8749f" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4ac0f3e1bc8ec6a8749f">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4bf86d6f424d9c7849f1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4bf86d6f424d9c7849f1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM (default)",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[52.8560667,-6.9121167,{"iconUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-green.png","index":0},"iconWidth":38,"iconHeight":95,"iconAnchorX":22,"iconAnchorY":94,"shadowUrl":{"data":"http://leafletjs.com/examples/custom-icons/leaf-shadow.png","index":0},"shadowWidth":50,"shadowHeight":64,"shadowAnchorX":4,"shadowAnchorY":62},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Oak Park",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[53.5,-8],6,[]],"limits":{"lat":[52.8560667,52.8560667],"lng":[-6.9121167,-6.9121167]}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="bio-data" class="section level1">
-<h1>Bio data</h1>
+<h1>Bio Data</h1>
 <p>Planting date and first observation of the disease are loaded.</p>
 <pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
 dates_cut &lt;-
@@ -1470,7 +1432,7 @@ Save the infilled weather data for the analysis for the analysis.</p>
 </div>
 <div id="weather-qc" class="section level2">
 <h2>Weather QC</h2>
-<p>Do some weather data quality controll.</p>
+<p>Do some weather data quality control.</p>
 <pre class="r"><code># Check if there are dupicated rows
 OP[duplicated(OP),  ]</code></pre>
 <div data-pagedtable="false">
@@ -1531,7 +1493,7 @@ hist(OP$rain[OP$rain&gt;0],
 <p><img src="images/wth_histograms-1.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-2.png" width="576" style="display: block; margin: auto;" /><img src="images/wth_histograms-3.png" width="576" style="display: block; margin: auto;" /> We can see that there is no suspicious values in the data. Rain is an often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens.</p>
 </div>
 <div id="weather-summaries" class="section level2">
-<h2>Weather summaries</h2>
+<h2>Weather Summaries</h2>
 <p>We shall summarise the weather data to get an idea about the general and potato late blight related climate conditions at Oak Park.</p>
 <pre class="r"><code>OP_rain &lt;- 
   OP %&gt;%
@@ -1986,10 +1948,10 @@ ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
   theme_article()+
   theme(legend.position = c(0.15, 0.85),)</code></pre>
 <p><img src="images/montly_risk_average_sums-1.png" width="672" /></p>
-<p>The number of wet hours that are within potato late blight biological range is rising from april to July. Mid- July is when the blight epidemics usually kick off.</p>
+<p>The number of wet hours that are within potato late blight biological range is rising from April to July. Mid-July is when the blight epidemics usually kick off.</p>
 </div>
 <div id="full-weather-plot" class="section level2">
-<h2>Full weather plot</h2>
+<h2>Full Weather Plot</h2>
 <p>Finally, the full daily weather data is presented below.</p>
 <details>
 <p><summary>The code</summary></p>
@@ -2094,6 +2056,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

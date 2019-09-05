@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -253,48 +254,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = false;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -451,7 +413,7 @@ div.tocify {
 
 <div id="parameter-evaluation" class="section level1">
 <h1>Parameter evaluation</h1>
-<p>Here we present the results of the sensitivity analysis.</p>
+<p>Here I present the results of the sensitivity analysis.</p>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
 <p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
@@ -499,7 +461,7 @@ if (any(as.numeric(packages_load) == 0)) {
 <pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
 </div>
 <div id="leaf-wetness-estimation" class="section level2">
-<h2>Leaf wetness estimation</h2>
+<h2>Leaf Wetness Estimation</h2>
 <p>Differences between pairs of models with same parameters, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
 <pre class="r"><code># load the data
 load( file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;auc_data.RData&quot;))
@@ -704,13 +666,13 @@ grDevices::png(filename = here::here(&quot;images&quot;, &quot;init_vis.png&quot
     width = 400, height = 800,bg = &quot;white&quot;, res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()</code></pre>
-<pre><code>## png 
-##   2</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
 <pre class="r"><code>p1;p2;p3</code></pre>
 <p><img src="images/desc_stat-1.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-2.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-3.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="model-fitting" class="section level3">
-<h3>Model fitting</h3>
+<h3>Model Fitting</h3>
 <pre class="r"><code>lapply(auc_data[, 1:3], function(x)
   sort(unique(x)))</code></pre>
 <pre><code>## $rh_thresh
@@ -763,7 +725,7 @@ sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(
 rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
   add_column( Order = 1:4, .before = 1) %&gt;% 
   add_column(., F_statistic = f_stat, .before = &quot;p.value&quot;) %&gt;% 
-  rename(&quot;No. of Parameteres&quot; = Rank,
+  rename(&quot;No. of Parameters&quot; = Rank,
          &quot;DF&quot; = &quot;Df.res&quot;,
          &quot;R sq.&quot; = &quot;R.squared&quot;,
          &quot;Adj. R sq.&quot; = &quot;Adj.R.sq&quot;,
@@ -781,7 +743,7 @@ rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;%
 Order
 </th>
 <th style="text-align:right;">
-No. of Parameteres
+No. of Parameters
 </th>
 <th style="text-align:right;">
 DF
@@ -1205,7 +1167,7 @@ cat(prettyModel)</code></pre>
 <p>AUROC = 0.74 - 0.6<em>RHt - 0.22</em>RHt<sup>2</sup> + 0.09<em>RHt<sup>3</sup> - 0.6</em>SDt + 2.32<em>RHt</em>SDt + 2.37<em>RHt<sup>2</sup></em>SDt - 0.16<em>SDt<sup>2</sup> + 4.83</em>RHt<em>SDt<sup>2</sup> + 0.04</em>SDt<sup>3</sup> + 0.31<em>Tt - 2.92</em>RHt<em>Tt + 2.38</em>RHt<sup>2</sup><em>Tt - 3.6</em>SDt<em>Tt + 21.18</em>RHt<em>SDt</em>Tt + 0.37<em>SDt<sup>2</sup></em>Tt - 0.04<em>Tt<sup>2</sup> + 0.46</em>RHt<em>Tt<sup>2</sup> - 0.83</em>SDt<em>Tt<sup>2</sup> - 0.13</em>Tt<sup>3</sup></p>
 </div>
 <div id="surface-plot-of-model-fits" class="section level3">
-<h3>Surface plot of model fits</h3>
+<h3>Surface Plot of Model Fits</h3>
 <p>Visualise fitted response surface.</p>
 <pre class="r"><code>z_min &lt;- min(auc_data$auc) - c(min(auc_data$auc) * 0.02)
 z_max &lt;- max(auc_data$auc) + c(max(auc_data$auc) * 0.02)
@@ -1309,8 +1271,8 @@ for (i in seq(nrow(par_cut))) {
 <p><img src="images/countour-1.png" width="960" /></p>
 </div>
 <div id="further-investigation" class="section level3">
-<h3>Further investigation</h3>
-<p>BaseBased on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:</p>
+<h3>Further Investigation</h3>
+<p>Based on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:</p>
 <pre class="r"><code>#Load function and the data
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))
 load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;AUROC_data.RData&quot;))
@@ -1413,6 +1375,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

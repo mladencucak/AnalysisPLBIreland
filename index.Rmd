@@ -2,12 +2,12 @@
 
 This repository is part of results of my PhD project. Here I present the evaluation of the potato late blight forecasting model used in Republic of Ireland, called Irish Rules. 
 
-The funding for this project comes from DAFM (Department of Agriculture, Food and Marine). 
+The funding for this project comes from [DAFM (Department of Agriculture, Food and Marine)](https://www.agriculture.gov.ie). 
 
 ## Notes 
 
 Some code chunks are folded and they can be accessed by clicking on the arrow (The code).  
-Try not to have other R sesions running because it could produce problems installing libraries.  
+Try not to have other R sessions running because it could produce problems installing libraries.  
 If there are any problems reproducing the analysis, please raise an issue on GitHub.  
 
 ## Project team

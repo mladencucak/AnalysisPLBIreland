@@ -1,6 +1,6 @@
 % Analysis
 
-Here we present the model and the methodology used in the analysis.  
+Here I present the model and the methodology used in the analysis.  
 
 # Libraries
 
@@ -8,7 +8,7 @@ Here we present the model and the methodology used in the analysis.
 knitr::opts_chunk$set(
   fig.path = "images/"
 )
-chooseCRANmirror(graphics=FALSE, ind=1)
+chooseCRANmirror(graphics = FALSE, ind = 1)
 knitr::knit_hooks$set(
   source = function(x, options) {
     hook.r = function(x, options) {
@@ -16,7 +16,7 @@ knitr::knit_hooks$set(
       language = tolower(options$engine)
       if (language == 'node') language = 'javascript'
       if (!options$highlight) language = 'text'
-      if(!is.null(options$foldcode)) {
+      if (!is.null(options$foldcode)) {
       paste0('\n\n', "<details><summary>The code</summary>\n", fence, language, '\n', x, fence,  '\n\n', "</details>\n")
       } else {
               paste0('\n\n', fence, language, '\n', x, fence,  '\n\n')
@@ -176,7 +176,7 @@ IrishRulesModel <- function(weather,
   } else{
     for (j in 1:length(idx)) {
       #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
-      if (if (lw_rhum=="rain") {
+      if (if (lw_rhum == "rain") {
         #if only rain
         (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) >= 0.1)           #just see rain sum
       } else{
@@ -328,7 +328,7 @@ head(OP[, c(1, 7, 9, 15, 24:30)], 5) %>%
 
 ```
 
-## Evaluation procedure
+## Evaluation Procedure
 
 The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
 
@@ -506,7 +506,7 @@ parallel::stopCluster(cl)
 Rather, the results of calculations from a prior run can be directly loaded.
 
 ```{r load-ROC}
-load(file = here::here("data", "op_2007_16","results","ROC_output.Rdata"))
+load(file = here::here("data", "op_2007_16","results", "ROC_output.Rdata"))
 ```
 
 Sort the outputs for each model variation.
@@ -524,7 +524,7 @@ ROC_data[[1]] %>%
 ```
 
 ```{r}
-save(ROC_data, file = here::here("data", "op_2007_16",  "ROC_data.RData"))
+save(ROC_data, file = here::here("data", "op_2007_16", "ROC_data.RData"))
 
 ```
 
@@ -579,18 +579,18 @@ df[nrow(df), c("sens", "one_min_spec")] <- 1
 
 
 #find AUROC value for selected model
-if("model"%in% names(AUROC_data)){
+if("model" %in% names(AUROC_data)){
   AUROC_lab <- paste("AUROC =", round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
-} else { #some changes in next chnk of code made this necessary, col model will be split and removed
+} else {#some changes in next chnk of code made this necessary, col model will be split and removed
   if(str_split(unique(df$model), "_")[[1]][4] == "rainrh"){
     mod_var <- str_split(unique(df$model), "_")
     mod_var[[1]][4] <- "rainrh"
-    implode <- function(..., sep='') {paste(..., collapse=sep)}
-    mod_var <-  implode(mod_var[[1]],sep="_")   
+    implode <- function(..., sep='') {paste(..., collapse = sep)}
+    mod_var <-  implode(mod_var[[1]], sep = "_")   
   }else{
     mod_var <- str_split(unique(df$model), "_")
-    implode <- function(..., sep='') {paste(..., collapse=sep)}
-    mod_var <-  implode(mod_var[[1]],sep="_") 
+    implode <- function(..., sep='') {paste(..., collapse = sep)}
+    mod_var <-  implode(mod_var[[1]], sep = "_") 
   }
   auc_val <- 
     unite(AUROC_data, col = model,  colnames(AUROC_data[,1:4]), sep = "_") %>% 
@@ -643,7 +643,7 @@ ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
     text = element_text(size = 10.5),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
-  )+
+  ) +
 geom_hline(
     yintercept = seq(0 , 1, 0.1),
     size = 0.5,
@@ -654,7 +654,7 @@ geom_hline(
 PlotROC(ROC_data[["90_10_12_rain"]])
 
 #Save ROC plotting function 
-save(PlotROC,file = here::here("data", "op_2007_16",  "PlotROC.RData"))
+save(PlotROC,file = here::here("data", "op_2007_16", "PlotROC.RData"))
 ```
 
 Prepare the data for further analysis and check the resulting data frame.
@@ -674,7 +674,7 @@ head(auc_data) %>%
 
 ```{r}
 auc_data
-save(auc_data, file = here::here("data", "op_2007_16",  "auc_data.RData"))
+save(auc_data, file = here::here("data", "op_2007_16", "auc_data.RData"))
 
 ```
 

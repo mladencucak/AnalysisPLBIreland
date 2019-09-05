@@ -104,7 +104,7 @@ leaflet() %>%
 
 ```
 
-# Bio data
+# Bio Data
 Planting date and first observation of the disease are loaded. 
 
 ```{r epidemic-initiation, fig.align='center'}
@@ -207,7 +207,7 @@ save(OP, file = here::here("data", "op_2007_16",  "OP_2007-2016_infilled.RData")
 
 ## Weather QC
 
-Do some weather data quality controll.
+Do some weather data quality control.
 ```{r checks}
 # Check if there are dupicated rows
 OP[duplicated(OP),  ]
@@ -257,9 +257,9 @@ hist(OP$rain[OP$rain>0],
 ```
 We can see that there is no suspicious values in the data. Rain is an often occurrence at Oak Park, although those are not heavy rains, which makes it a very good ground for the spread of crop pathogens. 
   
-## Weather summaries
+## Weather Summaries
   
-  We shall summarise the weather data to get an idea about the general and potato late blight related climate conditions at Oak Park. 
+We shall summarise the weather data to get an idea about the general and potato late blight related climate conditions at Oak Park. 
 ```{r wth_summary_all}
 OP_rain <- 
   OP %>%
@@ -497,9 +497,9 @@ ggplot(aes(month_abb, humid, fill = period_of_day, group)) +
   theme(legend.position = c(0.15, 0.85),)
 ```
 
-The number of wet hours that are within potato late blight biological range is rising from april to July. Mid- July is when the blight epidemics usually kick off.  
+The number of wet hours that are within potato late blight biological range is rising from April to July. Mid-July is when the blight epidemics usually kick off.  
   
-## Full weather plot
+## Full Weather Plot
 Finally, the full daily weather data is presented below. 
  
 

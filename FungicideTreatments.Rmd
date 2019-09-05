@@ -410,7 +410,7 @@ ControlFreqFun <-
   }
 ```
 
-Calculate the number of treatments for each warning threshold (EBH). Once again, we will use power of paralell processing for this task. 
+Calculate the number of treatments for each warning threshold (EBH). Once again, we will use power of parallel processing for this task. 
 
 ```{r apply-sense-spec-calc}
 #select max warning threshold
@@ -648,7 +648,7 @@ control_eval_long %>%
   
 It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years.   
   
-# Dose reduction for calendar treatment  
+# Dose Reduction for Calendar Treatment  
 Possible dose reductions are calculated for the usual 7 day calendar treatment.  
 Calculate the dose reductions based on the model outputs. Dose is reduced to quarters based on the risk output. The maximum dose is applied if the risk is over 12EBH.
 
@@ -795,7 +795,7 @@ dose_summary %>%
     'Mean Dose' = round(mean(dose),3),
     'sd' = round(sd(dose), 3),
     'Min \nTreatments' = min(treatments),
-    'Max Treatments'  = max(treatments),
+    'Max \nTreatments' = max(treatments),
     'Min Dose' = round(min(dose),3) ,
     'Max Dose' = round( max(dose),3)
   ) %>% 
