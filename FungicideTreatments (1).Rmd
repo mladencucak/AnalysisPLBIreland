@@ -1,0 +1,881 @@
+
+# Libraries
+
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::knit_hooks$set(
+  source = function(x, options) {
+    hook.r = function(x, options) {
+      fence <- "```"
+      language = tolower(options$engine)
+      if (language == 'node') language = 'javascript'
+      if (!options$highlight) language = 'text'
+      if(!is.null(options$foldcode)) {
+      paste0('\n\n', "<details><summary>The code</summary>\n", fence, language, '\n', x, fence,  '\n\n', "</details>\n")
+      } else {
+              paste0('\n\n', fence, language, '\n', x, fence,  '\n\n')
+      }
+    }
+    x = knitr:::hilight_source(x, 'markdown', options)
+    hook.r(
+      paste(c(
+        x, 
+        ''
+      ), collapse = '\n'), 
+      options
+    )
+  }
+)
+```
+
+Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.
+
+```{r setup, message=FALSE, warning=FALSE}
+list.of.packages <-
+  c(   
+    "tidyverse",
+    "readxl",
+    "data.table",
+    "lubridate",
+    "knitr",
+    "padr",
+    "readr",
+    "devtools",
+    "pracma",
+    "remotes",
+    "parallel",
+    "pbapply",
+    "ggrepel",
+    "ggthemes",
+    "egg",
+    "R.utils",
+    "rcompanion",
+    "mgsub",
+    "here",
+    "stringr",
+    "kableExtra",
+    "pander"
+  )
+
+new.packages <-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
+
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
+
+packages_load <-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste("Package/s: ", paste(list.of.packages[packages_load != TRUE], sep = ", "), "not loaded!"))
+} else {
+  print("All packages were successfully loaded.")
+}
+
+rm(list.of.packages, new.packages, packages_load)
+```
+
+# The Rationale  
+
+The crop risk prediction model is useful only if it provides same level of protection as the standard practice, while reducing necessary costs and labour. It was evident that the Irish Rules with their default variable thresholds were to conservative and failed to prove as sustainable solution for the disease forecasting.   
+Two alternative model parameterisations are proposed and in this section we will implement a theoretical study to evaluate the usefulness with regard to their their potential to save fungicide applications. 
+The performance is evaluated in two ways, as a reduction of:
+
+1. Number of treatments:
+
+  + With minimum window of 5 days between treatments 
+
+  + With minimum of 5 and maximum of 10 days between treatments
+
+2. Dose reduction based on 7 day calendar treatment  
+
+# Cut-off Dates
+
+Soil temperature data.
+
+```{r soiltemps , warning=FALSE}
+soildf <-
+  read_csv(
+    here::here("tmp", "agridata_375.csv"),
+    col_types = cols(X1 = col_skip(), X10 = col_skip()),
+    skip = 7
+  )
+soildf$date = as.Date(soildf$date, format = "%d-%b-%Y",  tz = "UTC")
+soildf <-
+  tidyr::separate(soildf,
+                  "date",
+                  c("year_var", "month", "day"),
+                  sep = "-",
+                  remove = F)
+soildf$doy <-  yday(soildf$date)
+soildf[, 2:5] <- lapply(soildf[, 2:5], as.numeric)
+```
+  
+We assume that the planting starts day after the daily average soil temperature becomes higher than 8&deg;C for three consecutive days in the beginning of April. This is common practice in Ireland, recommended by Teagasc.  
+  
+```{r }
+soildf <- soildf[with(soildf, month >= 4), ]
+dfls <- base::split(soildf, soildf$year_var)
+dates_cut <-
+  lapply(dfls, function(x) {
+    criteria <- as.numeric(x$soil > 8)
+    #cumulative sum days matching the criteria
+    criteria_sum <-
+      stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+    pl_date <- x[match(3, criteria_sum) + 1, "date"]
+    data.frame("year" = unique(year(x$date)),
+               date = pl_date[1, 1])
+  }) %>%
+  bind_rows() %>%
+  rename("plant_date"  = date)
+rm(soildf, dfls)
+```
+  
+The data for 2007 is missing so we shall use the mean date from other years. 
+  
+```{r missingyear_soiltemp, warning=FALSE}
+dates_cut$plant_doy <- yday(dates_cut$plant_date)
+dates_cut <-
+  bind_rows(
+    list(
+      dates_cut,
+      data.frame(
+        year = 2007,
+        plant_date = as.Date(strptime(paste("2007", mean(dates_cut$plant_doy, na.rm = TRUE)), format = "%Y %j")),
+        plant_doy = mean(dates_cut$plant_doy)
+      )
+    ))
+```
+  
+We will assume that the full emergence takes 3 and additional minimum of 2 weeks for full emergence and for the first plants to start meeting in the rows. 
+  
+```{r}
+meet_in_rows <- 5 * 7
+dates_cut$prot_start <- with(dates_cut, plant_doy + meet_in_rows)
+dates_cut$prot_start <- paste(dates_cut$year,
+                              dates_cut$prot_start,
+                              sep = "-") %>%
+  strptime(format = "%Y-%j") %>%
+  as.Date()
+```
+   
+For the purposes of this study we will assume that the growing season lasts 120 days. However, the pesticide protection lasts for at least another three weeks to allow the tuber growth.   
+  
+```{r}
+duration_of_season <- 120 + 21
+dates_cut$season_end <-
+  with(dates_cut, plant_doy + duration_of_season)
+dates_cut$season_end <-
+  paste(dates_cut$year,
+        dates_cut$season_end,
+        sep = "-") %>%
+                strptime(format = "%Y-%j") %>%
+  as.Date()
+
+dates_cut
+```
+
+
+Load the weather data with model outputs. 
+
+```{r}
+load(file = here::here("data", "op_2007_16", "OP_for_analysis.RData"))
+
+years <-  unique(OP$year_var)
+
+df <- filter(OP, month >= 2 & month <= 9)
+rm(OP)
+df <-
+  df[, c(
+    "date",
+    "year_var",
+    "short_date",
+    "week_var",
+    "doy",
+    "rain",
+    "temp",
+    "rhum",
+    "90_10_12_rain_ebh",
+    "88_12_10_rainrh_ebh",
+    "88_10_10_rainrh_ebh"
+  )]
+
+#Keep only  columns needed for faster code execution
+df <-  dplyr::rename(df,
+                     ir = "90_10_12_rain_ebh",
+                     ir_opt = "88_12_10_rainrh_ebh",
+                     ir_low_risk =  "88_10_10_rainrh_ebh")
+
+```
+# Treatment Frequency: Model vs. Calendar 
+
+Calculate the number of calendar treatments, assuming they would start 5 weeks and end `r duration_of_season` days after the planting 
+
+```{r}
+(calendar_five <- round(c(duration_of_season - 5 * 7) / 5, 0))
+(calendar_seven <- round(c(duration_of_season - 5 * 7) / 7, 0))
+
+```
+
+We are assuming that a fungicide treatment is activated every time the warning threshold is reached. Minimum period until the next treatment is 5 days. Cumulative sum of recommended treatments is calculated per season.  
+  
+```{r treatment-calc}
+
+ControlFreqFun <-
+  function(y,
+           weather_data,
+           dates_cut,
+           min_prot_dur = NULL,
+           max_prot_dur = NULL) {
+    #Set the warning threshold and run the rest of the script
+    warning_threshold <- y
+    #Weather and model output data
+    fun_df <- weather_data
+    
+    #Each warning would cause treatment that will keep the plants protected for a period of time
+    min_prot_dur <-
+      ifelse(is.null(min_prot_dur), 5, min_prot_dur)#If not defined default value is 5 days
+    max_prot_dur <-
+      ifelse(is.null(max_prot_dur), 10, max_prot_dur)#If not defined default value is 10 days
+    
+    
+    #A function to subset the data for the period of interest in each year
+    test.overlap = function(vals, start_date, end_date) {
+      rowSums(mapply(function(a, b)
+        between(vals, a, b),
+        start_date, end_date)) > 0
+    }
+    
+    #Subset the of the data for the duration of 'protection' period for each year
+    trt_df <-
+      fun_df  %>%
+      filter(
+        test.overlap(
+          short_date,
+          dates_cut$prot_start,
+          dates_cut$season_end + max_prot_dur #Additional days for risk estimation and timing of treatments
+        )
+      ) %>%
+      dplyr::select(
+        ends_with("year_var"),
+        ends_with("week_var"),
+        ends_with("doy"),
+        starts_with("ir")
+      ) %>%
+      group_by(year_var) %>%
+      #if there was an accumulation from previous day, it would triger a warning
+      #Check all of the first five rows because of possible break of 5 hours
+      mutate_at(., .vars = colnames(.[grep("ir", colnames(.))]),
+                funs(
+                  ifelse(row_number() <= 5 & . >= warning_threshold,
+                         warning_threshold, .)
+                )) %>%
+      #all five values all changed so we have to delete 4 of them and leave only 1
+      mutate_at(., .vars = colnames(.[grep("ir", colnames(.))]),
+                funs(ifelse(
+                  row_number() <= 4 & . == warning_threshold, 0, .
+                ))) %>%
+      # Change values coresponding to the warning threshold to 1 for calculating the sum
+      mutate_at(., .vars = colnames(.[grep("ir", colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %>%
+      group_by(year_var, week_var, doy) %>%
+      summarise_at(., .vars = colnames(.[grep("ir", colnames(.))]), .funs = sum)
+    
+    
+    #####################################################################
+    #Calculate the number of treatments with with minimum protection duration of 5 days
+    TreatmentWindowOne <-
+      function(model_output,
+               min_prot_dur ,
+               max_prot_dur) {
+        # model_output <- trt_df_one[[1]]$ir
+        
+        y <- model_output
+        
+        for (i in seq_along(1:c(length(y) - max_prot_dur))) {
+          #Following treatment will be implemented on day 5 if there is 1 in the next five days
+          if (y[i] == 1 & sum(y[c(i + 1):c(i + min_prot_dur)]) > 0) {
+            y[i + min_prot_dur] <- 1
+            y[c(i + 1):c(i + c(min_prot_dur - 1))] <- 0
+          }
+        }
+        #Add zeros for the duration of added period
+        y[c(length(y) - max_prot_dur):length(y)] <- 0
+        y
+      }
+    
+    #Apply function on yearly subsets
+    trt_df_one <-
+      split(trt_df, trt_df$year_var)
+    
+    for (year in seq_along(trt_df_one)) {
+      x <- trt_df_one[[year]]
+      trt_df_one[[year]] <-
+        
+        lapply(x[grep("ir", colnames(x))], function(x)
+          TreatmentWindowOne(x, min_prot_dur , max_prot_dur)) %>%
+        bind_cols()
+    }
+    
+    trt_df_one <-  bind_rows(trt_df_one)
+    trt_df_one <-  bind_cols(trt_df["year_var"], trt_df_one)
+
+   
+    #####################################################################
+    #Calculate the number of treatments with 5-10 day sliding treatment interval
+    TreatmentWindow <-
+      function(model_output,
+               min_prot_dur ,
+               max_prot_dur) {
+        x <- model_output
+        #attach vector, 10 days of 0
+        y <- vector(mode = "numeric", length = length(x))
+        # find the first treatment
+        y[which(x == 1)[1]] <- 1
+        
+        
+        for (i in seq_along(1:c(length(y) - max_prot_dur))) {
+          #Following treatment will be implemented on day 5 if there is 1 in the next five days
+          if (y[i] == 1 & sum(x[c(i + 1):c(i + 5)]) > 0) {
+            y[i + 5] <- 1
+          }
+          #Or on any following day with risk threshold reached
+          if (y[i] == 1 &
+              sum(x[c(i + 1):c(i + 5)]) == 0 & x[i + 6] == 1) {
+            y[i + 6] <- 1
+          }
+          if (y[i] == 1 &
+              sum(x[c(i + 1):c(i + 6)]) == 0 & x[i + 7] == 1) {
+            y[i + 7] <- 1
+          }
+          if (y[i] == 1 &
+              sum(x[c(i + 1):c(i + 7)]) == 0 & x[i + 8] == 1) {
+            y[i + 8] <- 1
+          }
+          if (y[i] == 1 &
+              sum(x[c(i + 1):c(i + 8)]) == 0 & x[i + 9] == 1) {
+            y[i + 9] <- 1
+          }
+          #If warning threshold was not reached at all or 10th day, then spray on 10th day
+          if (y[i] == 1 & sum(x[c(i + 1):c(i + 9)]) == 0) {
+            y[i + 10] <- 1
+          }
+          #if there was no treatment
+          if (i == c(length(y) - max_prot_dur))
+            break
+        }
+        #Add zeros for the duration of added period
+        y[c(length(y) - max_prot_dur):length(y)] <- 0
+        y
+      }
+    
+    #If the threshold is reached twive within a single day reset the value to 1 to enable the counter
+    trt_df[, grep("ir", colnames(trt_df))] <-
+      lapply(trt_df[, grep("ir", colnames(trt_df))], function(x)
+        ifelse(x > 1, 1, x))    
+    
+    trt_df_window <-
+      split(trt_df, trt_df$year_var)
+    
+    # Calculate number of treatments per year
+    for (year in seq_along(trt_df_window)) {
+      x <- trt_df_window[[year]]
+      trt_df_window[[year]] <-
+        lapply(x[grep("ir", colnames(x))], function(x)
+          TreatmentWindow(x, min_prot_dur, max_prot_dur)) %>%
+        bind_cols() %>%
+        rename_all(., .funs = funs(paste0("w_", .)))
+    }
+    
+    trt_df_window <-  bind_rows(trt_df_window)
+    
+    #Combine the data for both scenarios
+    trt_df <- bind_cols(trt_df_one, trt_df_window)
+    
+    #Calculate number of treatmetns per year
+    sum_df <-
+      trt_df %>%
+      group_by(year_var) %>%
+      summarise_at(colnames(trt_df[, grep("ir", colnames(trt_df))]),
+                   .funs = sum)
+    
+    sum_df$warning_thres <-  warning_threshold
+    
+    return(sum_df)
+  }
+```
+
+Calculate the number of treatments for each warning threshold (EBH). Once again, we will use power of paralell processing for this task. 
+
+```{r apply-sense-spec-calc}
+#select max warning threshold
+warning_thresholds <- 1:18
+
+begin <- Sys.time()
+#Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
+cores <- ifelse(detectCores() > 1, detectCores() - 1, 1)
+cl <- makeCluster(cores)
+clusterExport(cl, c("df", "dates_cut", "ControlFreqFun"))
+
+clusterEvalQ(cl, library("tidyverse", quietly = TRUE, verbose = FALSE))
+control_eval <- pbapply::pblapply(warning_thresholds, function(x)
+{
+  xx <-
+    ControlFreqFun(x,
+                   df,
+                   dates_cut,
+                   min_prot_dur = 5,
+                   max_prot_dur = 10)
+  return(xx)
+},
+cl = cl)
+begin - Sys.time() #check the duration of the pcontrol_evaless in the console
+stopCluster(cl)
+```
+
+Melt the data frame.
+```{r}
+control_eval_long <-
+  control_eval %>%
+  bind_rows() %>%
+  reshape2::melt(
+    id.vars = c("year_var", "warning_thres"),
+    variable.name = "programme",
+    value.name = "no_of_treatments"
+  )
+control_eval_long %>%
+  head() %>%
+  pander()
+```
+  
+
+```{r plot_models, warning=F, fig.align="center", fig.dim= c(11,8)}
+plot_models <- 
+control_eval_long %>%
+  # control_eval_long%>%
+  mutate(programme = ifelse(
+    programme == "ir",
+    "a) Default IR",
+    ifelse(
+      programme == "ir_opt",
+      "b) Optimised IR",
+      ifelse(
+        programme == "ir_low_risk",
+        "c) Low Risk IR",
+        ifelse(
+          programme == "w_ir",
+          "d) Default IR 5-10d",
+          ifelse(
+            programme == "w_ir_opt",
+            "e) Optimised IR 5-10d",
+            ifelse(programme == "w_ir_low_risk", "f) Low Risk IR 5-10d", "")
+          )
+        )
+      )
+    )
+  )) %>%
+  mutate(programme = factor(
+    programme,
+    levels = c(
+      "a) Default IR",
+      "b) Optimised IR",
+      "c) Low Risk IR",
+      "d) Default IR 5-10d",
+      "e) Optimised IR 5-10d",
+      "f) Low Risk IR 5-10d"
+    )
+  )) %>%
+  mutate(Years = factor(year_var)) %>%
+  ggplot(., aes(factor(warning_thres), no_of_treatments)) +
+  geom_vline(
+    xintercept = seq(1, 18, 1),
+    size = 0.2,
+    color = "gray",
+    linetype = "dotted"
+  ) +
+  geom_vline(
+    xintercept = seq(3, 15, 3),
+    size = 0.2,
+    color = "gray",
+    linetype = "solid"
+  ) +
+  geom_jitter(
+    aes(color = Years),
+    position = position_jitter(width = 0.1),
+    alpha = 0.6,
+    size = 1
+  ) +
+  scale_colour_brewer(palette = "Set3") +
+  geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_seven + 0.8 , label = "7-day freq."),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA
+  ) +
+  geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_five + 0.8, label = "5-day freq."),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA
+  ) +
+  geom_smooth(method = "loess",
+              se = FALSE,
+              color = gray.colors(2)[1],
+              aes(group = 1)) +
+  facet_wrap(~ programme, ncol = 3) +
+  # ggtitle("Cost effectiveness of model versions") +
+  
+  xlab("Warning thresholds (EBH)") +
+  ylab("Number of treatments") +
+  scale_x_discrete(breaks = seq(0, 18, 3)) +
+  theme(legend.position = "top") +
+  theme_article()+
+  theme(text = element_text(size=18))
+
+
+  ggsave(plot = plot_models,
+  file = here::here("images", "pub","plot_models.png"),
+  device = "png",
+  width = 19,
+  height = 13,
+  units = "cm",
+  dpi = 500
+)
+  plot_models
+```
+  
+  The figure shows how does the frequency of recommended  treatments vary with the increasing decision thresholds of the three model versions and how does it differ from the calendar spray programmes. The dots represent the number of treatments in relation to corresponding warning threshold, where each dot represents a single year. If the fitted smoothed line is above the estimated calendar frequency line, the model recommends more treatments than the usual standard calendar programme.  
+  
+There is variation in the data and it would be interesting to see if there is an effect of year. 
+
+```{r plot_years, warning=F, fig.align="center", fig.dim= c(11,9)}
+control_eval_long %>%
+  mutate(programme = ifelse(
+    programme == "ir",
+    "Default IR",
+    ifelse(
+      programme == "ir_opt",
+      "Optimised IR",
+      ifelse(
+        programme == "ir_low_risk",
+        "Low Risk IR",
+        ifelse(
+          programme == "w_ir",
+          "Default IR 5-10d",
+          ifelse(
+            programme == "w_ir_opt",
+            "Optimised IR 5-10d",
+            ifelse(programme == "w_ir_low_risk", "Low Risk IR 5-10d", "")
+          )
+        )
+      )
+    )
+  )) %>%
+  mutate(programme = factor(
+    programme,
+    levels = c(
+      "Default IR",
+      "Optimised IR",
+      "Low Risk IR",
+      "Default IR 5-10d",
+      "Optimised IR 5-10d",
+      "Low Risk IR 5-10d"
+    )
+  )) %>% 
+  mutate(Years = factor(year_var)) %>%
+  ggplot(.,
+         aes(
+           factor(warning_thres),
+           no_of_treatments,
+           group = programme,
+           colour = programme
+         )) +
+  geom_vline(
+    xintercept = seq(1, 18, 1),
+    size = 0.2,
+    color = "gray",
+    linetype = "dotted"
+  ) +
+  geom_vline(
+    xintercept = seq(3, 15, 3),
+    size = 0.2,
+    color = "gray",
+    linetype = "solid"
+  ) +
+  geom_line(aes()) +
+  geom_line(aes(warning_thres, calendar_seven), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_seven + 0.8 , label = "7-day freq."),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 3
+  ) +
+  geom_line(aes(warning_thres, calendar_five), colour = gray.colors(2)[1]) +
+  geom_label(
+    aes(14, calendar_five + 0.8, label = "5-day freq."),
+    colour = gray.colors(2)[1],
+    fill = NA,
+    label.size = NA,
+    size = 3
+  ) +
+  facet_wrap(~ Years, ncol = 5) +
+  ggtitle("Treatment Frequency as a Factor the Decision Threshold") +
+  theme(strip.text.y = element_blank()) +
+  xlab("Warning thresholds (EBH)") +
+  ylab("Number of treatments") +
+  theme_article() +
+  geom_vline(
+    xintercept = c(2, 3, 4),
+    size = 0.5,
+    color = "gray",
+    linetype = "dotted"
+  ) +
+  scale_x_discrete(breaks = seq(0, 18, 3)) +
+  scale_y_continuous(breaks = seq(0, 30, 5)) +
+  scale_colour_brewer("Model",
+                      palette = "Dark2") +
+  theme(legend.position = "top",
+        text = element_text(size = 14))
+```
+  
+It is evident that setting a threshold to even a minimum accumulation of risk, in other words a single effective blight hour, is triggering less treatments in certain years.   
+  
+# Dose reduction for calendar treatment  
+Possible dose reductions are calculated for the usual 7 day calendar treatment.  
+Calculate the dose reductions based on the model outputs. Dose is reduced to quarters based on the risk output. The maximum dose is applied if the risk is over 12EBH.
+
+```{r}
+test.overlap = function(vals, start_date, end_date) {
+  rowSums(mapply(function(a, b)
+    between(vals, a, b),
+    start_date, end_date)) > 0
+}
+#Dose calculation function based on the risk output
+Dose <-  function(x) {
+  ifelse(x >= 0 & x <= 3, 0,
+         ifelse(x > 3 & x <= 6, 0.25,
+                ifelse(
+                  x > 6 & x <= 9, 0.5,
+                  ifelse(x > 9 & x <= 12, 0.75,
+                         ifelse(x > 12,  1, 1))
+                )))
+}
+```
+  
+The function is applied on the data. 
+
+```{r}
+dosedf <-
+  df %>%
+  filter(test.overlap(short_date,
+                      dates_cut$prot_start,
+                      dates_cut$season_end)) %>%
+  dplyr::select(ends_with("year_var"),
+                ends_with("week_var"),
+                ends_with("doy"),
+                starts_with("ir")) %>%
+  group_by(year_var, week_var, doy) %>%
+  summarise_at(., .vars = colnames(.[grep("ir", colnames(.))]), .funs = max) %>%   #get max daily values
+  group_by(year_var) %>%
+  mutate(treat_week = sort(rep(seq(1, 19, 1), 7))[1:n()]) %>%
+  group_by(year_var, treat_week) %>%
+  summarise_at(., .vars = colnames(.[grep("ir", colnames(.))]), .funs = max) %>%
+  mutate_at(.,
+            .vars = colnames(.[grep("ir", colnames(.))]),
+            .funs = Dose)
+
+```
+
+```{r dose_reduction_each_year}
+#Get number of treatments per year and the dose reduction
+Summary <- function(x) {
+  data.frame(
+    n = length(x),
+    treatments = sum(as.numeric(x != 0)),
+    dose = sum(x) / length(x)
+  )
+}
+
+p1 <- 
+dosedf %>%
+  dplyr::select(-("treat_week")) %>%
+  reshape2::melt(id = "year_var",
+                 variable.name = "model",
+                 value.name = "dose") %>%
+  mutate(model = ifelse(
+    model == "ir",
+    "Default IR",
+    ifelse(
+      model == "ir_opt",
+      "Optimised IR",
+      ifelse(model == "ir_low_risk", "Low Risk IR", "")
+    )
+  )) %>%
+  mutate(model = factor(model, levels = c("Default IR",
+                                          "Optimised IR",
+                                          "Low Risk IR"))) %>%
+  group_by(year_var, model) %>%
+  do(Summary(.$dose)) %>%
+  ggplot(aes(
+    x = year_var,
+    y = dose,
+    fill = model,
+    group = model
+  )) +
+  geom_bar(
+    color = "black",
+    stat = "identity",
+    position = position_dodge(),
+    width = 0.9
+  ) +
+  geom_text(
+    aes(label = treatments),
+    vjust = -0.3,
+    color = "black",
+    position = position_dodge(0.9),
+    size = 2.9
+  ) +
+  scale_fill_brewer("Model:", palette = "Dark2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  theme_article() +
+  facet_grid(~ year_var, scales = "free") +
+  labs(x = "Year",
+       y = "Dose Reduction") +
+  theme(
+    axis.title = element_text(size = 11),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 9),
+    legend.position = "top",
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )+
+  theme(text = element_text(size=14))
+p1
+```
+  
+Now, let us make some summaries to see if we can reduce the number of treatments and fungicide usage based on the model outputs.
+
+```{r dose_reduction_overall}
+dose_summary <- 
+dosedf %>%
+  dplyr::select(-("treat_week")) %>%
+  reshape2::melt(id = "year_var",
+                 variable.name = "model",
+                 value.name = "dose") %>%
+  mutate(model = ifelse(
+    model == "ir",
+    "Default IR",
+    ifelse(
+      model == "ir_opt",
+      "Optimised IR",
+      ifelse(model == "ir_low_risk", "Low Risk IR", "")
+    )
+  )) %>%
+  mutate(model = factor(model,
+                        levels = c("Default IR",
+                                   "Optimised IR",
+                                   "Low Risk IR"))) %>%
+  group_by(year_var, model) %>%
+  do(Summary(.$dose))
+  
+dose_summary %>%
+  mutate(Model = model) %>% 
+  group_by(Model) %>%
+  summarise(
+    'Mean Treatments' = mean(treatments),
+    'Mean Dose' = round(mean(dose),3),
+    'sd' = round(sd(dose), 3),
+    'Min \nTreatments' = min(treatments),
+    'Max Treatments'  = max(treatments),
+    'Min Dose' = round(min(dose),3) ,
+    'Max Dose' = round( max(dose),3)
+  ) %>% 
+  kable(format = "html") %>% 
+  kableExtra::kable_styling( latex_options = "striped",full_width = FALSE)
+```
+
+```{r}
+p2 <- 
+dose_summary %>% 
+  group_by(model) %>%
+  summarise(mean_trt = mean(treatments),
+            mean = mean(dose),
+            sd = sd(dose)) %>% 
+ggplot(., aes(
+  x = model,
+  y = mean,
+  fill = model,
+  group = model
+)) +
+  geom_bar(
+    color = "black",
+    stat = "identity",
+    position = position_dodge(),
+    width = 0.7
+  ) +
+  geom_errorbar(aes(ymin = mean - sd,
+                    ymax = mean + sd), 
+                width = 0.2,
+                color = "gray") +
+  
+  scale_fill_brewer("Model:", palette = "Dark2") +
+  theme_article() +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  labs(x = "Model",
+       y = "Dose Reduction\n") +
+  theme(
+    axis.title = element_text(size = 11),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 11),
+    legend.position = "none",
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  ) 
+p2 +
+  theme(legend.position = c(0.35, 0.85))+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = "black",
+    position = position_dodge(0.9),
+    size = 6
+  ) +
+  coord_equal(6 / 1)+
+  theme(text = element_text(size=14))
+```
+
+
+```{r dose_reduction_all}
+p2 <- 
+p2+
+  labs(x = "Overall", y= "")+
+  theme(axis.text = element_blank(),
+        axis.ticks.y = element_blank())+
+  geom_text(
+    aes(label = mean_trt),
+    vjust = -0.3,
+    hjust =  0.4,
+    color = "black",
+    position = position_dodge(0.9),
+    size = 2.9
+  ) +
+  coord_equal(1 / 1)
+ggarrange(p1, p2, ncol = 2, widths = c(10,1))
+```
+
+
+Packages used
+```{r}
+sessionInfo()
+```

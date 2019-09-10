@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Results1.utf8.md</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PLB DSS Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa fa fa-home"></span>
+     
+    About
+  </a>
+</li>
+<li>
+  <a href="data.html">
+    <span class="fa fa fa fa-table"></span>
+     
+    Data
+  </a>
+</li>
+<li>
+  <a href="Analysis.html">
+    <span class="fa fa fa fa-file-code-o"></span>
+     
+    Analysis
+  </a>
+</li>
+<li>
+  <a href="Results1.html">
+    <span class="fa fa fa fa-bar-chart"></span>
+     
+    Results
+  </a>
+</li>
+<li>
+  <a href="FungicideTreatments.html">
+    <span class="fa fa fa fa-lightbulb-o"></span>
+     
+    Usefulness
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mladencucak/AnalysisPLBIreland">
+    <span class="fa fa-github-square"></span>
+     
+    source
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="parameter-evaluation" class="section level1">
+<h1>Parameter evaluation</h1>
+<p>Here we present the results of the sensitivity analysis.</p>
+<div id="libraries" class="section level2">
+<h2>Libraries</h2>
+<p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
+<pre class="r"><code>list.of.packages &lt;-
+  c(
+    &quot;DescTools&quot;,
+    &quot;tidyverse&quot;,
+    &quot;readxl&quot;,
+    &quot;data.table&quot;,
+    &quot;knitr&quot;,
+    &quot;zoo&quot;,
+    &quot;imputeTS&quot;,
+    &quot;ggthemes&quot;,
+    &quot;rcompanion&quot;,
+    &quot;mgsub&quot;,
+    &quot;R.utils&quot;,
+    &quot;here&quot;,
+    &quot;stringr&quot;,
+    &quot;pander&quot;,
+    &quot;egg&quot;,
+    &quot;rsm&quot;,
+    &quot;ggrepel&quot;,
+    &quot;cowplot&quot;,
+    &quot;viridis&quot;,
+    &quot;kableExtra&quot;
+  )
+
+new.packages &lt;-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
+
+#Download packages that are not already present in the library
+if (length(new.packages))
+  install.packages(new.packages, force = TRUE, dependencies = TRUE)
+
+packages_load &lt;-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste(&quot;Package/s: &quot;, paste(list.of.packages[packages_load != TRUE], sep = &quot;, &quot;), &quot;not loaded!&quot;))
+} else {
+  print(&quot;All packages were successfully loaded.&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
+<pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
+</div>
+<div id="leaf-wetness-estimation" class="section level2">
+<h2>Leaf wetness estimation</h2>
+<p>Differences between pairs of models with same parameters, differing only in leaf wetness estimation. We shall consult visual aids to assess if distribution of differences follows normal distribution.</p>
+<pre class="r"><code># load the data
+load( file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;auc_data.RData&quot;))
+
+t_data &lt;-
+  auc_data %&gt;%
+  group_by(rh_thresh, temp_thresh, hours) %&gt;%
+  unite(var, rh_thresh, temp_thresh, hours) %&gt;%
+  spread(key = lw_rh, value = auc) %&gt;%
+  mutate(difference = rain - rainrh)
+
+ggplot(t_data, aes(x = difference)) +
+  geom_density(fill = &quot;royalblue&quot;,
+               alpha = 0.5,
+               color = NA) +
+  geom_point(aes(y = 0),
+             alpha = 0.5) +
+  geom_histogram(binwidth = 0.001) +
+  theme_article()</code></pre>
+<p><img src="images/leaf-wet-graphs-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Compute summary statistics by groups.</p>
+<pre class="r"><code>group_by(auc_data, lw_rh) %&gt;%
+  summarise(
+    count = n(),
+    median = median(auc, na.rm = TRUE),
+    IQR = IQR(auc, na.rm = TRUE)
+  ) %&gt;%
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+lw_rh
+</th>
+<th style="text-align:right;">
+count
+</th>
+<th style="text-align:right;">
+median
+</th>
+<th style="text-align:right;">
+IQR
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+343
+</td>
+<td style="text-align:right;">
+0.6953608
+</td>
+<td style="text-align:right;">
+0.0601804
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+343
+</td>
+<td style="text-align:right;">
+0.7345361
+</td>
+<td style="text-align:right;">
+0.0902706
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>shapiro.test(t_data$difference)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  t_data$difference
+## W = 0.8718, p-value = 2.877e-16</code></pre>
+<p>The p-value &lt; 0.05 implying that the distribution of the data is significantly different from normal distribution.</p>
+<p>Use paired-sample Wilcoxon test to determine if median AUROC with rain as LW estimator is as good as the median auc with both rain and RH as estimators.</p>
+<pre class="r"><code>w.test &lt;- with(t_data,
+               wilcox.test(
+                 rain,
+                 rainrh,
+                 paired = TRUE,
+                 exact = F,
+                 alternative = &quot;less&quot;
+               ))
+w.test</code></pre>
+<pre><code>## 
+##  Wilcoxon signed rank test with continuity correction
+## 
+## data:  rain and rainrh
+## V = 11211, p-value &lt; 2.2e-16
+## alternative hypothesis: true location shift is less than 0</code></pre>
+<p>Wilcoxon signed rank test showed that median AUROC is greater when using both rain &gt;0.1 mm and RH&gt;90% instead only rain &gt;0.1 mm and as leaf wetness indicators with p &lt; 0.001. Model outputs with rain as single predictor are removed from further analysis.</p>
+<pre class="r"><code>auc_data %&gt;%
+  mutate(Leaf_Wetness = factor(ifelse(
+    lw_rh == &quot;rainrh&quot;, &quot;rain and rh&quot;, &quot;only rain&quot;
+  ))) %&gt;%
+
+  ggplot(aes(
+    x = factor(lw_rh),
+    y = auc,
+    group = Leaf_Wetness
+  )) +
+  geom_boxplot(aes(fill = Leaf_Wetness),
+               width = 0.4) +
+  scale_fill_brewer(
+    palette = &quot;Dark2&quot;,
+    name = &quot;Leaf Wetness&quot;,
+    labels = c(&quot;\nRain&gt;0.01\n&quot;, &quot;\nRain&gt;0.01 &amp;\n RH&gt;=90%\n&quot;)
+  ) +
+  scale_x_discrete(breaks = c(0, 90),
+                   labels = c(&quot;rain&quot;, &quot;rh and rain&quot;)) +
+  xlab(&quot;Infection period switch&quot;) +
+  ylab(&quot;AUROC&quot;) +
+  theme_article() +
+  theme(text = element_text(size=17))+
+  coord_equal(13 / 1)</code></pre>
+<p><img src="images/plot_lw_estim-1.png" width="672" /></p>
+<pre class="r"><code>auc_data &lt;-
+  auc_data %&gt;%
+  filter(lw_rh == &quot;rainrh&quot;) %&gt;%
+  select(-lw_rh)</code></pre>
+</div>
+<div id="t-rh-and-sporulation-duration" class="section level2">
+<h2>T, RH and sporulation duration</h2>
+<div id="initial-exploration" class="section level3">
+<h3>Initial exploration</h3>
+<p>Scatter plot matrix shows some relationships between y and other variables.</p>
+<pre class="r"><code>GGally::ggpairs(auc_data,
+                lower = list(continuous = &quot;points&quot;),
+                upper = list(continuous = &quot;cor&quot;))</code></pre>
+<p><img src="images/interactions-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Increasing temperature threshold had positive, while reducing RH and duration of sporulation threshold had negative correlation with AUROC.</p>
+<p>Take initial look at descriptive statistics and trend of AUROC response as a factor of each variable investigated.</p>
+<pre class="r"><code>p1 &lt;-  
+  auc_data[order(auc_data$hours), ] %&gt;%
+  ggplot(., aes(factor(hours), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;Durations of sporulation period&quot;) +
+  geom_smooth(method = &quot;loess&quot;,
+              se = T,
+              color = &quot;red&quot;,
+              aes(group = 1)) +
+  xlab(&quot;Sporulation period (hours)&quot;) +
+  ylab(&quot;AUROC&quot;) +
+  theme_article()
+
+p2 &lt;- 
+  ggplot(auc_data, aes(factor(rh_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;RH thresholds for sporulation and infection&quot;) +
+  geom_smooth(method = &quot;loess&quot;,
+              se = T,
+              color = &quot;blue&quot;,
+              aes(group = 1)) +
+  ylab(&quot;AUROC&quot;) +
+  xlab(&quot;RH threshold (%)&quot;) +
+  theme_article()
+
+p3 &lt;-  
+  ggplot(auc_data, aes(factor(temp_thresh), auc)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(
+    position = position_jitter(width = 0.2),
+    colour = &quot;black&quot;,
+    alpha = 0.6,
+    size = 0.7
+  ) +
+  ggtitle(&quot;Temperature thresholds for sporulation and infection&quot;) +
+  geom_smooth(
+    method = &quot;loess&quot;,
+    se = T,
+    color = &quot;black&quot;,
+    aes(group = 1),
+    show.legend = T
+  ) +
+  xlab(&quot;Temperature threshold (°C)&quot;) +
+  ylab(&quot;AUROC&quot;) +
+  theme_article()
+
+grDevices::png(filename = here::here(&quot;images&quot;, &quot;init_vis.png&quot;),
+    width = 400, height = 800,bg = &quot;white&quot;, res = NA)
+egg::ggarrange(p1,p2,p3, ncol = 1)
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
+<pre class="r"><code>p1;p2;p3</code></pre>
+<p><img src="images/desc_stat-1.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-2.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-3.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="model-fitting" class="section level3">
+<h3>Model fitting</h3>
+<pre class="r"><code>lapply(auc_data[, 1:3], function(x)
+  sort(unique(x)))</code></pre>
+<pre><code>## $rh_thresh
+## [1] 87 88 89 90 91 92 93
+## 
+## $temp_thresh
+## [1]  7  8  9 10 11 12 13
+## 
+## $hours
+## [1]  9 10 11 12 13 14 15</code></pre>
+<p>Create coded data set. Seven levels of each variable are used.</p>
+<pre class="r"><code>cd_data &lt;- coded.data(auc_data,
+                      Tt ~  (temp_thresh - 10),
+                      RHt ~ (rh_thresh - 90),
+                      SDt ~ (hours - 12))
+str(cd_data)</code></pre>
+<pre><code>## Classes &#39;coded.data&#39; and &#39;data.frame&#39;:   343 obs. of  4 variables:
+##  $ RHt: num  -3 -3 -3 -3 -3 -3 -3 -3 -3 -3 ...
+##  $ Tt : num  0 0 0 0 0 0 0 1 1 1 ...
+##  $ SDt: num  -2 -1 0 1 2 3 -3 -2 -1 0 ...
+##  $ auc: num  0.797 0.8 0.8 0.805 0.761 ...
+##  - attr(*, &quot;codings&quot;)=List of 3
+##   ..$ Tt :Class &#39;formula&#39;  language Tt ~ (temp_thresh - 10)
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..$ RHt:Class &#39;formula&#39;  language RHt ~ (rh_thresh - 90)
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..$ SDt:Class &#39;formula&#39;  language SDt ~ (hours - 12)
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##  - attr(*, &quot;rsdes&quot;)=List of 2
+##   ..$ primary: chr  &quot;Tt&quot; &quot;RHt&quot; &quot;SDt&quot;
+##   ..$ call   : language coded.data(data = auc_data, Tt ~ (temp_thresh - 10), RHt ~ (rh_thresh -      90), SDt ~ (hours - 12))</code></pre>
+<pre class="r"><code>head(cd_data)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["RHt"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Tt"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SDt"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["auc"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"-3","2":"0","3":"-2","4":"0.7966495","_rn_":"1"},{"1":"-3","2":"0","3":"-1","4":"0.7997423","_rn_":"2"},{"1":"-3","2":"0","3":"0","4":"0.7997423","_rn_":"3"},{"1":"-3","2":"0","3":"1","4":"0.8054124","_rn_":"4"},{"1":"-3","2":"0","3":"2","4":"0.7608247","_rn_":"5"},{"1":"-3","2":"0","3":"3","4":"0.6768041","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>We may use non-parametric local regression (LOESS) to obtain predicted values for the 4-dimensional response surface, using RHt, SDt, and Tt, and all 3- and 2-way iterations as the predictors. We can then compare the extent of agreement between polynomial regressions and the loess regression to aid in choosing the degree of the polynomial regression, by using the concordance correlation coefficient (see Lin, 1989, (A concordance correlation coefficient to evaluate reproducibility, Biometrics 45:255–268).</p>
+<pre class="r"><code>lo_fit1 &lt;- loess(auc ~ RHt * SDt * Tt, data = cd_data)
+lo_pred &lt;- predict(lo_fit1)</code></pre>
+<p>Fit models of first to fourth order, and evaluate fits.</p>
+<pre class="r"><code>poly_1_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 1), data = cd_data)
+poly_2_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 2), data = cd_data)
+poly_3_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 3), data = cd_data)
+poly_4_fit &lt;-  lm(auc ~ poly(RHt, SDt, Tt, degree = 4), data = cd_data)
+
+f_stat &lt;- 
+sapply(list(poly_1_fit, poly_2_fit,poly_3_fit, poly_4_fit), function(x) summary(x)$fstatistic[1] %&gt;% as.numeric %&gt;% round(2))
+
+rcompanion::compareLM(poly_1_fit,poly_2_fit,poly_3_fit,poly_4_fit)[[2]] %&gt;% 
+  add_column( Order = 1:4, .before = 1) %&gt;% 
+  add_column(., F_statistic = f_stat, .before = &quot;p.value&quot;) %&gt;% 
+  rename(&quot;No. of Parameteres&quot; = Rank,
+         &quot;DF&quot; = &quot;Df.res&quot;,
+         &quot;R sq.&quot; = &quot;R.squared&quot;,
+         &quot;Adj. R sq.&quot; = &quot;Adj.R.sq&quot;,
+         &quot;F&quot; = &quot;F_statistic&quot;,
+         &quot;p&quot; = &quot;p.value&quot;,
+         &quot;Shapiro-Wilk&quot; = &quot;Shapiro.W&quot;,
+         &quot;Shapiro-Wilk p&quot; = &quot;Shapiro.p&quot;) %&gt;% 
+  select(-c(&quot;AIC&quot;, &quot;AICc&quot;, &quot;BIC&quot;)) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;%
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE) </code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Order
+</th>
+<th style="text-align:right;">
+No. of Parameteres
+</th>
+<th style="text-align:right;">
+DF
+</th>
+<th style="text-align:right;">
+R sq.
+</th>
+<th style="text-align:right;">
+Adj. R sq.
+</th>
+<th style="text-align:right;">
+F
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+Shapiro-Wilk
+</th>
+<th style="text-align:right;">
+Shapiro-Wilk p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+339
+</td>
+<td style="text-align:right;">
+0.6375
+</td>
+<td style="text-align:right;">
+0.6342
+</td>
+<td style="text-align:right;">
+198.68
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9934
+</td>
+<td style="text-align:right;">
+0.13760
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+333
+</td>
+<td style="text-align:right;">
+0.7581
+</td>
+<td style="text-align:right;">
+0.7516
+</td>
+<td style="text-align:right;">
+115.98
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9971
+</td>
+<td style="text-align:right;">
+0.81390
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+323
+</td>
+<td style="text-align:right;">
+0.8617
+</td>
+<td style="text-align:right;">
+0.8535
+</td>
+<td style="text-align:right;">
+105.89
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9963
+</td>
+<td style="text-align:right;">
+0.61070
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+308
+</td>
+<td style="text-align:right;">
+0.8811
+</td>
+<td style="text-align:right;">
+0.8680
+</td>
+<td style="text-align:right;">
+67.12
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.9908
+</td>
+<td style="text-align:right;">
+0.03029
+</td>
+</tr>
+</tbody>
+</table>
+<p>Cubic model seems to be the best fit for our purpose. We want to get the best possible fit to the data, to understand underlying relationships between variable thresholds of our model. Hence, our priority is increase in explanatory power, for which our main guide is adjusted R<sup>2</sup>, while the distribution of residuals is still fulfilling the assumption of normality. Model of 4<sup>th</sup> order seems to provide very little gain in terms of fit Adj. R<sup>2</sup> comparing to 3<sup>rd</sup> order, and most importantly is not over-fitting indicated by Wilks-Shapiro test for model of 4<sup>th</sup> order. Information criterion are indication high values for all fits because of structure of data set, and this information is disregarded because the model is used for interpretation of the data.</p>
+<p>Looking at the concordance between local regression (LOESS) and polynomial models, we have:</p>
+<pre class="r"><code>pred_cd_data &lt;-
+  data.frame(
+    lo_pred,
+    predict(poly_1_fit),
+    predict(poly_2_fit),
+    predict(poly_3_fit),
+    predict(poly_4_fit)
+  )
+c1 &lt;-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_1_fit.)$rho
+c2 &lt;-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_2_fit.)$rho
+c3 &lt;-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_3_fit.)$rho
+c4 &lt;-
+  CCC(pred_cd_data$lo_pred, pred_cd_data$predict.poly_4_fit.)$rho
+
+plot(
+  c(c1$est, c2$est, c3$est, c4$est),
+  ylim = c(.8, 1),
+  pch = 16,
+  type = &quot;o&quot;,
+  ylab = &quot;Concordance with local regression prediction&quot;,
+  xlab = &quot;Polynomial degree&quot;,
+  xaxt = &quot;n&quot;
+)
+axis(1, 1:4, 1:4)
+abline(h = 1, lty = 3)
+arrows(
+  1:4,
+  c(c1$lwr.ci, c2$lwr.ci, c3$lwr.ci, c4$lwr.ci),
+  1:4,
+  c(c1$upr.ci, c2$upr.ci, c3$upr.ci, c4$upr.ci),
+  code = 3,
+  length = .05,
+  angle = 90
+)</code></pre>
+<p><img src="images/concordance-1.png" width="672" /></p>
+<p>This reinforces the choice of the polynomial model of degree 3, which yields predictions that agree the most with the local, non-parametric regression, and hence adequately reproduces the behaviour of the response surface.</p>
+<pre class="r"><code>panderOptions(&#39;round&#39;, 2)
+panderOptions(&#39;keep.trailing.zeros&#39;, TRUE)
+pander(poly_3_fit, add.significance.stars = TRUE)</code></pre>
+<table>
+<caption>Fitting linear model: auc ~ poly(RHt, SDt, Tt, degree = 3)</caption>
+<colgroup>
+<col width="37%" />
+<col width="12%" />
+<col width="15%" />
+<col width="11%" />
+<col width="12%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept)</strong></td>
+<td align="center">0.74</td>
+<td align="center">0.00</td>
+<td align="center">583.67</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.0</strong></td>
+<td align="center">-0.60</td>
+<td align="center">0.02</td>
+<td align="center">-25.78</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.0.0</strong></td>
+<td align="center">-0.22</td>
+<td align="center">0.02</td>
+<td align="center">-9.57</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)3.0.0</strong></td>
+<td align="center">0.09</td>
+<td align="center">0.02</td>
+<td align="center">3.69</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.0</strong></td>
+<td align="center">-0.60</td>
+<td align="center">0.02</td>
+<td align="center">-25.39</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.1.0</strong></td>
+<td align="center">2.32</td>
+<td align="center">0.43</td>
+<td align="center">5.34</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.1.0</strong></td>
+<td align="center">2.37</td>
+<td align="center">0.43</td>
+<td align="center">5.46</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.2.0</strong></td>
+<td align="center">-0.16</td>
+<td align="center">0.02</td>
+<td align="center">-6.65</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.2.0</strong></td>
+<td align="center">4.83</td>
+<td align="center">0.43</td>
+<td align="center">11.11</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.3.0</strong></td>
+<td align="center">0.04</td>
+<td align="center">0.02</td>
+<td align="center">1.57</td>
+<td align="center">0.12</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.1</strong></td>
+<td align="center">0.31</td>
+<td align="center">0.02</td>
+<td align="center">13.39</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.1</strong></td>
+<td align="center">-2.92</td>
+<td align="center">0.43</td>
+<td align="center">-6.73</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)2.0.1</strong></td>
+<td align="center">2.38</td>
+<td align="center">0.43</td>
+<td align="center">5.47</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.1</strong></td>
+<td align="center">-3.60</td>
+<td align="center">0.43</td>
+<td align="center">-8.29</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.1.1</strong></td>
+<td align="center">21.18</td>
+<td align="center">8.05</td>
+<td align="center">2.63</td>
+<td align="center">0.01</td>
+<td>* *</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.2.1</strong></td>
+<td align="center">0.37</td>
+<td align="center">0.43</td>
+<td align="center">0.86</td>
+<td align="center">0.39</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.2</strong></td>
+<td align="center">-0.04</td>
+<td align="center">0.02</td>
+<td align="center">-1.87</td>
+<td align="center">0.06</td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)1.0.2</strong></td>
+<td align="center">0.46</td>
+<td align="center">0.43</td>
+<td align="center">1.07</td>
+<td align="center">0.29</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.1.2</strong></td>
+<td align="center">-0.83</td>
+<td align="center">0.43</td>
+<td align="center">-1.92</td>
+<td align="center">0.06</td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="center"><strong>poly(RHt, SDt, Tt, degree = 3)0.0.3</strong></td>
+<td align="center">-0.13</td>
+<td align="center">0.02</td>
+<td align="center">-5.47</td>
+<td align="center">0.00</td>
+<td>* * *</td>
+</tr>
+</tbody>
+</table>
+<p>Evaluate model fit with diagnostic plot.</p>
+<pre class="r"><code>poly_3_fit$studres &lt;- rstudent(poly_3_fit)
+plot(poly_3_fit$studres, main = &quot;Residuals vs Order of data&quot;)
+abline(h = 0, col = &quot;red&quot;)
+hist(resid(poly_3_fit)) #distriburion of residuals should be approximately  normal</code></pre>
+<p><img src="images/diag_plot-1.png" width="50%" /><img src="images/diag_plot-2.png" width="50%" /></p>
+<p>Assumptions of normality of residuals are fulfilled.</p>
+<p>Extract the model formula. The code has been borrowed from <a href="https://stackoverflow.com/questions/50116648/how-do-i-convert-the-following-poly-output-to-a-function-useable-in-excel">this StackOverflow thread</a></p>
+<pre class="r"><code>processPolyNames = function(coef) {
+  members = strsplit(mgsub::mgsub(coef, c(&quot;poly\\(&quot;, &quot;, degre.*&quot;), c(&quot;&quot;, &quot;&quot;)), &quot;, &quot;)[[1]]
+  degree = as.numeric(strsplit(strsplit(coef, &quot;)&quot;)[[1]][2], &quot;\\.&quot;)[[1]])
+  coef_out = &quot;&quot;
+  for (d in seq_along(degree)) {
+    if (degree[d] == 0)
+      next
+    if (degree[d] == 1) {
+      if (coef_out == &quot;&quot;) {
+        coef_out = members[d]
+      } else {
+        coef_out = paste0(coef_out, &quot;*&quot;, members[d])
+      }
+    } else {
+      if (coef_out == &quot;&quot;) {
+        coef_out = paste0(members[d], &quot;^&quot;, degree[d], &quot;^&quot;)
+      } else {
+        coef_out = paste0(coef_out, &quot;*&quot;, members[d], &quot;^&quot;, degree[d], &quot;^&quot;)
+      }
+    }
+  }
+  return(coef_out)
+}
+
+coefs = summary(poly_3_fit)$coef[, 1]
+prettyNames = lapply(names(coefs)[-1], processPolyNames)
+prettyModel = &quot;&quot;
+for (i in seq_along(coefs)) {
+  if (i == 1) {
+    prettyModel = paste0(prettyModel, round(coefs[i], 2))
+  } else {
+    prettyModel = paste0(prettyModel,
+                         ifelse(coefs[i] &gt;= 0, &quot; + &quot;, &quot; &quot;),
+                         round(coefs[i], 2),
+                         &quot;*&quot;,
+                         prettyNames[[i - 1]])
+  }
+}
+prettyModel &lt;-  paste(&quot;AUROC =&quot;, gsub(&quot;-&quot;, &quot;- &quot;, prettyModel))
+cat(prettyModel)</code></pre>
+<pre><code>## AUROC = 0.74 - 0.6*RHt - 0.22*RHt^2^ + 0.09*RHt^3^ - 0.6*SDt + 2.32*RHt*SDt + 2.37*RHt^2^*SDt - 0.16*SDt^2^ + 4.83*RHt*SDt^2^ + 0.04*SDt^3^ + 0.31*Tt - 2.92*RHt*Tt + 2.38*RHt^2^*Tt - 3.6*SDt*Tt + 21.18*RHt*SDt*Tt + 0.37*SDt^2^*Tt - 0.04*Tt^2^ + 0.46*RHt*Tt^2^ - 0.83*SDt*Tt^2^ - 0.13*Tt^3^</code></pre>
+<pre class="r"><code>rm(processPolyNames, coefs, prettyNames)</code></pre>
+<p>AUROC = 0.74 - 0.6<em>RHt - 0.22</em>RHt<sup>2</sup> + 0.09<em>RHt<sup>3</sup> - 0.6</em>SDt + 2.32<em>RHt</em>SDt + 2.37<em>RHt<sup>2</sup></em>SDt - 0.16<em>SDt<sup>2</sup> + 4.83</em>RHt<em>SDt<sup>2</sup> + 0.04</em>SDt<sup>3</sup> + 0.31<em>Tt - 2.92</em>RHt<em>Tt + 2.38</em>RHt<sup>2</sup><em>Tt - 3.6</em>SDt<em>Tt + 21.18</em>RHt<em>SDt</em>Tt + 0.37<em>SDt<sup>2</sup></em>Tt - 0.04<em>Tt<sup>2</sup> + 0.46</em>RHt<em>Tt<sup>2</sup> - 0.83</em>SDt<em>Tt<sup>2</sup> - 0.13</em>Tt<sup>3</sup></p>
+</div>
+<div id="surface-plot-of-model-fits" class="section level3">
+<h3>Surface plot of model fits</h3>
+<p>Visualise fitted response surface.</p>
+<pre class="r"><code>z_min &lt;- min(auc_data$auc) - c(min(auc_data$auc) * 0.02)
+z_max &lt;- max(auc_data$auc) + c(max(auc_data$auc) * 0.02)
+
+# use a viridis palette for usability
+library(viridis)
+color_var &lt;- plasma(256)
+
+par(mar = c(1.5, 4.5, 3.5, 1.5),
+    mfrow = c(3, 3),
+    cex = 0.5)
+
+par_cut &lt;- data.frame(
+  Tt = c(rep(0, 6), -3, 0, +3),
+  RHt = c(rep(0, 3), -3, 0, +3, rep(0, 3)),
+  SDt = c(-3, 0, +3, rep(0, 6))
+)
+
+
+plot_ls &lt;- list()
+for (i in seq(nrow(par_cut))) {
+  persp(
+    poly_3_fit,
+    if (i &lt;= 3) {
+      ~ RHt + Tt
+    } else if (i %in% 4:6) {
+      ~ SDt + Tt
+    } else if (i &gt;= 7) {
+      ~ SDt + RHt
+    }
+    ,
+    at = data.frame(par_cut[i, ]),
+    zlab = &quot;\nAUROC&quot;,
+    xlab = if (i &lt;= 3) {
+      c(&quot;RHt (%)&quot;, &quot;Tt (°C)&quot;)
+    } else if (i %in% 4:6) {
+      c(&quot;SDt (hours)&quot;, &quot;Tt (°C)&quot;)
+    } else if (i &gt;= 7) {
+      c(&quot;SDt (hours)&quot;, &quot;RHt (%)&quot;)
+    },
+    col = color_var,
+    zlim = c(z_min, z_max),
+    theta = if(i %in% c(1:6)){37}else{ 127},
+    phi = 10,
+    border = &quot;grey15&quot;,
+    lwd = 0.5,
+    cex.main = 1.8,
+    cex.axis = 1.06,
+    cex.lab = 1.8,
+    main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;,
+                  &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C, &quot;,
+                   &quot;\n&quot;,
+                  &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%, &quot;,
+                  &quot;and SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
+                  )
+  )
+}</code></pre>
+<p><img src="images/persp-1.png" width="960" /></p>
+<p>Plots show relationship between variation in parameters of two variables with third variable fixed at three levels and response as AUROC. 3D surface plots indicate that reduced sporulation duration and relative humidity threshold improves accuracy of the model; while model versions with increased temperature threshold have better diagnostic performance.</p>
+<p>Another way to present this data is with contour plots. We will plot contour plots corresponding to the above 3D surfaces.</p>
+<pre class="r"><code>par(
+  mar = c(3, 4, 4, 2),
+    mfrow = c(3, 3),
+    cex.main = 1.2,
+    cex.axis = 1.06,
+    cex.lab = 1.1)
+# c(5, 4, 4, 2)
+
+
+for (i in seq(nrow(par_cut))) {
+  contour(poly_3_fit,
+        if (i &lt;= 3) {
+          ~ RHt + Tt
+        } else if (i %in% 4:6) {
+          ~ SDt + Tt
+        } else if (i &gt;= 7) {
+          ~ SDt + RHt
+        }
+        ,
+         image=TRUE,
+        at = data.frame(par_cut[i,]),
+    zlab = &quot;\nAUROC&quot;,
+    xlab = if (i &lt;= 3) {
+          c(&quot;RHt (%)&quot;,&quot;Tt (°C)&quot;)
+        } else if (i %in% 4:6) {
+          c(&quot;SDt (hours)&quot;, &quot;Tt (°C)&quot;)
+        } else if (i &gt;= 7) {
+          c(&quot;SDt (hours)&quot;, &quot;RHt (%)&quot;)
+        },
+    cex.main = 1.1,
+    cex.axis = 1,
+    cex.lab = 1,
+    main = paste0(&quot;\n&quot;,letters[i],&quot;) &quot;, &quot;Response at &quot;, 
+                  &quot;Tt = &quot;, par_cut[i,1] + 10,&quot;°C,&quot;,
+                   &quot;\n&quot;,
+                  &quot;RHt = &quot;, par_cut[i,2] + 90, &quot;%, &quot;,
+                  &quot;and SDt = &quot;, par_cut[i,3] +12, &quot; hours.&quot;
+                  )
+  )
+}</code></pre>
+<p><img src="images/countour-1.png" width="960" /></p>
+</div>
+<div id="further-investigation" class="section level3">
+<h3>Further investigation</h3>
+<p>BaseBased on the sensitivity analysis following model parameterisations were compared to the original parameters of Irish Rules and further analysed:</p>
+<pre class="r"><code>#Load function and the data
+load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))
+load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;AUROC_data.RData&quot;))
+load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;PlotROC.RData&quot;))
+
+mod_list &lt;-  list(ROC_data[[&quot;88_10_12_rainrh&quot;]],
+                  ROC_data[[&quot;90_10_10_rainrh&quot;]],
+                  ROC_data[[&quot;90_12_12_rainrh&quot;]],
+                  ROC_data[[&quot;90_10_12_rain&quot;]],
+                  ROC_data[[&quot;88_12_10_rainrh&quot;]],
+                  ROC_data[[&quot;88_10_10_rainrh&quot;]])
+
+pl &lt;- map2(mod_list, c(1:length(mod_list)), PlotROC)
+plot_grid(pl[[1]],
+          pl[[2]],
+          pl[[3]],
+          pl[[4]],
+          pl[[5]],
+          pl[[6]],
+          ncol = 3)</code></pre>
+<p><img src="images/further_analysis-1.png" width="1152" /></p>
+<pre class="r"><code>ls_roc &lt;- lapply(mod_list[4:6], function(x) {
+  df &lt;- x[rev(x$cut_point), ]
+  
+  #append rows for plotting
+  x &lt;- rep(NA, ncol(df))
+  df &lt;- rbind(x, df)
+  df[nrow(df) + 1, ] &lt;- NA
+  df$model &lt;- unique(df$model[!is.na(df$model)])
+  df[1, c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 0
+  df[nrow(df), c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 1
+  
+  #Condense labels for a single cutoff point
+  df &lt;-
+    df %&gt;%
+    group_by(one_min_spec, sens, model) %&gt;%
+    summarise(cut_point = ifelse(
+      all(is.na(cut_point)),
+      &quot;&quot;,
+      range(cut_point, na.rm = TRUE) %&gt;%
+        unique() %&gt;%
+        paste(collapse = &quot;-&quot;)
+    )) %&gt;%
+    ungroup()
+  return(df)
+})
+df &lt;- bind_rows(ls_roc)
+
+rename(df, Model = model) %&gt;%
+  ggplot(aes(
+    one_min_spec,
+    sens,
+    group = Model,
+    color = Model,
+    label = cut_point
+  )) +
+  geom_point() +
+  geom_text_repel(size = 4,
+                  fontface = &quot;bold&quot;) +
+  geom_line(size = 1.5,
+            aes(lty = Model)) +
+  scale_colour_brewer(palette = &quot;Dark2&quot;) +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = &quot;Sensitivity&quot;) +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     name = &quot;1- Specificity&quot;) +
+  theme_article() +
+  theme(
+    text = element_text(size = 14),
+    legend.position = c(.95, .15),
+    legend.justification = c(&quot;right&quot;, &quot;bottom&quot;),
+  ) +
+  ggtitle(&quot;ROC for selected models&quot;)</code></pre>
+<p><img src="figures/plot-ROC-figures-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>IR have failed to indicate any risk in 2 and the warning threshold of 12 hour was reached in only 4 years out of 10.</p>
+</div>
+</div>
+</div>
+
+
+
+Copyright 2018 Mladen Čučak
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

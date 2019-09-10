@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Analysis.utf8.md</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PLB DSS Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa fa fa-home"></span>
+     
+    About
+  </a>
+</li>
+<li>
+  <a href="data.html">
+    <span class="fa fa fa fa-table"></span>
+     
+    Data
+  </a>
+</li>
+<li>
+  <a href="Analysis.html">
+    <span class="fa fa fa fa-file-code-o"></span>
+     
+    Analysis
+  </a>
+</li>
+<li>
+  <a href="Results1.html">
+    <span class="fa fa fa fa-bar-chart"></span>
+     
+    Results
+  </a>
+</li>
+<li>
+  <a href="FungicideTreatments.html">
+    <span class="fa fa fa fa-lightbulb-o"></span>
+     
+    Usefulness
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mladencucak/AnalysisPLBIreland">
+    <span class="fa fa-github-square"></span>
+     
+    source
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Analysis</h1>
+
+</div>
+
+
+<p>Here we present the model and the methodology used in the analysis.</p>
+<div id="libraries" class="section level1">
+<h1>Libraries</h1>
+<p>Packages needed for the analysis are loaded. If the libraries do not exist locally, they will be downloaded.</p>
+<pre class="r"><code>list.of.packages &lt;-
+  c(
+    &quot;tidyverse&quot;,
+    &quot;readxl&quot;,
+    &quot;ggrepel&quot;,
+    &quot;pracma&quot;,
+    &quot;remotes&quot;,
+    &quot;parallel&quot;,
+    &quot;pbapply&quot;,
+    &quot;R.utils&quot;,
+    &quot;rcompanion&quot;,
+    &quot;mgsub&quot;,
+    &quot;here&quot;,
+    &quot;stringr&quot;,
+    &quot;pander&quot;,
+    &quot;tools&quot;,
+    &quot;kableExtra&quot;
+  )
+
+new.packages &lt;-
+  list.of.packages[!(list.of.packages %in% installed.packages()[, &quot;Package&quot;])]
+
+#Download packages that are not already present
+if (length(new.packages))
+  install.packages(new.packages)
+
+if (&quot;gt&quot; %in% installed.packages() == FALSE)
+  remotes::install_github(&quot;rstudio/gt&quot;)
+
+list.of.packages &lt;- c(list.of.packages, &quot;gt&quot;)
+packages_load &lt;-
+  lapply(list.of.packages, require, character.only = TRUE)
+
+#Print warning if there is a problem with installing/loading some of packages
+if (any(as.numeric(packages_load) == 0)) {
+  warning(paste(&quot;Package/s: &quot;, paste(list.of.packages[packages_load != TRUE], sep = &quot;, &quot;), &quot;not loaded!&quot;))
+} else {
+  print(&quot;All packages were successfully loaded.&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;All packages were successfully loaded.&quot;</code></pre>
+<pre class="r"><code>rm(list.of.packages, new.packages, packages_load)</code></pre>
+</div>
+<div id="the-model" class="section level1">
+<h1>The Model</h1>
+<p>According to the Irish Rules (Bourke, 1953), temperatures ≥ 10 ℃ and relative humidity ≥ 90 % provide the necessary environmental conditions considered conducive for potato late blight. The blight epidemic onset risk is then estimated during periods fulfilling the following criteria:<br />
+* <strong>Sporulation period</strong> is the initial stage considered necessary for the formation of sporangia is set to a minimum of 12 consecutive hours and is referred to as the sporulation duration threshold (SDt) in this evaluation;<br />
+* <strong>Infection period</strong> starts after the sporulation period and is reduced by 4 hours if the surface of plants was not wet at the beginning of the infection period. The leaf (surface) wetness is considered present if there was a considerable amount of precipitation (≥ 0.1 mm) during the time window of 3 hours before and 3 hours after the 12th consecutive hour of sporulation. The infection period lasts until conditions are not broken for more than 5h (spore survival).<br />
+Implementation of the model.</p>
+<div class="figure">
+<img src="figures/Figure2.png" alt="Irish Rules simplified alghorithm schematics." />
+<p class="caption">Irish Rules simplified alghorithm schematics.</p>
+</div>
+<details>
+<p><summary>The code</summary></p>
+<pre class="r"><code>IrishRulesModel &lt;- function(weather,
+                            param = NULL,
+                            infill_gap = NULL) {
+#&#39; Irish Rules
+#&#39;
+#&#39; This function calculates potatolate blight risk using Irish Rules model (Bourke, 1953)
+#&#39; @param weather The weather data in formated as data frame
+#&#39; @param infill_gap Maximum alowed gap for missing value interpolation
+#&#39; @keywords Irish Rules
+#&#39;
+  # wetness requirement prior to infection accumulation start
+  # time window of 6 hours, 3 before/after sporulation ends
+  wet_before &lt;- 3
+  wet_after &lt;- 3
+  
+  # Parameter list
+  if (is.null(param)) {
+    rh_thresh &lt;- 90 
+    temp_thresh &lt;- 10
+    hours &lt;- 12   #sum of hours before EBH accumulation
+  } else {
+    #pass a vector of parameters
+    rh_thresh &lt;- as.numeric(param[2])
+    temp_thresh &lt;- as.numeric(param[3])
+    hours &lt;- as.numeric(param[4])
+    lw_rhum &lt;-
+      param[5]           #if is NA then only rain data will be used
+  }
+  
+  #threshold for estimation of leaf wetness using relative humidity
+  lw_rhum_threshold &lt;- 90
+    
+  weather[[&quot;rain&quot;]] -&gt; rain
+  if (&quot;rhum&quot; %in% names(weather)) {
+    weather[[&quot;rhum&quot;]] -&gt; rh
+  }
+  if (&quot;rh&quot; %in% names(weather)) {
+    weather[[&quot;rh&quot;]] -&gt; rh
+  }
+  weather[[&quot;temp&quot;]] -&gt; temp
+  
+  # This function to infil missing values to let the model run
+  #If maximum infill gap is not provided it is defaulted to 7
+  if (is.null(infill_gap)) {
+    infill_gap &lt;- 7
+  }
+  
+  if (sum(is.na(with(weather, rain, temp, rhum))) &gt; 0) {
+    temp &lt;-
+      round(zoo::na.spline(temp, na.rm = FALSE, maxgap = infill_gap), 1)
+    rh &lt;-
+      round(zoo::na.spline(rh, na.rm = FALSE, maxgap = infill_gap), 0)
+    rh  &lt;- sapply(rh, function(x) ifelse(x &gt; 100, x &lt;- 100, x))
+  }
+  
+  if (sum(is.na(with(weather, rain, temp, rhum))) &gt; 0) {
+    stop(print(&quot;The sum of NAs is more than 7! Check your weather data.&quot;))
+  }
+  
+  # &quot;Out of boounds&quot;
+  rain &lt;- c(rain, rep(0, 20))
+  temp &lt;- c(temp, rep(0, 20))
+  rh &lt;- c(rh, rep(0, 20))
+  
+  # conditions for sporulation
+  criteria &lt;- as.numeric(temp &gt;= temp_thresh &amp; rh &gt;= rh_thresh)
+  
+  # cumulative sum of hours that meet the criteria for sporulatoion with restart at zero
+  criteria_sum &lt;-
+    stats::ave(criteria, cumsum(criteria == 0), FUN = cumsum)
+  
+  # Initiate risk accumulation vector
+  risk &lt;- rep(0, length(temp))
+  
+  criteria_met12  &lt;-
+    as.numeric(criteria_sum &gt;= hours) #accumulation of EBH starts after sporulation
+  idx             &lt;- which(criteria_sum == hours)
+  
+  #If there are no accumulations return vector with zeros
+  if (sum(criteria_sum == hours) == 0) {
+    #breaks the loop if there is no initial accumulation of 12 hours
+    head(risk, -20)
+  } else{
+    for (j in 1:length(idx)) {
+      #switch that looks if there was wetness: first rain, then both rain and rh, if rh exists
+      if (if (lw_rhum==&quot;rain&quot;) {
+        #if only rain
+        (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1)           #just see rain sum
+      } else{
+        any((any(rh[(idx[j] - wet_before):(idx[j] + wet_after)] &gt;= lw_rhum_threshold)) |
+            #take both as possible switches
+            (sum(rain[(idx[j] - wet_before):(idx[j] + wet_after)]) &gt;= 0.1))
+      })
+        # outputs true or false
+      {
+        n &lt;- idx[j]        #start accumulation from 12th hour
+      } else {
+        n &lt;- idx[j] + 4      #start accumulation from 16th hour
+      }
+      s &lt;- criteria_met12[n]
+      
+      # if a break of less than or equal to 5 hours
+      m &lt;- n - 1
+      
+      while (s == 1)
+      {
+        risk[n] &lt;- risk[m] + 1
+        n &lt;- n + 1
+        m &lt;- n - 1
+        s &lt;- criteria[n]
+        if (s == 0 &amp;&amp; (criteria[n + 2] == 1)) {
+          n = n + 2
+          s = 1
+        } else if (s == 0 &amp;&amp; (criteria[n + 3] == 1)) {
+          n = n + 3
+          s = 1
+        } else if (s == 0 &amp;&amp; (criteria[n + 4] == 1)) {
+          n = n + 4
+          s = 1
+        } else if (s == 0 &amp;&amp; (criteria[n + 5] == 1)) {
+          n = n + 5
+          s = 1
+        }
+      }
+      
+    }
+    head(risk, -20) #remove last 20 values that were added to vectors to prevent &quot;Out of bounds&quot; issue
+  }
+}</code></pre>
+</details>
+</div>
+<div id="bio-dates" class="section level1">
+<h1>Bio dates</h1>
+<p>Emergence takes around 3 weeks under Irish conditions. Period when healthy host present is considered to last from emergence until 14 days prior to the first observation of the disease in the field. A 10-day ‘warning period’ considered to last from -14 days to – 4 days prior to disease observed in the field. The 4-day period was assumed to be a minimum time needed from incubation period, for the establishment of visible disease symptoms in the field.</p>
+<pre class="r"><code>#Get subsets of data for period before the epidemics were initiated
+dates_cut &lt;-
+  read_csv(
+    here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;plantingdates.csv&quot;),
+    col_types = cols(
+      disease_observed = col_date(format = &quot;%d/%m/%Y&quot;),
+      planting_date =  col_date(format = &quot;%d/%m/%Y&quot;)
+    )
+  )
+
+
+dates_cut &lt;-
+  add_column(dates_cut,
+             emergence = as.Date(dates_cut$planting_date) + 21,
+             .before = &quot;planting_date&quot;)
+#set warnning period to 14 days before disease onset
+dates_cut &lt;- add_column(dates_cut, disease_onset = as.Date(dates_cut$disease_observed) - 4,
+                        .before = &quot;disease_observed&quot;)
+
+dates_cut &lt;- add_column(dates_cut, warning = as.Date(dates_cut$disease_onset) - 10, .before = &quot;disease_onset&quot; )
+rownames(dates_cut) &lt;- NULL
+
+dates_cut %&gt;% 
+  rename_all(. %&gt;%
+               gsub(&quot;_&quot;, &quot; &quot;, .) %&gt;% 
+               tools::toTitleCase()) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Year
+</th>
+<th style="text-align:left;">
+Emergence
+</th>
+<th style="text-align:left;">
+Planting Date
+</th>
+<th style="text-align:left;">
+Warning
+</th>
+<th style="text-align:left;">
+Disease Onset
+</th>
+<th style="text-align:left;">
+Disease Observed
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2007
+</td>
+<td style="text-align:left;">
+2007-04-24
+</td>
+<td style="text-align:left;">
+2007-04-03
+</td>
+<td style="text-align:left;">
+2007-06-16
+</td>
+<td style="text-align:left;">
+2007-06-26
+</td>
+<td style="text-align:left;">
+2007-06-30
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2008
+</td>
+<td style="text-align:left;">
+2008-04-28
+</td>
+<td style="text-align:left;">
+2008-04-07
+</td>
+<td style="text-align:left;">
+2008-06-18
+</td>
+<td style="text-align:left;">
+2008-06-28
+</td>
+<td style="text-align:left;">
+2008-07-02
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:left;">
+2009-05-12
+</td>
+<td style="text-align:left;">
+2009-04-21
+</td>
+<td style="text-align:left;">
+2009-06-22
+</td>
+<td style="text-align:left;">
+2009-07-02
+</td>
+<td style="text-align:left;">
+2009-07-06
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:left;">
+2010-05-25
+</td>
+<td style="text-align:left;">
+2010-05-04
+</td>
+<td style="text-align:left;">
+2010-07-05
+</td>
+<td style="text-align:left;">
+2010-07-15
+</td>
+<td style="text-align:left;">
+2010-07-19
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:left;">
+2011-05-27
+</td>
+<td style="text-align:left;">
+2011-05-06
+</td>
+<td style="text-align:left;">
+2011-07-14
+</td>
+<td style="text-align:left;">
+2011-07-24
+</td>
+<td style="text-align:left;">
+2011-07-28
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:left;">
+2012-06-18
+</td>
+<td style="text-align:left;">
+2012-05-28
+</td>
+<td style="text-align:left;">
+2012-06-29
+</td>
+<td style="text-align:left;">
+2012-07-09
+</td>
+<td style="text-align:left;">
+2012-07-13
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:left;">
+2013-06-24
+</td>
+<td style="text-align:left;">
+2013-06-03
+</td>
+<td style="text-align:left;">
+2013-08-09
+</td>
+<td style="text-align:left;">
+2013-08-19
+</td>
+<td style="text-align:left;">
+2013-08-23
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:left;">
+2014-06-13
+</td>
+<td style="text-align:left;">
+2014-05-23
+</td>
+<td style="text-align:left;">
+2014-07-18
+</td>
+<td style="text-align:left;">
+2014-07-28
+</td>
+<td style="text-align:left;">
+2014-08-01
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:left;">
+2015-06-12
+</td>
+<td style="text-align:left;">
+2015-05-22
+</td>
+<td style="text-align:left;">
+2015-07-17
+</td>
+<td style="text-align:left;">
+2015-07-27
+</td>
+<td style="text-align:left;">
+2015-07-31
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2016
+</td>
+<td style="text-align:left;">
+2016-06-21
+</td>
+<td style="text-align:left;">
+2016-05-31
+</td>
+<td style="text-align:left;">
+2016-07-08
+</td>
+<td style="text-align:left;">
+2016-07-18
+</td>
+<td style="text-align:left;">
+2016-07-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="the-analysis" class="section level1">
+<h1>The Analysis</h1>
+<p>The set of the most important variables of Irish rules model is evaluated. The Excel sheet with parameters under evaluation is available in data folder and can be changed and used for model evaluation in other locations. Column named <code>90_10_12_rain</code> represents set of the original model parameters.</p>
+<pre class="r"><code>#read in parameters
+parameters &lt;-
+  read_excel(here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;raw&quot;, &quot;par.xlsx&quot;), sheet = &quot;par&quot;)
+parameters </code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["rh_thresh"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["temp_thresh"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["hours"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["lw_rh"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"93","2":"13","3":"15","4":"rain"},{"1":"92","2":"12","3":"14","4":"rainrh"},{"1":"91","2":"11","3":"13","4":"NA"},{"1":"90","2":"10","3":"12","4":"NA"},{"1":"89","2":"9","3":"11","4":"NA"},{"1":"88","2":"8","3":"10","4":"NA"},{"1":"87","2":"7","3":"9","4":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>params &lt;- expand.grid(parameters[, 1:3])
+
+#set the leaf wetness threshold to NA, meaning only rain is considered as an estimator for leaf wetness, as in original model
+params$lw_rh &lt;- &quot;rain&quot;
+
+#Repeat all of the analysis considering rh &gt;= 90% and rain as an estimator of leaf wetness
+params2 &lt;- params
+params2$lw_rh &lt;- as.character(&quot;rainrh&quot;)
+
+parameters &lt;- bind_rows(params, params2)
+rm(params, params2)
+
+# set a column with a name for each model
+parameters &lt;- add_column(parameters, model = NA, .before = 1)
+for (i in seq_along(1:nrow(parameters))) {
+  parameters[i, 1] &lt;-
+    paste0(parameters[i, 2:length(names(parameters))], collapse = &quot;_&quot;)
+}
+str(parameters)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    686 obs. of  5 variables:
+##  $ model      : chr  &quot;93_13_15_rain&quot; &quot;92_13_15_rain&quot; &quot;91_13_15_rain&quot; &quot;90_13_15_rain&quot; ...
+##  $ rh_thresh  : num  93 92 91 90 89 88 87 93 92 91 ...
+##  $ temp_thresh: num  13 13 13 13 13 13 13 12 12 12 ...
+##  $ hours      : num  15 15 15 15 15 15 15 15 15 15 ...
+##  $ lw_rh      : chr  &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; &quot;rain&quot; ...</code></pre>
+<div id="model-run" class="section level2">
+<h2>Model Run</h2>
+<p>The model has been run with each set of parameters, and columns with model outputs are attached to weather data frame. Names of new columns correspond to the set of parameters supplied.</p>
+<pre class="r"><code># This chunk is not run
+load(OP, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;OP_2007-2016_infilled.RData&quot;))
+
+for(i in 1:nrow(parameters)) {
+  loop_var &lt;- apply(parameters[i, ], 1, function(x) {
+    #run the model with different parameters
+    k &lt;-
+      lapply(split(OP, factor(OP$year)), function(chunk)
+        IrishRulesModel(chunk, x)) #get the list of outputs
+    unlist(k) -&gt; k  #make it a vector
+  })
+  #attach each output of each model version to the data
+  OP[, ncol(OP) + 1] &lt;-  as.numeric(loop_var)
+  rm(loop_var)
+  names(OP)[ncol(OP)] &lt;- paste0(parameters[i, 1])
+  print(paste(i, &quot;of&quot;, nrow(parameters)))
+}
+
+
+nn &lt;- paste0(names(OP[, 26:length(names(OP))]), &quot;_ebh&quot;, &quot;&quot;)
+setnames(OP, old = c(names(OP[, 26:length(names(OP))])), new = nn)
+rm( nn)</code></pre>
+<p>Instead, just load the output from a prior model run to save time.</p>
+<pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;, &quot;OP_for_analysis.RData&quot;))
+# Sample of outputs
+head(OP[, c(1, 7, 9, 15, 24:30)], 5) %&gt;% 
+  kable() %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:right;">
+doy
+</th>
+<th style="text-align:right;">
+rain
+</th>
+<th style="text-align:right;">
+vappr
+</th>
+<th style="text-align:left;">
+stna
+</th>
+<th style="text-align:right;">
+sol_rad
+</th>
+<th style="text-align:right;">
+93_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+92_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+91_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+90_13_15_rain_ebh
+</th>
+<th style="text-align:right;">
+89_13_15_rain_ebh
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2401162
+</td>
+<td style="text-align:left;">
+2007-04-01 00:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+8.0
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401163
+</td>
+<td style="text-align:left;">
+2007-04-01 01:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.9
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401164
+</td>
+<td style="text-align:left;">
+2007-04-01 02:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.9
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401165
+</td>
+<td style="text-align:left;">
+2007-04-01 03:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.6
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2401166
+</td>
+<td style="text-align:left;">
+2007-04-01 04:00:00
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.2
+</td>
+<td style="text-align:left;">
+Oak_Park
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="evaluation-procedure" class="section level2">
+<h2>Evaluation procedure</h2>
+<p>The function <code>SensParametersCalc</code> calculates Sensitivity and Specificity of each variation of the model.</p>
+<details>
+<p><summary>The code</summary></p>
+<pre class="r"><code>SensParametersCalc &lt;-
+  function(y,
+           weather_data,
+           dates_cut,
+           prot_duration = NULL) {
+#&#39; Sensitivity analysis
+#&#39;
+#&#39; The function `SensParametersCalc` calculates Sensitivity and Specificity of each variation of the model.
+#&#39; @param y Decision threeshold (EBH). 
+#&#39; @param weather_data The weather data  formated as a data frame, containing outputs of all model runs with different parameters. 
+#&#39; @param dates_cut Dates defining the the periods of evaulation. Specificity is calculated for the period from planting date to warning date. Sensitivity is calculated for the period from -14 to -4 days before the disease is observed in the field. 
+#&#39; @param prot_duration Each time the warning threshold is reached during the period from planting date to warning date, one treatment is assumed, which would provide protedtion for indicated number of days.
+#&#39;
+
+    #Set the warning threshold and run the rest of the script
+    warning_threshold &lt;- y
+    #data
+    fun_df &lt;- weather_data
+    
+    #A function to subset the data for the period of interest in each year
+    test.overlap = function(vals, start_date, end_date) {
+      rowSums(mapply(function(a, b)
+        between(vals, a, b),
+        start_date, end_date)) &gt; 0
+    }
+    
+    #Subset  each year from emergence to disease onset and calculate number of FP and TN
+    fptn_df &lt;-
+      fun_df  %&gt;%
+      #Subset the of the data for the duration of non-warning period for each year
+      filter(test.overlap(short_date, dates_cut$emergence, dates_cut$warning)) %&gt;%
+      select(
+        ends_with(&quot;year_var&quot;),
+        ends_with(&quot;week_var&quot;),
+        ends_with(&quot;doy&quot;),
+        ends_with(&quot;_ebh&quot;)
+      ) %&gt;%
+      group_by(year_var) %&gt;%
+      #if there was an accumulation from previous day, it would triger a warning
+      #Check all of the first five rows because of possible break of 5 hours
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(
+                  ifelse(row_number() &lt;= 5 &amp; . &gt;= warning_threshold,
+                         warning_threshold, .)
+                )) %&gt;%
+      #all five values all changed so we have to delete 4 of them and leave only 1
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(
+                  row_number() &lt;= 4 &amp; . == warning_threshold, 0, .
+                ))) %&gt;%
+      # Change values coresponding to the warning threshold to 1 for calculating the sum
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+      group_by(year_var, week_var, doy) %&gt;%
+      summarise_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), .funs = sum)
+    
+    
+    #Each warning would cause treatment that will keep the plants protected for a period of time
+    prot_duration &lt;-
+      ifelse(is.null(prot_duration), 7, prot_duration)#If not defined default value is 7 days
+    
+    TreatmentWindow &lt;- function(x, prot_duration) {
+      y &lt;-
+        vector(mode = &quot;numeric&quot;, length = length(x) + prot_duration)
+      for (i in seq_along(x)) {
+        if (x[i] == 1) {
+          y[i:c(i + prot_duration)] &lt;- 1
+        }
+      }
+      y
+    }
+    fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))] &lt;-
+      lapply(fptn_df[grep(&quot;ebh&quot;, colnames(fptn_df))], function(x)
+        TreatmentWindow(x, prot_duration))
+    
+    
+    FP &lt;-
+      summarise_all(fptn_df[, colnames(fptn_df[, grep(&quot;ebh&quot;, colnames(fptn_df))])], .funs = sum)
+    
+    #Each warning will cause a treatment
+    total_days &lt;-
+      nrow(fptn_df) #total  duration of non_warning period
+    
+    TN &lt;- total_days - FP
+    
+    
+    ##########################################################
+    #subset for 10 days prior to disease onset: Warning period
+    tpfn_df &lt;-
+      fun_df %&gt;%
+      #Subset of the data for the duration WARNING period in each year
+      filter(test.overlap(short_date,  dates_cut$warning, dates_cut$disease_onset)) %&gt;%
+      select(
+        ends_with(&quot;year_var&quot;),
+        ends_with(&quot;week_var&quot;),
+        ends_with(&quot;doy&quot;),
+        ends_with(&quot;_ebh&quot;)
+      ) %&gt;%
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(
+                  ifelse(row_number() &lt;= 5 &amp;
+                           . &gt;= warning_threshold, warning_threshold, .)
+                )) %&gt;%
+      #all five values is changed so we have to delete 4 of them and leave only one
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(
+                  row_number() &lt;= 4 &amp; . == warning_threshold,
+                  0, .
+                ))) %&gt;%
+      mutate_at(., .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]),
+                funs(ifelse(. == warning_threshold, 1, 0))) %&gt;%
+      group_by(year_var) %&gt;%
+      summarise_at(., .vars = colnames(.[, c(4:length(colnames(.)))]) , .funs = sum)  %&gt;%
+      mutate_at(., #some years have two warnings during the warning period
+                .vars = colnames(.[grep(&quot;ebh&quot;, colnames(.))]), funs(ifelse(. &gt;= 1 , 1, 0)))
+    
+    TP &lt;-
+      summarise_all(tpfn_df[, colnames(tpfn_df[, grep(&quot;ebh&quot;, colnames(tpfn_df))])], .funs = sum)
+    
+    #number of outbreaks(in this case there is only one location, so number of outbreaks is same as number of years.
+    unique(tpfn_df$year_var) %&gt;%
+      length() -&gt; no_of_outbreaks
+    FN &lt;- no_of_outbreaks - TP
+    
+    #summary
+    test &lt;- data.frame(
+      model = names(FP),
+      FP = t(FP[1,]),
+      tn = t(TN[1,]),
+      TP = t(TP[1,]),
+      FN = t(FN[1,])
+    )
+    names(test) &lt;- c(&quot;model&quot;, &quot;FP&quot;, &quot;TN&quot;, &quot;TP&quot;, &quot;FN&quot;)
+    test &lt;- data.frame(test, row.names = NULL)
+    
+    
+    test$model &lt;-  str_replace(test$model, &quot;_ebh&quot;, &quot;&quot;)
+    test$sens &lt;- with(test, TP / (TP + FN))  #PTP sensitivity
+    test$spec &lt;- with(test, TN / (TN + FP))  #PTN specificity
+    return_df &lt;- test[, c(&quot;model&quot;, &quot;sens&quot;)]
+    return_df$&quot;one_min_spec&quot; &lt;- 1 - test[, &quot;spec&quot;]
+    return_df$cut_point &lt;- warning_threshold
+    
+    return(return_df)
+  }</code></pre>
+</details>
+<p>This function was applied to output of each variation of the model with varying warning threshold from 1 to 18 EBH. The function is run with parallel processing support because it reduces the run time to 4 minutes with 4 cores i7(7th generation) and 12GB RAM laptop.</p>
+<pre class="r"><code># this chunk not evaluated
+#select max warning threshold
+warning_thresholds &lt;- 1:18
+begin &lt;- Sys.time()
+#Detect the number of cores and set it to total minus 1, if there are multiple cores, to avoid overload
+cores &lt;- ifelse(parallel::detectCores() &gt; 1, parallel::detectCores()-1, 1)
+cl &lt;- parallel::makeCluster(cores)
+parallel::clusterExport(cl, c(&quot;OP&quot;, &quot;dates_cut&quot;, &quot;SensParametersCalc&quot;))
+parallel::clusterEvalQ(cl, library(&quot;tidyverse&quot;))
+  ROC &lt;- pbapply::pblapply(warning_thresholds, function(x)
+  {
+    xx &lt;- SensParametersCalc(x,OP, dates_cut, prot_duration = 7)
+    return(xx)
+  },
+  cl = cl
+  )
+begin - Sys.time() #check the duration of the process in the console
+parallel::stopCluster(cl)</code></pre>
+<p>Rather, the results of calculations from a prior run can be directly loaded.</p>
+<pre class="r"><code>load(file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,&quot;results&quot;,&quot;ROC_output.Rdata&quot;))</code></pre>
+<p>Sort the outputs for each model variation.</p>
+<pre class="r"><code>ROC_data &lt;-
+  as.data.frame(data.table::rbindlist(ROC))
+rownames(ROC_data) &lt;- NULL
+# rm(ROC) #Outputs stored for each warning threshold/cutoffs
+ROC_data &lt;-
+  base::split(ROC_data, ROC_data$model) #Get the list of all model outputs with different cutoffs
+ROC_data[[1]] %&gt;% 
+  rename_all(. %&gt;% capitalize() %&gt;% gsub(&quot;_&quot;, &quot; &quot;, .)) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling( latex_options = &quot;striped&quot;,full_width = FALSE)</code></pre>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:right;">
+Sens
+</th>
+<th style="text-align:right;">
+One min spec
+</th>
+<th style="text-align:right;">
+Cut point
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+273
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.6443299
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+959
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.6005155
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1645
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.5773196
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2331
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+0.4484536
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3017
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.4201031
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3703
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3891753
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4389
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3685567
+</td>
+<td style="text-align:right;">
+7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5075
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3556701
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5761
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3376289
+</td>
+<td style="text-align:right;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6447
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3247423
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7133
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3247423
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7819
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.3015464
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8505
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2835052
+</td>
+<td style="text-align:right;">
+13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9191
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2628866
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9877
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2525773
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10563
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.8
+</td>
+<td style="text-align:right;">
+0.2319588
+</td>
+<td style="text-align:right;">
+16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11249
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.7
+</td>
+<td style="text-align:right;">
+0.2113402
+</td>
+<td style="text-align:right;">
+17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11935
+</td>
+<td style="text-align:left;">
+87_10_10_rain
+</td>
+<td style="text-align:right;">
+0.6
+</td>
+<td style="text-align:right;">
+0.2113402
+</td>
+<td style="text-align:right;">
+18
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>save(ROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;ROC_data.RData&quot;))</code></pre>
+</div>
+<div id="roc" class="section level2">
+<h2>ROC</h2>
+<p>Contingency tables were created with sensitivity and specificity values from confusion matrix for each decision threshold for all model outputs from 1 to 18 EBH accumulation. Empirical ROC curve was created for each variation of the model. Area under the curve (AUROC) was calculated using trapezoidal rule for each variation of the model outputs.</p>
+<pre class="r"><code>#function to calculate AUROC for list of inputs
+GetAUC &lt;- function(fun_df) {
+  fun_df &lt;- fun_df[rev(order(fun_df$cut_point)), ]
+  auc &lt;-
+    pracma::trapz(c(0, fun_df$one_min_spec, 1), c(0, fun_df$sens, 1))
+  result &lt;- data.frame(model = unique(fun_df$model),
+                       auc = auc)
+  return(result)
+}
+AUROC_data &lt;- lapply(ROC_data, function(x)
+  GetAUC(x))
+AUROC_data &lt;-
+  lapply(AUROC_data, function(x)
+    mutate_if(x, is.factor, as.character))
+AUROC_data &lt;- bind_rows(AUROC_data)
+save(AUROC_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;AUROC_data.RData&quot;))</code></pre>
+<p>The plotting function.</p>
+<details>
+<p><summary>The code</summary></p>
+<pre class="r"><code>PlotROC &lt;- function(df, numbering = NULL) {
+  df &lt;- df[rev(df$cut_point), ]
+#append rows for plotting
+x &lt;- rep(NA, ncol(df))
+df &lt;- rbind(x, df)
+df[nrow(df) + 1, ] &lt;- NA
+df$model &lt;- unique(df$model[!is.na(df$model)])
+df[1, c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 0
+df[nrow(df), c(&quot;sens&quot;, &quot;one_min_spec&quot;)] &lt;- 1
+
+#Condense labels for a single cutoff point
+ df &lt;- 
+  df %&gt;% 
+  group_by(one_min_spec, sens, model) %&gt;% 
+  summarise(cut_point = ifelse(all(is.na(cut_point)),
+                               &quot;&quot;,
+                               range(cut_point, na.rm = TRUE) %&gt;%
+                                 unique() %&gt;%
+                                 paste(collapse = &quot;-&quot;))) %&gt;%
+  ungroup()
+
+
+#find AUROC value for selected model
+if(&quot;model&quot;%in% names(AUROC_data)){
+  AUROC_lab &lt;- paste(&quot;AUROC =&quot;, round(AUROC_data[AUROC_data$model == unique(df$model), ]$auc, 3))
+} else { #some changes in next chnk of code made this necessary, col model will be split and removed
+  if(str_split(unique(df$model), &quot;_&quot;)[[1]][4] == &quot;rainrh&quot;){
+    mod_var &lt;- str_split(unique(df$model), &quot;_&quot;)
+    mod_var[[1]][4] &lt;- &quot;rainrh&quot;
+    implode &lt;- function(..., sep=&#39;&#39;) {paste(..., collapse=sep)}
+    mod_var &lt;-  implode(mod_var[[1]],sep=&quot;_&quot;)   
+  }else{
+    mod_var &lt;- str_split(unique(df$model), &quot;_&quot;)
+    implode &lt;- function(..., sep=&#39;&#39;) {paste(..., collapse=sep)}
+    mod_var &lt;-  implode(mod_var[[1]],sep=&quot;_&quot;) 
+  }
+  auc_val &lt;- 
+    unite(AUROC_data, col = model,  colnames(AUROC_data[,1:4]), sep = &quot;_&quot;) %&gt;% 
+    filter(model == mod_var) %&gt;% 
+    select(auc)
+  AUROC_lab &lt;- paste(&quot;AUROC =&quot;, round(auc_val, 3))
+  
+}
+
+#Print title without or with lettering (for later analysis)
+pars &lt;- str_split(df[1,&quot;model&quot;], &quot;_&quot;)
+title &lt;- 
+  paste0( ifelse(is.null(numbering),&quot;&quot;,  paste0(letters[numbering],&quot;) &quot;)), 
+          &quot;ROC for &quot;, 
+          &quot;Tt = &quot;, pars[[1]][[2]],&quot;°C; &quot;,
+          &quot;RHt = &quot;, pars[[1]][1], &quot;%; &quot;,
+          &quot;SDt = &quot;, pars[[1]][3], 
+          &quot;\n&quot;,
+          &quot; hours; and LW = rain &gt; 0.1mm and RH&gt;90%.&quot;)
+
+
+ggplot(df, aes(one_min_spec, sens, label = cut_point)) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    color = &quot;black&quot;,
+    linetype = &quot;dashed&quot;
+  ) +
+  geom_path(colour = &quot;gray&quot;) +
+  geom_point(colour = &quot;black&quot;) +
+  ggrepel::geom_text_repel(size = 3) +
+  scale_y_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     breaks = seq(0, 1, 0.1),
+                     name = &quot;Sensitivity&quot;) +
+  scale_x_continuous(limits = c(0, 1),
+                     expand = c(0, 0),
+                     breaks = seq(0, 1, 0.1),
+                     name = &quot;1- Specificity&quot;) +
+  ggtitle(title) +
+  annotate(
+    &quot;text&quot;,
+    x = 0.7,
+    y = 0.15,
+    label = AUROC_lab,
+    size = 5
+  ) +
+  theme_bw() +
+  theme(
+    text = element_text(size = 10.5),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )+
+geom_hline(
+    yintercept = seq(0 , 1, 0.1),
+    size = 0.5,
+    color = &quot;gray&quot;,
+    linetype = &quot;dotted&quot;
+  )
+}
+PlotROC(ROC_data[[&quot;90_10_12_rain&quot;]])</code></pre>
+</details>
+<p><img src="images/plotROC-1.png" width="80%" height="80%" style="display: block; margin: auto;" /></p>
+<details>
+<p><summary>The code</summary></p>
+<pre class="r"><code>#Save ROC plotting function 
+save(PlotROC,file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;PlotROC.RData&quot;))</code></pre>
+</details>
+<p>Prepare the data for further analysis and check the resulting data frame.</p>
+<pre class="r"><code>params &lt;- colnames(parameters[, names(parameters) != &quot;model&quot;])
+AUROC_data &lt;-
+  separate(AUROC_data, model, into =  params, sep = &quot;_&quot;)
+AUROC_data[, 1:3] &lt;-
+  lapply(AUROC_data[, 1:3], as.numeric)
+auc_data &lt;- data.frame(AUROC_data)
+head(auc_data) %&gt;% 
+  kable(format = &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+rh_thresh
+</th>
+<th style="text-align:right;">
+temp_thresh
+</th>
+<th style="text-align:right;">
+hours
+</th>
+<th style="text-align:left;">
+lw_rh
+</th>
+<th style="text-align:right;">
+auc
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.8064433
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7966495
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.7680412
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7997423
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+rain
+</td>
+<td style="text-align:right;">
+0.7128866
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+rainrh
+</td>
+<td style="text-align:right;">
+0.7997423
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>auc_data</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["rh_thresh"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["temp_thresh"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["hours"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["lw_rh"],"name":[4],"type":["chr"],"align":["left"]},{"label":["auc"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"87","2":"10","3":"10","4":"rain","5":"0.8064433"},{"1":"87","2":"10","3":"10","4":"rainrh","5":"0.7966495"},{"1":"87","2":"10","3":"11","4":"rain","5":"0.7680412"},{"1":"87","2":"10","3":"11","4":"rainrh","5":"0.7997423"},{"1":"87","2":"10","3":"12","4":"rain","5":"0.7128866"},{"1":"87","2":"10","3":"12","4":"rainrh","5":"0.7997423"},{"1":"87","2":"10","3":"13","4":"rain","5":"0.7237113"},{"1":"87","2":"10","3":"13","4":"rainrh","5":"0.8054124"},{"1":"87","2":"10","3":"14","4":"rain","5":"0.7155928"},{"1":"87","2":"10","3":"14","4":"rainrh","5":"0.7608247"},{"1":"87","2":"10","3":"15","4":"rain","5":"0.6932990"},{"1":"87","2":"10","3":"15","4":"rainrh","5":"0.6768041"},{"1":"87","2":"10","3":"9","4":"rain","5":"0.8077320"},{"1":"87","2":"10","3":"9","4":"rainrh","5":"0.7997423"},{"1":"87","2":"11","3":"10","4":"rain","5":"0.8126289"},{"1":"87","2":"11","3":"10","4":"rainrh","5":"0.8059278"},{"1":"87","2":"11","3":"11","4":"rain","5":"0.7917526"},{"1":"87","2":"11","3":"11","4":"rainrh","5":"0.8172680"},{"1":"87","2":"11","3":"12","4":"rain","5":"0.7403351"},{"1":"87","2":"11","3":"12","4":"rainrh","5":"0.8234536"},{"1":"87","2":"11","3":"13","4":"rain","5":"0.7442010"},{"1":"87","2":"11","3":"13","4":"rainrh","5":"0.8296392"},{"1":"87","2":"11","3":"14","4":"rain","5":"0.7301546"},{"1":"87","2":"11","3":"14","4":"rainrh","5":"0.7793814"},{"1":"87","2":"11","3":"15","4":"rain","5":"0.7041237"},{"1":"87","2":"11","3":"15","4":"rainrh","5":"0.6922680"},{"1":"87","2":"11","3":"9","4":"rain","5":"0.8213918"},{"1":"87","2":"11","3":"9","4":"rainrh","5":"0.8136598"},{"1":"87","2":"12","3":"10","4":"rain","5":"0.8448454"},{"1":"87","2":"12","3":"10","4":"rainrh","5":"0.8489691"},{"1":"87","2":"12","3":"11","4":"rain","5":"0.7960052"},{"1":"87","2":"12","3":"11","4":"rainrh","5":"0.8528351"},{"1":"87","2":"12","3":"12","4":"rain","5":"0.7664948"},{"1":"87","2":"12","3":"12","4":"rainrh","5":"0.8590206"},{"1":"87","2":"12","3":"13","4":"rain","5":"0.7372423"},{"1":"87","2":"12","3":"13","4":"rainrh","5":"0.8235825"},{"1":"87","2":"12","3":"14","4":"rain","5":"0.7043814"},{"1":"87","2":"12","3":"14","4":"rainrh","5":"0.7497423"},{"1":"87","2":"12","3":"15","4":"rain","5":"0.7215206"},{"1":"87","2":"12","3":"15","4":"rainrh","5":"0.7104381"},{"1":"87","2":"12","3":"9","4":"rain","5":"0.8702320"},{"1":"87","2":"12","3":"9","4":"rainrh","5":"0.8583763"},{"1":"87","2":"13","3":"10","4":"rain","5":"0.8644330"},{"1":"87","2":"13","3":"10","4":"rainrh","5":"0.8608247"},{"1":"87","2":"13","3":"11","4":"rain","5":"0.8134021"},{"1":"87","2":"13","3":"11","4":"rainrh","5":"0.8646907"},{"1":"87","2":"13","3":"12","4":"rain","5":"0.8152062"},{"1":"87","2":"13","3":"12","4":"rainrh","5":"0.9063144"},{"1":"87","2":"13","3":"13","4":"rain","5":"0.7256443"},{"1":"87","2":"13","3":"13","4":"rainrh","5":"0.8110825"},{"1":"87","2":"13","3":"14","4":"rain","5":"0.6898196"},{"1":"87","2":"13","3":"14","4":"rainrh","5":"0.7353093"},{"1":"87","2":"13","3":"15","4":"rain","5":"0.6945876"},{"1":"87","2":"13","3":"15","4":"rainrh","5":"0.6833763"},{"1":"87","2":"13","3":"9","4":"rain","5":"0.8675258"},{"1":"87","2":"13","3":"9","4":"rainrh","5":"0.8597938"},{"1":"87","2":"7","3":"10","4":"rain","5":"0.7345361"},{"1":"87","2":"7","3":"10","4":"rainrh","5":"0.7247423"},{"1":"87","2":"7","3":"11","4":"rain","5":"0.6851804"},{"1":"87","2":"7","3":"11","4":"rainrh","5":"0.7268041"},{"1":"87","2":"7","3":"12","4":"rain","5":"0.6472938"},{"1":"87","2":"7","3":"12","4":"rainrh","5":"0.7365979"},{"1":"87","2":"7","3":"13","4":"rain","5":"0.6716495"},{"1":"87","2":"7","3":"13","4":"rainrh","5":"0.7523196"},{"1":"87","2":"7","3":"14","4":"rain","5":"0.6698454"},{"1":"87","2":"7","3":"14","4":"rainrh","5":"0.7157216"},{"1":"87","2":"7","3":"15","4":"rain","5":"0.6551546"},{"1":"87","2":"7","3":"15","4":"rainrh","5":"0.6270619"},{"1":"87","2":"7","3":"9","4":"rain","5":"0.7378866"},{"1":"87","2":"7","3":"9","4":"rainrh","5":"0.7304124"},{"1":"87","2":"8","3":"10","4":"rain","5":"0.7386598"},{"1":"87","2":"8","3":"10","4":"rainrh","5":"0.7296392"},{"1":"87","2":"8","3":"11","4":"rain","5":"0.6912371"},{"1":"87","2":"8","3":"11","4":"rainrh","5":"0.7314433"},{"1":"87","2":"8","3":"12","4":"rain","5":"0.6514175"},{"1":"87","2":"8","3":"12","4":"rainrh","5":"0.7412371"},{"1":"87","2":"8","3":"13","4":"rain","5":"0.6716495"},{"1":"87","2":"8","3":"13","4":"rainrh","5":"0.7528351"},{"1":"87","2":"8","3":"14","4":"rain","5":"0.6698454"},{"1":"87","2":"8","3":"14","4":"rainrh","5":"0.7157216"},{"1":"87","2":"8","3":"15","4":"rain","5":"0.6551546"},{"1":"87","2":"8","3":"15","4":"rainrh","5":"0.6270619"},{"1":"87","2":"8","3":"9","4":"rain","5":"0.7430412"},{"1":"87","2":"8","3":"9","4":"rainrh","5":"0.7363402"},{"1":"87","2":"9","3":"10","4":"rain","5":"0.7613402"},{"1":"87","2":"9","3":"10","4":"rainrh","5":"0.7445876"},{"1":"87","2":"9","3":"11","4":"rain","5":"0.7208763"},{"1":"87","2":"9","3":"11","4":"rainrh","5":"0.7512887"},{"1":"87","2":"9","3":"12","4":"rain","5":"0.6734536"},{"1":"87","2":"9","3":"12","4":"rainrh","5":"0.7626289"},{"1":"87","2":"9","3":"13","4":"rain","5":"0.6876289"},{"1":"87","2":"9","3":"13","4":"rainrh","5":"0.7672680"},{"1":"87","2":"9","3":"14","4":"rain","5":"0.6759021"},{"1":"87","2":"9","3":"14","4":"rainrh","5":"0.7242268"},{"1":"87","2":"9","3":"15","4":"rain","5":"0.6716495"},{"1":"87","2":"9","3":"15","4":"rainrh","5":"0.6507732"},{"1":"87","2":"9","3":"9","4":"rain","5":"0.7475515"},{"1":"87","2":"9","3":"9","4":"rainrh","5":"0.7411082"},{"1":"88","2":"10","3":"10","4":"rain","5":"0.8140464"},{"1":"88","2":"10","3":"10","4":"rainrh","5":"0.8055412"},{"1":"88","2":"10","3":"11","4":"rain","5":"0.7524485"},{"1":"88","2":"10","3":"11","4":"rainrh","5":"0.8096649"},{"1":"88","2":"10","3":"12","4":"rain","5":"0.7338918"},{"1":"88","2":"10","3":"12","4":"rainrh","5":"0.8194588"},{"1":"88","2":"10","3":"13","4":"rain","5":"0.7176546"},{"1":"88","2":"10","3":"13","4":"rainrh","5":"0.7698454"},{"1":"88","2":"10","3":"14","4":"rain","5":"0.6953608"},{"1":"88","2":"10","3":"14","4":"rainrh","5":"0.7413660"},{"1":"88","2":"10","3":"15","4":"rain","5":"0.7134021"},{"1":"88","2":"10","3":"15","4":"rainrh","5":"0.7082474"},{"1":"88","2":"10","3":"9","4":"rain","5":"0.8057990"},{"1":"88","2":"10","3":"9","4":"rainrh","5":"0.7972938"},{"1":"88","2":"11","3":"10","4":"rain","5":"0.8411082"},{"1":"88","2":"11","3":"10","4":"rainrh","5":"0.8341495"},{"1":"88","2":"11","3":"11","4":"rain","5":"0.7842784"},{"1":"88","2":"11","3":"11","4":"rainrh","5":"0.8367268"},{"1":"88","2":"11","3":"12","4":"rain","5":"0.7628866"},{"1":"88","2":"11","3":"12","4":"rainrh","5":"0.8434278"},{"1":"88","2":"11","3":"13","4":"rain","5":"0.7400773"},{"1":"88","2":"11","3":"13","4":"rainrh","5":"0.7925258"},{"1":"88","2":"11","3":"14","4":"rain","5":"0.7082474"},{"1":"88","2":"11","3":"14","4":"rainrh","5":"0.7581186"},{"1":"88","2":"11","3":"15","4":"rain","5":"0.7298969"},{"1":"88","2":"11","3":"15","4":"rainrh","5":"0.7288660"},{"1":"88","2":"11","3":"9","4":"rain","5":"0.8266753"},{"1":"88","2":"11","3":"9","4":"rainrh","5":"0.8238402"},{"1":"88","2":"12","3":"10","4":"rain","5":"0.8662371"},{"1":"88","2":"12","3":"10","4":"rainrh","5":"0.8586340"},{"1":"88","2":"12","3":"11","4":"rain","5":"0.8087629"},{"1":"88","2":"12","3":"11","4":"rainrh","5":"0.8615979"},{"1":"88","2":"12","3":"12","4":"rain","5":"0.7850515"},{"1":"88","2":"12","3":"12","4":"rainrh","5":"0.8615979"},{"1":"88","2":"12","3":"13","4":"rain","5":"0.7152062"},{"1":"88","2":"12","3":"13","4":"rainrh","5":"0.7635309"},{"1":"88","2":"12","3":"14","4":"rain","5":"0.6868557"},{"1":"88","2":"12","3":"14","4":"rainrh","5":"0.7345361"},{"1":"88","2":"12","3":"15","4":"rain","5":"0.6971649"},{"1":"88","2":"12","3":"15","4":"rainrh","5":"0.6971649"},{"1":"88","2":"12","3":"9","4":"rain","5":"0.8779639"},{"1":"88","2":"12","3":"9","4":"rainrh","5":"0.8720361"},{"1":"88","2":"13","3":"10","4":"rain","5":"0.8586340"},{"1":"88","2":"13","3":"10","4":"rainrh","5":"0.8445876"},{"1":"88","2":"13","3":"11","4":"rain","5":"0.8421392"},{"1":"88","2":"13","3":"11","4":"rainrh","5":"0.8788660"},{"1":"88","2":"13","3":"12","4":"rain","5":"0.8103093"},{"1":"88","2":"13","3":"12","4":"rainrh","5":"0.8840206"},{"1":"88","2":"13","3":"13","4":"rain","5":"0.7039948"},{"1":"88","2":"13","3":"13","4":"rainrh","5":"0.7494845"},{"1":"88","2":"13","3":"14","4":"rain","5":"0.6613402"},{"1":"88","2":"13","3":"14","4":"rainrh","5":"0.7109536"},{"1":"88","2":"13","3":"15","4":"rain","5":"0.6628866"},{"1":"88","2":"13","3":"15","4":"rainrh","5":"0.6613402"},{"1":"88","2":"13","3":"9","4":"rain","5":"0.8501289"},{"1":"88","2":"13","3":"9","4":"rainrh","5":"0.8414948"},{"1":"88","2":"7","3":"10","4":"rain","5":"0.7677835"},{"1":"88","2":"7","3":"10","4":"rainrh","5":"0.7545103"},{"1":"88","2":"7","3":"11","4":"rain","5":"0.6960052"},{"1":"88","2":"7","3":"11","4":"rainrh","5":"0.7559278"},{"1":"88","2":"7","3":"12","4":"rain","5":"0.6832474"},{"1":"88","2":"7","3":"12","4":"rainrh","5":"0.7695876"},{"1":"88","2":"7","3":"13","4":"rain","5":"0.6801546"},{"1":"88","2":"7","3":"13","4":"rainrh","5":"0.7663660"},{"1":"88","2":"7","3":"14","4":"rain","5":"0.6685567"},{"1":"88","2":"7","3":"14","4":"rainrh","5":"0.7438144"},{"1":"88","2":"7","3":"15","4":"rain","5":"0.6896907"},{"1":"88","2":"7","3":"15","4":"rainrh","5":"0.6804124"},{"1":"88","2":"7","3":"9","4":"rain","5":"0.7639175"},{"1":"88","2":"7","3":"9","4":"rainrh","5":"0.7472938"},{"1":"88","2":"8","3":"10","4":"rain","5":"0.7719072"},{"1":"88","2":"8","3":"10","4":"rainrh","5":"0.7597938"},{"1":"88","2":"8","3":"11","4":"rain","5":"0.7010309"},{"1":"88","2":"8","3":"11","4":"rainrh","5":"0.7627577"},{"1":"88","2":"8","3":"12","4":"rain","5":"0.6873711"},{"1":"88","2":"8","3":"12","4":"rainrh","5":"0.7764175"},{"1":"88","2":"8","3":"13","4":"rain","5":"0.6801546"},{"1":"88","2":"8","3":"13","4":"rainrh","5":"0.7360825"},{"1":"88","2":"8","3":"14","4":"rain","5":"0.6685567"},{"1":"88","2":"8","3":"14","4":"rainrh","5":"0.7128866"},{"1":"88","2":"8","3":"15","4":"rain","5":"0.6896907"},{"1":"88","2":"8","3":"15","4":"rainrh","5":"0.6804124"},{"1":"88","2":"8","3":"9","4":"rain","5":"0.7680412"},{"1":"88","2":"8","3":"9","4":"rainrh","5":"0.7525773"},{"1":"88","2":"9","3":"10","4":"rain","5":"0.7833763"},{"1":"88","2":"9","3":"10","4":"rainrh","5":"0.7664948"},{"1":"88","2":"9","3":"11","4":"rain","5":"0.7134021"},{"1":"88","2":"9","3":"11","4":"rainrh","5":"0.7722938"},{"1":"88","2":"9","3":"12","4":"rain","5":"0.6949742"},{"1":"88","2":"9","3":"12","4":"rainrh","5":"0.7844072"},{"1":"88","2":"9","3":"13","4":"rain","5":"0.6961340"},{"1":"88","2":"9","3":"13","4":"rainrh","5":"0.7497423"},{"1":"88","2":"9","3":"14","4":"rain","5":"0.6716495"},{"1":"88","2":"9","3":"14","4":"rainrh","5":"0.7202320"},{"1":"88","2":"9","3":"15","4":"rain","5":"0.6958763"},{"1":"88","2":"9","3":"15","4":"rainrh","5":"0.6907216"},{"1":"88","2":"9","3":"9","4":"rain","5":"0.7699742"},{"1":"88","2":"9","3":"9","4":"rainrh","5":"0.7657216"},{"1":"89","2":"10","3":"10","4":"rain","5":"0.7516753"},{"1":"89","2":"10","3":"10","4":"rainrh","5":"0.8112113"},{"1":"89","2":"10","3":"11","4":"rain","5":"0.7637887"},{"1":"89","2":"10","3":"11","4":"rainrh","5":"0.8197165"},{"1":"89","2":"10","3":"12","4":"rain","5":"0.7420103"},{"1":"89","2":"10","3":"12","4":"rainrh","5":"0.8207474"},{"1":"89","2":"10","3":"13","4":"rain","5":"0.7198454"},{"1":"89","2":"10","3":"13","4":"rainrh","5":"0.7725515"},{"1":"89","2":"10","3":"14","4":"rain","5":"0.7041237"},{"1":"89","2":"10","3":"14","4":"rainrh","5":"0.6938144"},{"1":"89","2":"10","3":"15","4":"rain","5":"0.7257732"},{"1":"89","2":"10","3":"15","4":"rainrh","5":"0.7154639"},{"1":"89","2":"10","3":"9","4":"rain","5":"0.8065722"},{"1":"89","2":"10","3":"9","4":"rainrh","5":"0.7936856"},{"1":"89","2":"11","3":"10","4":"rain","5":"0.7721649"},{"1":"89","2":"11","3":"10","4":"rainrh","5":"0.8318299"},{"1":"89","2":"11","3":"11","4":"rain","5":"0.7880155"},{"1":"89","2":"11","3":"11","4":"rainrh","5":"0.8382732"},{"1":"89","2":"11","3":"12","4":"rain","5":"0.7631443"},{"1":"89","2":"11","3":"12","4":"rainrh","5":"0.8382732"},{"1":"89","2":"11","3":"13","4":"rain","5":"0.7368557"},{"1":"89","2":"11","3":"13","4":"rainrh","5":"0.7865979"},{"1":"89","2":"11","3":"14","4":"rain","5":"0.7164948"},{"1":"89","2":"11","3":"14","4":"rainrh","5":"0.7041237"},{"1":"89","2":"11","3":"15","4":"rain","5":"0.7340206"},{"1":"89","2":"11","3":"15","4":"rainrh","5":"0.7257732"},{"1":"89","2":"11","3":"9","4":"rain","5":"0.8225515"},{"1":"89","2":"11","3":"9","4":"rainrh","5":"0.8197165"},{"1":"89","2":"12","3":"10","4":"rain","5":"0.7981959"},{"1":"89","2":"12","3":"10","4":"rainrh","5":"0.8492268"},{"1":"89","2":"12","3":"11","4":"rain","5":"0.8087629"},{"1":"89","2":"12","3":"11","4":"rainrh","5":"0.8610825"},{"1":"89","2":"12","3":"12","4":"rain","5":"0.7493557"},{"1":"89","2":"12","3":"12","4":"rainrh","5":"0.8256443"},{"1":"89","2":"12","3":"13","4":"rain","5":"0.7235825"},{"1":"89","2":"12","3":"13","4":"rainrh","5":"0.7677835"},{"1":"89","2":"12","3":"14","4":"rain","5":"0.6909794"},{"1":"89","2":"12","3":"14","4":"rainrh","5":"0.6858247"},{"1":"89","2":"12","3":"15","4":"rain","5":"0.7118557"},{"1":"89","2":"12","3":"15","4":"rainrh","5":"0.7118557"},{"1":"89","2":"12","3":"9","4":"rain","5":"0.8556701"},{"1":"89","2":"12","3":"9","4":"rainrh","5":"0.8492268"},{"1":"89","2":"13","3":"10","4":"rain","5":"0.7845361"},{"1":"89","2":"13","3":"10","4":"rainrh","5":"0.8331186"},{"1":"89","2":"13","3":"11","4":"rain","5":"0.7979381"},{"1":"89","2":"13","3":"11","4":"rainrh","5":"0.8395619"},{"1":"89","2":"13","3":"12","4":"rain","5":"0.7363402"},{"1":"89","2":"13","3":"12","4":"rainrh","5":"0.8097938"},{"1":"89","2":"13","3":"13","4":"rain","5":"0.7000000"},{"1":"89","2":"13","3":"13","4":"rainrh","5":"0.7403351"},{"1":"89","2":"13","3":"14","4":"rain","5":"0.6572165"},{"1":"89","2":"13","3":"14","4":"rainrh","5":"0.6489691"},{"1":"89","2":"13","3":"15","4":"rain","5":"0.6773196"},{"1":"89","2":"13","3":"15","4":"rainrh","5":"0.6690722"},{"1":"89","2":"13","3":"9","4":"rain","5":"0.8423969"},{"1":"89","2":"13","3":"9","4":"rainrh","5":"0.8305412"},{"1":"89","2":"7","3":"10","4":"rain","5":"0.6927835"},{"1":"89","2":"7","3":"10","4":"rainrh","5":"0.7552835"},{"1":"89","2":"7","3":"11","4":"rain","5":"0.7092784"},{"1":"89","2":"7","3":"11","4":"rainrh","5":"0.7682990"},{"1":"89","2":"7","3":"12","4":"rain","5":"0.6860825"},{"1":"89","2":"7","3":"12","4":"rainrh","5":"0.7710052"},{"1":"89","2":"7","3":"13","4":"rain","5":"0.6868557"},{"1":"89","2":"7","3":"13","4":"rainrh","5":"0.7755155"},{"1":"89","2":"7","3":"14","4":"rain","5":"0.6747423"},{"1":"89","2":"7","3":"14","4":"rainrh","5":"0.6932990"},{"1":"89","2":"7","3":"15","4":"rain","5":"0.6902062"},{"1":"89","2":"7","3":"15","4":"rainrh","5":"0.6798969"},{"1":"89","2":"7","3":"9","4":"rain","5":"0.7595361"},{"1":"89","2":"7","3":"9","4":"rainrh","5":"0.7552835"},{"1":"89","2":"8","3":"10","4":"rain","5":"0.7030928"},{"1":"89","2":"8","3":"10","4":"rainrh","5":"0.7594072"},{"1":"89","2":"8","3":"11","4":"rain","5":"0.7194588"},{"1":"89","2":"8","3":"11","4":"rainrh","5":"0.7725515"},{"1":"89","2":"8","3":"12","4":"rain","5":"0.6953608"},{"1":"89","2":"8","3":"12","4":"rainrh","5":"0.7752577"},{"1":"89","2":"8","3":"13","4":"rain","5":"0.6878866"},{"1":"89","2":"8","3":"13","4":"rainrh","5":"0.7398196"},{"1":"89","2":"8","3":"14","4":"rain","5":"0.6757732"},{"1":"89","2":"8","3":"14","4":"rainrh","5":"0.6597938"},{"1":"89","2":"8","3":"15","4":"rain","5":"0.6912371"},{"1":"89","2":"8","3":"15","4":"rainrh","5":"0.6809278"},{"1":"89","2":"8","3":"9","4":"rain","5":"0.7685567"},{"1":"89","2":"8","3":"9","4":"rainrh","5":"0.7591495"},{"1":"89","2":"9","3":"10","4":"rain","5":"0.7103093"},{"1":"89","2":"9","3":"10","4":"rainrh","5":"0.7677835"},{"1":"89","2":"9","3":"11","4":"rain","5":"0.7213918"},{"1":"89","2":"9","3":"11","4":"rainrh","5":"0.7757732"},{"1":"89","2":"9","3":"12","4":"rain","5":"0.6987113"},{"1":"89","2":"9","3":"12","4":"rainrh","5":"0.7784794"},{"1":"89","2":"9","3":"13","4":"rain","5":"0.6935567"},{"1":"89","2":"9","3":"13","4":"rainrh","5":"0.7457474"},{"1":"89","2":"9","3":"14","4":"rain","5":"0.6773196"},{"1":"89","2":"9","3":"14","4":"rainrh","5":"0.6649485"},{"1":"89","2":"9","3":"15","4":"rain","5":"0.6989691"},{"1":"89","2":"9","3":"15","4":"rainrh","5":"0.6886598"},{"1":"89","2":"9","3":"9","4":"rain","5":"0.7689433"},{"1":"89","2":"9","3":"9","4":"rainrh","5":"0.7608247"},{"1":"90","2":"10","3":"10","4":"rain","5":"0.7286082"},{"1":"90","2":"10","3":"10","4":"rainrh","5":"0.8237113"},{"1":"90","2":"10","3":"11","4":"rain","5":"0.7465206"},{"1":"90","2":"10","3":"11","4":"rainrh","5":"0.8297680"},{"1":"90","2":"10","3":"12","4":"rain","5":"0.7493557"},{"1":"90","2":"10","3":"12","4":"rainrh","5":"0.8067010"},{"1":"90","2":"10","3":"13","4":"rain","5":"0.7123711"},{"1":"90","2":"10","3":"13","4":"rainrh","5":"0.7652062"},{"1":"90","2":"10","3":"14","4":"rain","5":"0.7195876"},{"1":"90","2":"10","3":"14","4":"rainrh","5":"0.7164948"},{"1":"90","2":"10","3":"15","4":"rain","5":"0.7304124"},{"1":"90","2":"10","3":"15","4":"rainrh","5":"0.7257732"},{"1":"90","2":"10","3":"9","4":"rain","5":"0.8021907"},{"1":"90","2":"10","3":"9","4":"rainrh","5":"0.8032216"},{"1":"90","2":"11","3":"10","4":"rain","5":"0.7409794"},{"1":"90","2":"11","3":"10","4":"rainrh","5":"0.8332474"},{"1":"90","2":"11","3":"11","4":"rain","5":"0.7588918"},{"1":"90","2":"11","3":"11","4":"rainrh","5":"0.8382732"},{"1":"90","2":"11","3":"12","4":"rain","5":"0.7606959"},{"1":"90","2":"11","3":"12","4":"rainrh","5":"0.8085052"},{"1":"90","2":"11","3":"13","4":"rain","5":"0.7164948"},{"1":"90","2":"11","3":"13","4":"rainrh","5":"0.7641753"},{"1":"90","2":"11","3":"14","4":"rain","5":"0.7206186"},{"1":"90","2":"11","3":"14","4":"rainrh","5":"0.7154639"},{"1":"90","2":"11","3":"15","4":"rain","5":"0.7324742"},{"1":"90","2":"11","3":"15","4":"rainrh","5":"0.7247423"},{"1":"90","2":"11","3":"9","4":"rain","5":"0.8092784"},{"1":"90","2":"11","3":"9","4":"rainrh","5":"0.8161082"},{"1":"90","2":"12","3":"10","4":"rain","5":"0.7393041"},{"1":"90","2":"12","3":"10","4":"rainrh","5":"0.8222938"},{"1":"90","2":"12","3":"11","4":"rain","5":"0.7551546"},{"1":"90","2":"12","3":"11","4":"rainrh","5":"0.8411082"},{"1":"90","2":"12","3":"12","4":"rain","5":"0.7574742"},{"1":"90","2":"12","3":"12","4":"rainrh","5":"0.8074742"},{"1":"90","2":"12","3":"13","4":"rain","5":"0.7407216"},{"1":"90","2":"12","3":"13","4":"rainrh","5":"0.7878866"},{"1":"90","2":"12","3":"14","4":"rain","5":"0.7002577"},{"1":"90","2":"12","3":"14","4":"rainrh","5":"0.6961340"},{"1":"90","2":"12","3":"15","4":"rain","5":"0.7170103"},{"1":"90","2":"12","3":"15","4":"rainrh","5":"0.7128866"},{"1":"90","2":"12","3":"9","4":"rain","5":"0.8654639"},{"1":"90","2":"12","3":"9","4":"rainrh","5":"0.8447165"},{"1":"90","2":"13","3":"10","4":"rain","5":"0.7652062"},{"1":"90","2":"13","3":"10","4":"rainrh","5":"0.8537371"},{"1":"90","2":"13","3":"11","4":"rain","5":"0.7376289"},{"1":"90","2":"13","3":"11","4":"rainrh","5":"0.8248711"},{"1":"90","2":"13","3":"12","4":"rain","5":"0.7402062"},{"1":"90","2":"13","3":"12","4":"rainrh","5":"0.7875000"},{"1":"90","2":"13","3":"13","4":"rain","5":"0.7087629"},{"1":"90","2":"13","3":"13","4":"rainrh","5":"0.7551546"},{"1":"90","2":"13","3":"14","4":"rain","5":"0.6639175"},{"1":"90","2":"13","3":"14","4":"rainrh","5":"0.6613402"},{"1":"90","2":"13","3":"15","4":"rain","5":"0.6824742"},{"1":"90","2":"13","3":"15","4":"rainrh","5":"0.6752577"},{"1":"90","2":"13","3":"9","4":"rain","5":"0.8505155"},{"1":"90","2":"13","3":"9","4":"rainrh","5":"0.8496134"},{"1":"90","2":"7","3":"10","4":"rain","5":"0.6779639"},{"1":"90","2":"7","3":"10","4":"rainrh","5":"0.7734536"},{"1":"90","2":"7","3":"11","4":"rain","5":"0.6979381"},{"1":"90","2":"7","3":"11","4":"rainrh","5":"0.7844072"},{"1":"90","2":"7","3":"12","4":"rain","5":"0.7079897"},{"1":"90","2":"7","3":"12","4":"rainrh","5":"0.7695876"},{"1":"90","2":"7","3":"13","4":"rain","5":"0.6793814"},{"1":"90","2":"7","3":"13","4":"rainrh","5":"0.7733247"},{"1":"90","2":"7","3":"14","4":"rain","5":"0.6865979"},{"1":"90","2":"7","3":"14","4":"rainrh","5":"0.7201031"},{"1":"90","2":"7","3":"15","4":"rain","5":"0.7041237"},{"1":"90","2":"7","3":"15","4":"rainrh","5":"0.7005155"},{"1":"90","2":"7","3":"9","4":"rain","5":"0.7606959"},{"1":"90","2":"7","3":"9","4":"rainrh","5":"0.7631443"},{"1":"90","2":"8","3":"10","4":"rain","5":"0.6792526"},{"1":"90","2":"8","3":"10","4":"rainrh","5":"0.7713918"},{"1":"90","2":"8","3":"11","4":"rain","5":"0.6989691"},{"1":"90","2":"8","3":"11","4":"rainrh","5":"0.7824742"},{"1":"90","2":"8","3":"12","4":"rain","5":"0.7090206"},{"1":"90","2":"8","3":"12","4":"rainrh","5":"0.7671392"},{"1":"90","2":"8","3":"13","4":"rain","5":"0.6804124"},{"1":"90","2":"8","3":"13","4":"rainrh","5":"0.7355670"},{"1":"90","2":"8","3":"14","4":"rain","5":"0.6917526"},{"1":"90","2":"8","3":"14","4":"rainrh","5":"0.6886598"},{"1":"90","2":"8","3":"15","4":"rain","5":"0.7103093"},{"1":"90","2":"8","3":"15","4":"rainrh","5":"0.7067010"},{"1":"90","2":"8","3":"9","4":"rain","5":"0.7619845"},{"1":"90","2":"8","3":"9","4":"rainrh","5":"0.7610825"},{"1":"90","2":"9","3":"10","4":"rain","5":"0.6875000"},{"1":"90","2":"9","3":"10","4":"rainrh","5":"0.7818299"},{"1":"90","2":"9","3":"11","4":"rain","5":"0.7074742"},{"1":"90","2":"9","3":"11","4":"rainrh","5":"0.7929124"},{"1":"90","2":"9","3":"12","4":"rain","5":"0.7186856"},{"1":"90","2":"9","3":"12","4":"rainrh","5":"0.7769330"},{"1":"90","2":"9","3":"13","4":"rain","5":"0.6922680"},{"1":"90","2":"9","3":"13","4":"rainrh","5":"0.7478093"},{"1":"90","2":"9","3":"14","4":"rain","5":"0.6953608"},{"1":"90","2":"9","3":"14","4":"rainrh","5":"0.6922680"},{"1":"90","2":"9","3":"15","4":"rain","5":"0.7221649"},{"1":"90","2":"9","3":"15","4":"rainrh","5":"0.7175258"},{"1":"90","2":"9","3":"9","4":"rain","5":"0.7715206"},{"1":"90","2":"9","3":"9","4":"rainrh","5":"0.7715206"},{"1":"91","2":"10","3":"10","4":"rain","5":"0.7157216"},{"1":"91","2":"10","3":"10","4":"rainrh","5":"0.7966495"},{"1":"91","2":"10","3":"11","4":"rain","5":"0.6921392"},{"1":"91","2":"10","3":"11","4":"rainrh","5":"0.7417526"},{"1":"91","2":"10","3":"12","4":"rain","5":"0.6461340"},{"1":"91","2":"10","3":"12","4":"rainrh","5":"0.7041237"},{"1":"91","2":"10","3":"13","4":"rain","5":"0.6752577"},{"1":"91","2":"10","3":"13","4":"rainrh","5":"0.7154639"},{"1":"91","2":"10","3":"14","4":"rain","5":"0.6927835"},{"1":"91","2":"10","3":"14","4":"rainrh","5":"0.6917526"},{"1":"91","2":"10","3":"15","4":"rain","5":"0.6953608"},{"1":"91","2":"10","3":"15","4":"rainrh","5":"0.6886598"},{"1":"91","2":"10","3":"9","4":"rain","5":"0.7274485"},{"1":"91","2":"10","3":"9","4":"rainrh","5":"0.7863402"},{"1":"91","2":"11","3":"10","4":"rain","5":"0.7353093"},{"1":"91","2":"11","3":"10","4":"rainrh","5":"0.8255155"},{"1":"91","2":"11","3":"11","4":"rain","5":"0.7092784"},{"1":"91","2":"11","3":"11","4":"rainrh","5":"0.7621134"},{"1":"91","2":"11","3":"12","4":"rain","5":"0.6559278"},{"1":"91","2":"11","3":"12","4":"rainrh","5":"0.7139175"},{"1":"91","2":"11","3":"13","4":"rain","5":"0.6804124"},{"1":"91","2":"11","3":"13","4":"rainrh","5":"0.7226804"},{"1":"91","2":"11","3":"14","4":"rain","5":"0.7000000"},{"1":"91","2":"11","3":"14","4":"rainrh","5":"0.6989691"},{"1":"91","2":"11","3":"15","4":"rain","5":"0.6489691"},{"1":"91","2":"11","3":"15","4":"rainrh","5":"0.6438144"},{"1":"91","2":"11","3":"9","4":"rain","5":"0.7435567"},{"1":"91","2":"11","3":"9","4":"rainrh","5":"0.8121134"},{"1":"91","2":"12","3":"10","4":"rain","5":"0.6503866"},{"1":"91","2":"12","3":"10","4":"rainrh","5":"0.7373711"},{"1":"91","2":"12","3":"11","4":"rain","5":"0.6703608"},{"1":"91","2":"12","3":"11","4":"rainrh","5":"0.7247423"},{"1":"91","2":"12","3":"12","4":"rain","5":"0.6755155"},{"1":"91","2":"12","3":"12","4":"rainrh","5":"0.7324742"},{"1":"91","2":"12","3":"13","4":"rain","5":"0.6963918"},{"1":"91","2":"12","3":"13","4":"rainrh","5":"0.6953608"},{"1":"91","2":"12","3":"14","4":"rain","5":"0.7170103"},{"1":"91","2":"12","3":"14","4":"rainrh","5":"0.7159794"},{"1":"91","2":"12","3":"15","4":"rain","5":"0.6742268"},{"1":"91","2":"12","3":"15","4":"rainrh","5":"0.6711340"},{"1":"91","2":"12","3":"9","4":"rain","5":"0.6671392"},{"1":"91","2":"12","3":"9","4":"rainrh","5":"0.7505155"},{"1":"91","2":"13","3":"10","4":"rain","5":"0.6766753"},{"1":"91","2":"13","3":"10","4":"rainrh","5":"0.7680412"},{"1":"91","2":"13","3":"11","4":"rain","5":"0.6530928"},{"1":"91","2":"13","3":"11","4":"rainrh","5":"0.7052835"},{"1":"91","2":"13","3":"12","4":"rain","5":"0.6654639"},{"1":"91","2":"13","3":"12","4":"rainrh","5":"0.7136598"},{"1":"91","2":"13","3":"13","4":"rain","5":"0.6793814"},{"1":"91","2":"13","3":"13","4":"rainrh","5":"0.6711340"},{"1":"91","2":"13","3":"14","4":"rain","5":"0.6855670"},{"1":"91","2":"13","3":"14","4":"rainrh","5":"0.6773196"},{"1":"91","2":"13","3":"15","4":"rain","5":"0.6896907"},{"1":"91","2":"13","3":"15","4":"rainrh","5":"0.6814433"},{"1":"91","2":"13","3":"9","4":"rain","5":"0.6975515"},{"1":"91","2":"13","3":"9","4":"rainrh","5":"0.7918814"},{"1":"91","2":"7","3":"10","4":"rain","5":"0.6760309"},{"1":"91","2":"7","3":"10","4":"rainrh","5":"0.7752577"},{"1":"91","2":"7","3":"11","4":"rain","5":"0.6511598"},{"1":"91","2":"7","3":"11","4":"rainrh","5":"0.7246134"},{"1":"91","2":"7","3":"12","4":"rain","5":"0.6150773"},{"1":"91","2":"7","3":"12","4":"rainrh","5":"0.7203608"},{"1":"91","2":"7","3":"13","4":"rain","5":"0.6514175"},{"1":"91","2":"7","3":"13","4":"rainrh","5":"0.7296392"},{"1":"91","2":"7","3":"14","4":"rain","5":"0.6689433"},{"1":"91","2":"7","3":"14","4":"rainrh","5":"0.7076031"},{"1":"91","2":"7","3":"15","4":"rain","5":"0.6716495"},{"1":"91","2":"7","3":"15","4":"rainrh","5":"0.6654639"},{"1":"91","2":"7","3":"9","4":"rain","5":"0.6810567"},{"1":"91","2":"7","3":"9","4":"rainrh","5":"0.7667526"},{"1":"91","2":"8","3":"10","4":"rain","5":"0.6760309"},{"1":"91","2":"8","3":"10","4":"rainrh","5":"0.7667526"},{"1":"91","2":"8","3":"11","4":"rain","5":"0.6552835"},{"1":"91","2":"8","3":"11","4":"rainrh","5":"0.7206186"},{"1":"91","2":"8","3":"12","4":"rain","5":"0.6192010"},{"1":"91","2":"8","3":"12","4":"rainrh","5":"0.6809278"},{"1":"91","2":"8","3":"13","4":"rain","5":"0.6555412"},{"1":"91","2":"8","3":"13","4":"rainrh","5":"0.6930412"},{"1":"91","2":"8","3":"14","4":"rain","5":"0.6730670"},{"1":"91","2":"8","3":"14","4":"rainrh","5":"0.6720361"},{"1":"91","2":"8","3":"15","4":"rain","5":"0.6747423"},{"1":"91","2":"8","3":"15","4":"rainrh","5":"0.6685567"},{"1":"91","2":"8","3":"9","4":"rain","5":"0.6813144"},{"1":"91","2":"8","3":"9","4":"rainrh","5":"0.7581186"},{"1":"91","2":"9","3":"10","4":"rain","5":"0.6871134"},{"1":"91","2":"9","3":"10","4":"rainrh","5":"0.7658505"},{"1":"91","2":"9","3":"11","4":"rain","5":"0.6645619"},{"1":"91","2":"9","3":"11","4":"rainrh","5":"0.7157216"},{"1":"91","2":"9","3":"12","4":"rain","5":"0.6284794"},{"1":"91","2":"9","3":"12","4":"rainrh","5":"0.6891753"},{"1":"91","2":"9","3":"13","4":"rain","5":"0.6648196"},{"1":"91","2":"9","3":"13","4":"rainrh","5":"0.7023196"},{"1":"91","2":"9","3":"14","4":"rain","5":"0.6771907"},{"1":"91","2":"9","3":"14","4":"rainrh","5":"0.6761598"},{"1":"91","2":"9","3":"15","4":"rain","5":"0.6860825"},{"1":"91","2":"9","3":"15","4":"rainrh","5":"0.6793814"},{"1":"91","2":"9","3":"9","4":"rain","5":"0.6961340"},{"1":"91","2":"9","3":"9","4":"rainrh","5":"0.7613402"},{"1":"92","2":"10","3":"10","4":"rain","5":"0.7130155"},{"1":"92","2":"10","3":"10","4":"rainrh","5":"0.7533505"},{"1":"92","2":"10","3":"11","4":"rain","5":"0.7309278"},{"1":"92","2":"10","3":"11","4":"rainrh","5":"0.7144330"},{"1":"92","2":"10","3":"12","4":"rain","5":"0.6706186"},{"1":"92","2":"10","3":"12","4":"rainrh","5":"0.6646907"},{"1":"92","2":"10","3":"13","4":"rain","5":"0.6957474"},{"1":"92","2":"10","3":"13","4":"rainrh","5":"0.6859536"},{"1":"92","2":"10","3":"14","4":"rain","5":"0.7015464"},{"1":"92","2":"10","3":"14","4":"rainrh","5":"0.6907216"},{"1":"92","2":"10","3":"15","4":"rain","5":"0.7046392"},{"1":"92","2":"10","3":"15","4":"rainrh","5":"0.6953608"},{"1":"92","2":"10","3":"9","4":"rain","5":"0.6993557"},{"1":"92","2":"10","3":"9","4":"rainrh","5":"0.7472938"},{"1":"92","2":"11","3":"10","4":"rain","5":"0.7363402"},{"1":"92","2":"11","3":"10","4":"rainrh","5":"0.7880155"},{"1":"92","2":"11","3":"11","4":"rain","5":"0.7563144"},{"1":"92","2":"11","3":"11","4":"rainrh","5":"0.7391753"},{"1":"92","2":"11","3":"12","4":"rain","5":"0.6819588"},{"1":"92","2":"11","3":"12","4":"rainrh","5":"0.6775773"},{"1":"92","2":"11","3":"13","4":"rain","5":"0.6974227"},{"1":"92","2":"11","3":"13","4":"rainrh","5":"0.6891753"},{"1":"92","2":"11","3":"14","4":"rain","5":"0.6587629"},{"1":"92","2":"11","3":"14","4":"rainrh","5":"0.6515464"},{"1":"92","2":"11","3":"15","4":"rain","5":"0.6618557"},{"1":"92","2":"11","3":"15","4":"rainrh","5":"0.6515464"},{"1":"92","2":"11","3":"9","4":"rain","5":"0.7228093"},{"1":"92","2":"11","3":"9","4":"rainrh","5":"0.7811856"},{"1":"92","2":"12","3":"10","4":"rain","5":"0.6887887"},{"1":"92","2":"12","3":"10","4":"rainrh","5":"0.7539948"},{"1":"92","2":"12","3":"11","4":"rain","5":"0.6971649"},{"1":"92","2":"12","3":"11","4":"rainrh","5":"0.6908505"},{"1":"92","2":"12","3":"12","4":"rain","5":"0.6984536"},{"1":"92","2":"12","3":"12","4":"rainrh","5":"0.6940722"},{"1":"92","2":"12","3":"13","4":"rain","5":"0.7139175"},{"1":"92","2":"12","3":"13","4":"rainrh","5":"0.7056701"},{"1":"92","2":"12","3":"14","4":"rain","5":"0.6804124"},{"1":"92","2":"12","3":"14","4":"rainrh","5":"0.6731959"},{"1":"92","2":"12","3":"15","4":"rain","5":"0.6804124"},{"1":"92","2":"12","3":"15","4":"rainrh","5":"0.6731959"},{"1":"92","2":"12","3":"9","4":"rain","5":"0.6722938"},{"1":"92","2":"12","3":"9","4":"rainrh","5":"0.7394330"},{"1":"92","2":"13","3":"10","4":"rain","5":"0.7032216"},{"1":"92","2":"13","3":"10","4":"rainrh","5":"0.7815722"},{"1":"92","2":"13","3":"11","4":"rain","5":"0.6659794"},{"1":"92","2":"13","3":"11","4":"rainrh","5":"0.6613402"},{"1":"92","2":"13","3":"12","4":"rain","5":"0.6721649"},{"1":"92","2":"13","3":"12","4":"rainrh","5":"0.6706186"},{"1":"92","2":"13","3":"13","4":"rain","5":"0.6907216"},{"1":"92","2":"13","3":"13","4":"rainrh","5":"0.6907216"},{"1":"92","2":"13","3":"14","4":"rain","5":"0.6896907"},{"1":"92","2":"13","3":"14","4":"rainrh","5":"0.6896907"},{"1":"92","2":"13","3":"15","4":"rain","5":"0.6896907"},{"1":"92","2":"13","3":"15","4":"rainrh","5":"0.6896907"},{"1":"92","2":"13","3":"9","4":"rain","5":"0.6850515"},{"1":"92","2":"13","3":"9","4":"rainrh","5":"0.7692010"},{"1":"92","2":"7","3":"10","4":"rain","5":"0.6853093"},{"1":"92","2":"7","3":"10","4":"rainrh","5":"0.7194588"},{"1":"92","2":"7","3":"11","4":"rain","5":"0.6983247"},{"1":"92","2":"7","3":"11","4":"rainrh","5":"0.6796392"},{"1":"92","2":"7","3":"12","4":"rain","5":"0.6465206"},{"1":"92","2":"7","3":"12","4":"rainrh","5":"0.6413660"},{"1":"92","2":"7","3":"13","4":"rain","5":"0.6664948"},{"1":"92","2":"7","3":"13","4":"rainrh","5":"0.6574742"},{"1":"92","2":"7","3":"14","4":"rain","5":"0.6801546"},{"1":"92","2":"7","3":"14","4":"rainrh","5":"0.6701031"},{"1":"92","2":"7","3":"15","4":"rain","5":"0.6832474"},{"1":"92","2":"7","3":"15","4":"rainrh","5":"0.6739691"},{"1":"92","2":"7","3":"9","4":"rain","5":"0.6692010"},{"1":"92","2":"7","3":"9","4":"rainrh","5":"0.7141753"},{"1":"92","2":"8","3":"10","4":"rain","5":"0.6914948"},{"1":"92","2":"8","3":"10","4":"rainrh","5":"0.7256443"},{"1":"92","2":"8","3":"11","4":"rain","5":"0.7045103"},{"1":"92","2":"8","3":"11","4":"rainrh","5":"0.6858247"},{"1":"92","2":"8","3":"12","4":"rain","5":"0.6527062"},{"1":"92","2":"8","3":"12","4":"rainrh","5":"0.6475515"},{"1":"92","2":"8","3":"13","4":"rain","5":"0.6726804"},{"1":"92","2":"8","3":"13","4":"rainrh","5":"0.6636598"},{"1":"92","2":"8","3":"14","4":"rain","5":"0.6822165"},{"1":"92","2":"8","3":"14","4":"rainrh","5":"0.6721649"},{"1":"92","2":"8","3":"15","4":"rain","5":"0.6853093"},{"1":"92","2":"8","3":"15","4":"rainrh","5":"0.6760309"},{"1":"92","2":"8","3":"9","4":"rain","5":"0.6747423"},{"1":"92","2":"8","3":"9","4":"rainrh","5":"0.7199742"},{"1":"92","2":"9","3":"10","4":"rain","5":"0.6976804"},{"1":"92","2":"9","3":"10","4":"rainrh","5":"0.7318299"},{"1":"92","2":"9","3":"11","4":"rain","5":"0.7171392"},{"1":"92","2":"9","3":"11","4":"rainrh","5":"0.6913660"},{"1":"92","2":"9","3":"12","4":"rain","5":"0.6594072"},{"1":"92","2":"9","3":"12","4":"rainrh","5":"0.6542526"},{"1":"92","2":"9","3":"13","4":"rain","5":"0.6793814"},{"1":"92","2":"9","3":"13","4":"rainrh","5":"0.6703608"},{"1":"92","2":"9","3":"14","4":"rain","5":"0.6914948"},{"1":"92","2":"9","3":"14","4":"rainrh","5":"0.6814433"},{"1":"92","2":"9","3":"15","4":"rain","5":"0.6945876"},{"1":"92","2":"9","3":"15","4":"rainrh","5":"0.6853093"},{"1":"92","2":"9","3":"9","4":"rain","5":"0.6805412"},{"1":"92","2":"9","3":"9","4":"rainrh","5":"0.7253866"},{"1":"93","2":"10","3":"10","4":"rain","5":"0.6434278"},{"1":"93","2":"10","3":"10","4":"rainrh","5":"0.6953608"},{"1":"93","2":"10","3":"11","4":"rain","5":"0.6666237"},{"1":"93","2":"10","3":"11","4":"rainrh","5":"0.6543814"},{"1":"93","2":"10","3":"12","4":"rain","5":"0.6863402"},{"1":"93","2":"10","3":"12","4":"rainrh","5":"0.6823454"},{"1":"93","2":"10","3":"13","4":"rain","5":"0.6597938"},{"1":"93","2":"10","3":"13","4":"rainrh","5":"0.7046392"},{"1":"93","2":"10","3":"14","4":"rain","5":"0.6659794"},{"1":"93","2":"10","3":"14","4":"rainrh","5":"0.6597938"},{"1":"93","2":"10","3":"15","4":"rain","5":"0.6752577"},{"1":"93","2":"10","3":"15","4":"rainrh","5":"0.6721649"},{"1":"93","2":"10","3":"9","4":"rain","5":"0.6168814"},{"1":"93","2":"10","3":"9","4":"rainrh","5":"0.6752577"},{"1":"93","2":"11","3":"10","4":"rain","5":"0.6639175"},{"1":"93","2":"11","3":"10","4":"rainrh","5":"0.7239691"},{"1":"93","2":"11","3":"11","4":"rain","5":"0.6432990"},{"1":"93","2":"11","3":"11","4":"rainrh","5":"0.6332474"},{"1":"93","2":"11","3":"12","4":"rain","5":"0.6494845"},{"1":"93","2":"11","3":"12","4":"rainrh","5":"0.6432990"},{"1":"93","2":"11","3":"13","4":"rain","5":"0.6659794"},{"1":"93","2":"11","3":"13","4":"rainrh","5":"0.6659794"},{"1":"93","2":"11","3":"14","4":"rain","5":"0.6659794"},{"1":"93","2":"11","3":"14","4":"rainrh","5":"0.6659794"},{"1":"93","2":"11","3":"15","4":"rain","5":"0.6752577"},{"1":"93","2":"11","3":"15","4":"rainrh","5":"0.6721649"},{"1":"93","2":"11","3":"9","4":"rain","5":"0.6505155"},{"1":"93","2":"11","3":"9","4":"rainrh","5":"0.7115979"},{"1":"93","2":"12","3":"10","4":"rain","5":"0.6925258"},{"1":"93","2":"12","3":"10","4":"rainrh","5":"0.7664948"},{"1":"93","2":"12","3":"11","4":"rain","5":"0.6608247"},{"1":"93","2":"12","3":"11","4":"rainrh","5":"0.6507732"},{"1":"93","2":"12","3":"12","4":"rain","5":"0.6670103"},{"1":"93","2":"12","3":"12","4":"rainrh","5":"0.6608247"},{"1":"93","2":"12","3":"13","4":"rain","5":"0.6835052"},{"1":"93","2":"12","3":"13","4":"rainrh","5":"0.6835052"},{"1":"93","2":"12","3":"14","4":"rain","5":"0.6835052"},{"1":"93","2":"12","3":"14","4":"rainrh","5":"0.6835052"},{"1":"93","2":"12","3":"15","4":"rain","5":"0.6896907"},{"1":"93","2":"12","3":"15","4":"rainrh","5":"0.6896907"},{"1":"93","2":"12","3":"9","4":"rain","5":"0.6784794"},{"1":"93","2":"12","3":"9","4":"rainrh","5":"0.7521907"},{"1":"93","2":"13","3":"10","4":"rain","5":"0.6631443"},{"1":"93","2":"13","3":"10","4":"rainrh","5":"0.7556701"},{"1":"93","2":"13","3":"11","4":"rain","5":"0.6835052"},{"1":"93","2":"13","3":"11","4":"rainrh","5":"0.6773196"},{"1":"93","2":"13","3":"12","4":"rain","5":"0.6835052"},{"1":"93","2":"13","3":"12","4":"rainrh","5":"0.6835052"},{"1":"93","2":"13","3":"13","4":"rain","5":"0.6896907"},{"1":"93","2":"13","3":"13","4":"rainrh","5":"0.6896907"},{"1":"93","2":"13","3":"14","4":"rain","5":"0.6896907"},{"1":"93","2":"13","3":"14","4":"rainrh","5":"0.6896907"},{"1":"93","2":"13","3":"15","4":"rain","5":"0.6896907"},{"1":"93","2":"13","3":"15","4":"rainrh","5":"0.6896907"},{"1":"93","2":"13","3":"9","4":"rain","5":"0.6898196"},{"1":"93","2":"13","3":"9","4":"rainrh","5":"0.7815722"},{"1":"93","2":"7","3":"10","4":"rain","5":"0.6478093"},{"1":"93","2":"7","3":"10","4":"rainrh","5":"0.6819588"},{"1":"93","2":"7","3":"11","4":"rain","5":"0.6631443"},{"1":"93","2":"7","3":"11","4":"rainrh","5":"0.6458763"},{"1":"93","2":"7","3":"12","4":"rain","5":"0.6779639"},{"1":"93","2":"7","3":"12","4":"rainrh","5":"0.6728093"},{"1":"93","2":"7","3":"13","4":"rain","5":"0.6957474"},{"1":"93","2":"7","3":"13","4":"rainrh","5":"0.6957474"},{"1":"93","2":"7","3":"14","4":"rain","5":"0.6440722"},{"1":"93","2":"7","3":"14","4":"rainrh","5":"0.6378866"},{"1":"93","2":"7","3":"15","4":"rain","5":"0.6541237"},{"1":"93","2":"7","3":"15","4":"rainrh","5":"0.6510309"},{"1":"93","2":"7","3":"9","4":"rain","5":"0.6195876"},{"1":"93","2":"7","3":"9","4":"rainrh","5":"0.6634021"},{"1":"93","2":"8","3":"10","4":"rain","5":"0.6488402"},{"1":"93","2":"8","3":"10","4":"rainrh","5":"0.6829897"},{"1":"93","2":"8","3":"11","4":"rain","5":"0.6641753"},{"1":"93","2":"8","3":"11","4":"rainrh","5":"0.6469072"},{"1":"93","2":"8","3":"12","4":"rain","5":"0.6789948"},{"1":"93","2":"8","3":"12","4":"rainrh","5":"0.6738402"},{"1":"93","2":"8","3":"13","4":"rain","5":"0.6967784"},{"1":"93","2":"8","3":"13","4":"rainrh","5":"0.6967784"},{"1":"93","2":"8","3":"14","4":"rain","5":"0.6451031"},{"1":"93","2":"8","3":"14","4":"rainrh","5":"0.6389175"},{"1":"93","2":"8","3":"15","4":"rain","5":"0.6613402"},{"1":"93","2":"8","3":"15","4":"rainrh","5":"0.6582474"},{"1":"93","2":"8","3":"9","4":"rain","5":"0.6206186"},{"1":"93","2":"8","3":"9","4":"rainrh","5":"0.6655928"},{"1":"93","2":"9","3":"10","4":"rain","5":"0.6447165"},{"1":"93","2":"9","3":"10","4":"rainrh","5":"0.6869845"},{"1":"93","2":"9","3":"11","4":"rain","5":"0.6698454"},{"1":"93","2":"9","3":"11","4":"rainrh","5":"0.6532216"},{"1":"93","2":"9","3":"12","4":"rain","5":"0.6795103"},{"1":"93","2":"9","3":"12","4":"rainrh","5":"0.6743557"},{"1":"93","2":"9","3":"13","4":"rain","5":"0.7024485"},{"1":"93","2":"9","3":"13","4":"rainrh","5":"0.7024485"},{"1":"93","2":"9","3":"14","4":"rain","5":"0.6548969"},{"1":"93","2":"9","3":"14","4":"rainrh","5":"0.6487113"},{"1":"93","2":"9","3":"15","4":"rain","5":"0.6649485"},{"1":"93","2":"9","3":"15","4":"rainrh","5":"0.6618557"},{"1":"93","2":"9","3":"9","4":"rain","5":"0.6164948"},{"1":"93","2":"9","3":"9","4":"rainrh","5":"0.6668814"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>save(auc_data, file = here::here(&quot;data&quot;, &quot;op_2007_16&quot;,  &quot;auc_data.RData&quot;))</code></pre>
+<p>Packages used.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.6.0 (2019-04-26)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 17134)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] tools     parallel  stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] gt_0.1.0          kableExtra_1.1.0  pander_0.6.3     
+##  [4] here_0.1          mgsub_1.7.1       rcompanion_2.2.1 
+##  [7] R.utils_2.9.0     R.oo_1.22.0       R.methodsS3_1.7.1
+## [10] pbapply_1.4-0     remotes_2.0.4     pracma_2.2.5     
+## [13] ggrepel_0.8.1     readxl_1.3.1      forcats_0.4.0    
+## [16] stringr_1.4.0     dplyr_0.8.1       purrr_0.3.2      
+## [19] readr_1.3.1       tidyr_0.8.3       tibble_2.1.3     
+## [22] ggplot2_3.2.0     tidyverse_1.2.1  
+## 
+## loaded via a namespace (and not attached):
+##  [1] nlme_3.1-140       matrixStats_0.54.0 lubridate_1.7.4   
+##  [4] webshot_0.5.1      httr_1.4.0         rprojroot_1.3-2   
+##  [7] backports_1.1.4    R6_2.4.0           nortest_1.0-4     
+## [10] lazyeval_0.2.2     colorspace_1.4-1   withr_2.1.2       
+## [13] tidyselect_0.2.5   compiler_3.6.0     cli_1.1.0         
+## [16] rvest_0.3.4        expm_0.999-4       xml2_1.2.0        
+## [19] sandwich_2.5-1     sass_0.1.1         checkmate_1.9.3   
+## [22] scales_1.0.0       lmtest_0.9-37      mvtnorm_1.0-11    
+## [25] multcompView_0.1-7 commonmark_1.7     digest_0.6.19     
+## [28] foreign_0.8-71     rmarkdown_1.13     pkgconfig_2.0.2   
+## [31] htmltools_0.3.6    manipulate_1.0.1   highr_0.8         
+## [34] rlang_0.4.0        rstudioapi_0.10    generics_0.0.2    
+## [37] zoo_1.8-6          jsonlite_1.6       magrittr_1.5      
+## [40] modeltools_0.2-22  Matrix_1.2-17      Rcpp_1.0.1        
+## [43] DescTools_0.99.28  munsell_0.5.0      stringi_1.4.3     
+## [46] multcomp_1.4-10    yaml_2.2.0         MASS_7.3-51.4     
+## [49] plyr_1.8.4         grid_3.6.0         crayon_1.3.4      
+## [52] lattice_0.20-38    haven_2.1.0        splines_3.6.0     
+## [55] hms_0.4.2          knitr_1.23         pillar_1.4.1      
+## [58] EMT_1.1            boot_1.3-22        codetools_0.2-16  
+## [61] stats4_3.6.0       glue_1.3.1         evaluate_0.14     
+## [64] data.table_1.12.2  modelr_0.1.4       cellranger_1.1.0  
+## [67] gtable_0.3.0       assertthat_0.2.1   xfun_0.7          
+## [70] coin_1.3-0         libcoin_1.0-4      broom_0.5.2       
+## [73] survival_2.44-1.1  viridisLite_0.3.0  TH.data_1.0-10</code></pre>
+</div>
+</div>
+
+
+
+Copyright 2018 Mladen Čučak
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
