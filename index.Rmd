@@ -4,7 +4,7 @@ This repository is part of results of my PhD project. Here I present the evaluat
   
   The open-access publication of the manuscript can be found [here](https://www.mdpi.com/2073-4395/9/9/515).
   
-  The repository is buit on the example research compedium provided by Emerson Del Ponte [here](https://github.com/emdelponte/research-compendium-website).
+  The repository is built on the example research compendium provided by Emerson Del Ponte [here](https://github.com/emdelponte/research-compendium-website).
 
 The funding for this project comes from [DAFM (Department of Agriculture, Food and Marine)](https://www.agriculture.gov.ie). 
 
