@@ -2,7 +2,7 @@
 
 This repository is part of results of my PhD project. Here I present the evaluation of the potato late blight forecasting model used in Republic of Ireland, called Irish Rules.  
   
-  The open-access publication of the manuscript can be found [here](https://www.mdpi.com/2073-4395/9/9/515).
+**The open-access publication of the manuscript can be found** [here](https://www.mdpi.com/2073-4395/9/9/515).
   
   The repository is built on the example research compendium provided by Emerson Del Ponte [here](https://github.com/emdelponte/research-compendium-website).
 
