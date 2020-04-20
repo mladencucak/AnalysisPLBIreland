@@ -70,9 +70,9 @@ function(data, param = NULL){
                 (sum(rain[(idx[j]-wet_before):(idx[j]+wet_after)])>= 0.1))   
           }) # outputs true or false
           {         
-            n <- idx[j]        #start accumulation from 12th hour
+            n <- idx[j]        #start accumulation from `hours` hour
           } else {         
-            n <- idx[j]+4      #start accumulation from 16th hour
+            n <- idx[j]+4      #start accumulation from `hours` hour
           }    
           s <- criteria_met12[n]
           # if a break of less than or equal to 5 hours  
