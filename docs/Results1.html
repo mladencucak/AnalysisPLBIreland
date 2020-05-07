@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
 
-<title>Results1.utf8.md</title>
+<title>Results1.utf8</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -93,7 +92,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -242,6 +240,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -270,6 +269,12 @@ $(document).ready(function () {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -578,7 +583,7 @@ w.test</code></pre>
   scale_fill_brewer(
     palette = &quot;Dark2&quot;,
     name = &quot;Leaf Wetness&quot;,
-    labels = c(&quot;\nRain&gt;0.01\n&quot;, &quot;\nRain&gt;0.01 &amp;\n RH&gt;=90%\n&quot;)
+    labels = c(paste0(&quot;\nRain &quot;,&quot;\u2265&quot;,&quot; 0.1\n&quot;), paste0(&quot;\nRain &quot;,&quot;\u2265&quot;,&quot; 0.1 &amp;\n RH &quot;,&quot;\u2265&quot;,&quot; 90%\n&quot;))
   ) +
   scale_x_discrete(breaks = c(0, 90),
                    labels = c(&quot;rain&quot;, &quot;rh and rain&quot;)) +
@@ -666,8 +671,8 @@ grDevices::png(filename = here::here(&quot;images&quot;, &quot;init_vis.png&quot
     width = 400, height = 800,bg = &quot;white&quot;, res = NA)
 egg::ggarrange(p1,p2,p3, ncol = 1)
 dev.off()</code></pre>
-<pre><code>## quartz_off_screen 
-##                 2</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 <pre class="r"><code>p1;p2;p3</code></pre>
 <p><img src="images/desc_stat-1.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-2.png" width="576" style="display: block; margin: auto;" /><img src="images/desc_stat-3.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
